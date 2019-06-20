@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="product" />
+<meta name="pageid" content="$!product.id" />
+<!-- <title>$!esc.html($websiteTool.getWebsite().getName()) </title> -->
+<title></title>
+
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/script/cloud-zoom/cloud-zoom.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css"/>
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+<script type="text/javascript" src="/jdvop/script/common.js"></script>
+<script type='text/javascript' src='/jdvop/script/cloud-zoom/cloud-zoom.1.0.3.min.js'></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+</head>
+<body>
+ #parse('header.vsl')      
+<div class="w1200 clearfix">
+<!--内容框 str -->
+    <div class="crumbs"><a href="/jdvop/index.php">首页</a><a href="/jdvop/products.php" title="">商品列表</a>详情</div>
+    <div class="product-details">
+        <div class="tb-gallery">
+            <div class="jqzoom" id="spec-n1">
+                #if($product.ownerType == "system" || $product.ownerType == "jingdong")
+                    <a href="$!product.thumbnailImage" class="cloud-zoom" id="zoom1" rel="adjustX:5, adjustY:-1, zoomWidth:360, zoomHeight:360">
+                        <img src="$!product.thumbnailImage" width="360" height="360" alt="$!product.name"/>
+                    </a>
+                #else
+                    <a href="$configTool.getImageHost()$!product.thumbnailImage" class="cloud-zoom" id="zoom1" rel="adjustX:5, adjustY:-1, zoomWidth:360, zoomHeight:360">
+                        <img src="$configTool.getImageHost()$!product.thumbnailImage" width="360" height="360" alt="$!product.name"/>
+                    </a>
+                #end
+            </div>
+            <div class="tb-thumb">
+                <span class="prev control" id="spec-left">上一个</span>
+                <div class="tb-pic" id="spec-list">
+                    <ul>
+                        #foreach($!img in $!productImageList)
+                        <li class=" #if($velocityCount == 1) curr #end js-silderImage" >
+                            #if($product.ownerType == "system")
+                                <img src="$configTool.getImageHost()$!img.imageUrl" width="58" height="58" href="$!img.imageUrl" class="cloud-zoom-gallery" rel="useZoom:'zoom1', smallImage:'$!img.imageUrl'" />
+                            #else
+                                <img src="$configTool.getImageHost()/thumbnail$!img.imageUrl" width="58" height="58" href="$configTool.getImageHost()$!img.imageUrl" class="cloud-zoom-gallery" rel="useZoom:'zoom1', smallImage:'$configTool.getImageHost()$!img.imageUrl'" />
+                            #end
+                        </li>
+                        #end
+                    </ul>
+                </div>
+                <span class="next control" id="spec-right">下一个</span>
+            </div>
+        </div>
+        <form id="buy_form" action="/jdvop/shoppingCart/chooseEntry.php" method="get">
+            <input type="hidden" name="isSelected[]"  value="true"/>
+            <input type="hidden" name="entry[]"  value="$productTool.getStorageUnits($product.id).get(0).id"/>
+            <input type="hidden" name="type[]"  value="sku"/>
+            <input type="hidden" name="sentry[]"  value="$product.id"/>
+            <input type="hidden" name="stype[]"  value="product"/>
+            <input type="hidden" name="productOwnerType[]"  value="$!product.ownerType"/>
+            
+            <input type="hidden" name="isRobOver"  value="$!fp.isRobOver"/>
+            <input type="hidden" name="endTime" value="$!dateTool.format('yyyy-MM-dd HH:mm',$!fp.endTime)"/>
+            <input type="hidden" name="uid"  value="$!currentUser.userId"/>
+            <input type="hidden" name="fpid"  value="$!fp.id"/>
+            <div class="item-info">
+                <ul>
+                    <li class="name overflow-h">$!product.name</li>
+                    #set($discountPrice = $productTool.getProductSoldPrice($!product))
+                    #if($fp)
+                        #set($discountPrice = $fp.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                        #set($originalPrice = $fp.displayOriginalPrice*$websiteTool.getWebsite().getRatio())
+                    #end
+                    #if($isSelling)
+                        #if($fp)
+                            <li class="summary-price clearfix">
+                                <p class="fl"><i>单 价：</i>$!numberTool.format("#0", $discountPrice)</p>
+                                <p class="zekou fl">
+                                    <span class="txt">$!numberTool.format('#0.0',$fp.discountRate)折</span>
+                                    <i class="yuanjia">单价：$!numberTool.format("#0", $originalPrice)</i>
+                                </p>
+                                <p class="time qianggou">
+                                    #if($fp.isRobOver)
+                                        <em></em>
+                                    #else
+                                        <em></em>
+                                    #end
+                                </p>
+                            </li>
+                        #else
+                            <li class="summary-price"><i>单 价：</i>$!numberTool.format("#0", $discountPrice)</li>
+                        #end
+                    #else
+                        <li class="summary-price">商品已下架</li>
+                    #end
+                    <li><i>品 牌：</i>$!product.brand.name &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;<i>型 号：</i>$!product.productCode</li>
+                    <li class="clearfix">
+                        <i class="fl">概 述：</i> 
+                        <p style="float: left; width: 490px; height:35px; overflow: hidden;">$!product.features</p>
+                    </li>
+                    #if($isSelling)
+                        <li>
+                            <i>库 存：</i> 
+                            #if($isStock)
+                                有货，下单立即发货。
+                            #else
+                                <i class="red">
+                                无货，不可下单
+                                </i>
+                            #end
+                        </li>
+                        #if($isStock)
+                        <li class="clearfix">
+                            <i class="fl" style="line-height: 37px;">数 量：</i> 
+                            <div class="choose-amount">
+                                <span class="but-add sub_amount">-</span>
+                                <input type="text" readonly="true" value="1" name="amount[]" class="text"/>
+                                <span class="add_amount">+</span>
+                            </div>
+                                #if($fp && $!fp.buyNumPerPerson > 0)<i class="pl20p lh40p">每人限购$!fp.buyNumPerPerson件 </i>#end
+                        </li>
+                        <li>
+                            #if($currentUser)
+                                #if($!currentUser.integral < $discountPrice)
+                                    <i class="but_clearing_grey"></i>
+                                    <i class="red">积分不足，请继续努力哦！</i>
+                                #else
+                                    #if($fp)
+                                        #if($fp.isRobOver)
+                                            <input type="button" value="抢光了" class="btn-nowbuy disabled"/>
+                                        #else
+                                            <i class="but_now" id="buy_now"></i>
+                                        #end
+                                    #else
+                                        <i class="but_now" id="buy_now"></i>
+                                        <i class="but_add_cart"  id="add_cart"></i> 
+                                    #end
+                                #end
+                            #else
+                                #if($fp)
+                                    #if($fp.isRobOver)
+                                        <input type="button" value="抢光了" class="btn-nowbuy disabled"/>
+                                    #else
+                                        <i class="but_now" id="buy_now"></i>
+                                    #end
+                                #else
+                                    <i class="but_now" id="buy_now"></i>
+                                    <i class="but_add_cart"  id="add_cart"></i> 
+                                #end
+                            #end    
+                        </li>
+                        #end
+                    #else 
+                        <li>
+                            <i class="but_clearing_grey"></i>
+                        </li>
+                    #end
+                </ul>
+            </div>
+        </form>
+        <div class="layout-right-por">
+            <p class="title">- - - - - <i>看看其他</i> - - - - -</p>
+            <ul class="clearfix">
+                #set($sameProducts = $productTool.getTwoProducts($discountPrice, $!product))
+                #if($sameProducts && !$sameProducts.isEmpty())
+                    #foreach($sameProduct in $sameProducts)
+                        #set($soldPrice = $!productTool.getProductSoldPrice($sameProduct))
+                        ##如果是限时兑换产品  价格 -- begin
+                        #if($fps)
+                            #foreach($fp in $fps)
+                                #if($fp.productId == $sameProduct.id)
+                                    #set($soldPrice = $fp.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                                    #break
+                                #end
+                            #end
+                        #end
+                        ##如果是限时兑换产品  价格 -- end
+                        <li>
+                            <a href="/jdvop/product/${sameProduct.id}.php" target="_blank">
+                                <p class="img">
+                                    #if($sameProduct.ownerType == "system" || $sameProduct.ownerType == "jingdong")
+                                        <img src="$!sameProduct.thumbnailImage" width="130" height="130"/>
+                                    #else
+                                        <img src="$configTool.getImageHost()/thumbnail$!sameProduct.thumbnailImage" width="130" height="130"/>
+                                    #end
+                                </p>
+                                <p class="txt1 overflow-h">积分：$!numberTool.format('#0', $soldPrice) </p>
+                                <p class="name overflow-h">$!sameProduct.name</p>
+                            </a>
+                        </li>
+                    #end
+                #else
+                    <li><p style="padding: 20px;">暂无商品</p></li>
+                #end
+            </ul>
+        </div>
+    </div>
+    <div class="w1200 clearfix">
+        <div class="fl sidebar-left">
+            <div class="sidebar">
+                <h3>同类商品推荐</h3>
+                <div class="sidebar-dl"><a class="curr">同价位</a><a>同品牌</a>
+                </div>
+                <div class="sidebal-tab">
+                    <ul class="sidebar-ul">
+                        #if($fp)
+                            #set($sameProducts = $productTool.getEqualPriceProducts($fp.displayDiscountPrice))
+                        #else
+                            #set($sameProducts = $productTool.getEqualPriceProducts($!product.retailPrice))
+                        #end
+                        #if($sameProducts && !$sameProducts.isEmpty()) 
+                            #foreach($sameProduct in $sameProducts)
+                                #set($isfp = false)
+                                #if($fps)
+                                   ##如果是限时兑换产品 --去掉 begin
+                                    #foreach($fp in $fps)
+                                        #if($fp.productId == $sameProduct.id)
+                                            #set($isfp = true)
+                                            #break
+                                        #end
+                                    #end
+                                    ##如果是限时兑换产品 --去掉 end
+                                #end
+                                #if($isfp == false)
+                                    #set($soldPrice = $!productTool.getProductSoldPrice($sameProduct))
+                                    <li>
+                                        <a href="/jdvop/product/${sameProduct.id}.php">
+                                            #if($sameProduct.ownerType == "system" || $sameProduct.ownerType == "jingdong")
+                                                <img  alt="" src="$!sameProduct.thumbnailImage"/>
+                                            #else
+                                                <img  alt="" src="$configTool.getImageHost()/thumbnail$!sameProduct.thumbnailImage"/>
+                                            #end
+                                        </a>
+                                        <p class="overflow-h"><a href="/jdvop/product/${sameProduct.id}.php">$!sameProduct.name</a></p>
+                                        <p><span>积 分： </span>
+                                            <i class="orange ffa">
+                                                $!numberTool.format("#0", $soldPrice)
+                                            </i>
+                                        </p>
+                                    </li>
+                                #end    
+                            #end
+                        #else
+                            <li><p style="padding: 20px;">暂无商品</p></li>
+                        #end
+                    </ul>
+                    <ul class="sidebar-ul" style="display:none;">
+                        #set($sameBrandProducts = $productTool.getEqualBrandProducts($product.brand))
+                        #if($sameBrandProducts && !$sameBrandProducts.isEmpty())
+                        #foreach($sameProduct in $sameBrandProducts)
+                            #set($soldPrice = $!productTool.getProductSoldPrice($sameProduct))
+                            ##如果是限时兑换产品 价格 -- begin
+                            #if($fps)
+                                #foreach($fp in $fps)
+                                    #if($fp.productId == $sameProduct.id)
+                                        #set($soldPrice = $fp.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                                        #break
+                                    #end
+                                #end
+                            #end
+                            ##如果是限时兑换产品  价格 -- end
+                            <li>
+                                <a href="/jdvop/product/${sameProduct.id}.php">
+                                    #if($sameProduct.ownerType == "system")
+                                        <img  alt="" src="$!sameProduct.thumbnailImage"/>
+                                    #else
+                                        <img  alt="" src="$configTool.getImageHost()/thumbnail$!sameProduct.thumbnailImage"/>
+                                    #end
+                                </a>
+                                <p class="overflow-h"><a href="/jdvop/product/${sameProduct.id}.php">$!sameProduct.name</a></p>
+                                <p>
+                                    <span>积 分：</span>
+                                    <i class="orange ffa">
+                                        $!numberTool.format("#0", $soldPrice)
+                                    </i>
+                                </p>
+                            </li>
+                        #end
+                        #else
+                            <li><p style="padding: 20px;">暂无商品</p></li>
+                        #end
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="product-details-list fl">
+            <ul class="product-list">
+                <li class="curr"><span>商品详情</span>
+                </li>
+                <li><span>售后服务</span>
+                </li>
+            </ul>
+            <div class="product-content">
+                <div>
+                    <ul class="parameters">
+                        <li>名 称：$!product.name</li>
+                        <li>型 号：$!product.productCode</li>
+                        <li>品 牌：$!product.brand.name</li>
+                        <li>产品规格：$!productTool.getPropertyValue($product, 'LENGTH') * $!productTool.getPropertyValue($product, 'WIDTH') * $!productTool.getPropertyValue($product, 'HEIGHT') cm</li>
+                        <li>重 量：$!productTool.getPropertyValue($product, 'WEIGHT')kg</li>
+                    </ul>
+                    <ul class="parameters">
+                        <li>$!product.features</li>
+                    </ul>
+                    $!productDescription.description
+                </div>
+                <div style="margin: 20px; display: none;">
+                    <p style="padding:15px 0px 15px  0px; border-bottom:1px dotted #dedede; ">本产品全国联保，享受三包服务</p>
+                    <br>
+                    <p class="fwb">服务承诺：</p>
+                    <p style="padding: 5px 0xp;">本平台所售商品均为正品行货，凭质保证书及发票，可享受全国联保服务，与您亲临商场选购的商品享受相同的质量保证。</p>
+                    <br>
+                    <p style="padding: 10px 0px; margin-bottom:10px; border-bottom:1px dotted #dedede; ">注：因厂家会在没有任何提前通知的情况下更改产品包装、产地或者一些附件，本司不能确保客户收到的货物与商城图片、产地、附件说明完全一致。只能确保为原厂正货！并且保证与当时市场上同样主流新品一致。若本商城没有及时更新，请大家谅解！</p>
+
+                    <p class="fwb orange">权利声明：</p>
+                    平台上的所有商品信息、客户评价、商品咨询、网友讨论等内容，是本平台重要的经营资源，未经许可，禁止非法转载使用。 注：本站商品信息均来自于厂商，其真实性、准确性和合法性由信息拥有者（厂商）负责。本站不提供任何保证，并不承担任何法律责任。
+                </div>
+            </div>
+        </div>
+    </div>
+<!--内容框 end -->
+</div>
+<!--footer-->
+#parse('footer.vsl')   
+<!--footer  end-->
+<script type="text/javascript">
+    $(function(){
+         $(".js-nav-show").hover(function(){
+            $(this).children(".product-categories").show();
+        },function(){
+             $(this).children(".product-categories").hide();
+        });
+        //选中
+        $('li.js-silderImage img').click(function(e) {
+            e.preventDefault();
+            $(this).parent().addClass('curr').siblings().removeClass('curr');
+        });
+        //同类商品推荐
+        $('.sidebar-dl a').click(function() {
+            $(this).addClass('curr').siblings().removeClass('curr');
+            var aIndex = $(this).index();
+            $('.sidebal-tab>ul').eq(aIndex).show().siblings().hide();
+        });
+        //详情,参数,售后
+        $('.product-list li').click(function(){
+            var aIndex = $(this).index();
+            $(this).addClass("curr").siblings().removeClass('curr');
+            $('.product-content>div').eq(aIndex).show().siblings().hide();
+        });
+         
+         //加入购物车
+         $("#add_cart").bind("click", function(){
+             
+             var _amount = $('input[name="amount[]"]').val();
+             var _param  = {entry:$productTool.getStorageUnits($product.id).get(0).id, type:'sku', sentry:$product.id, stype:'product', amount:_amount};
+             $.post("/jdvop/shoppingCart/add.php", _param, function(data){
+                 location = data.message;
+             },'json');
+         });
+         
+         $("#buy_now").bind("click", function(){
+             var uid = $('input[name="uid"]').val();
+             var fpid = $('input[name="fpid"]').val();
+             if(uid === '' || fpid === ''){
+                 $("#buy_form").submit();
+             }else{//如果是限时兑换产品 且用户已经登录
+                var _param  = {fpid:fpid, amount:$('input[name="amount[]"]').val()};
+                //如果个人限购 数量已满 弹出提示框
+                $.post("/jdvop/activity/limitExchange/checkBeforeSubmit.php", _param, function(d){
+                    if(d.isOk){
+                        $("#buy_form").submit();
+                    }else{
+                         messageBox("error", "错误信息", d.message, false);
+                    }
+                }, "json");
+             }
+         });
+         
+         //增加数量
+         $('.add_amount').bind("click", function(e){
+             e.preventDefault();
+             var thizAmount = $(this).siblings('input[name="amount[]"]');
+             thizAmount.val(parseInt(thizAmount.val()) + 1);
+         });
+         
+         //减少数量
+         $('.sub_amount').bind("click", function(e){
+             e.preventDefault();
+             var thizAmount = $(this).siblings('input[name="amount[]"]');
+             var amount = parseInt(thizAmount.val()) - 1;
+             if(amount >= 1){
+                thizAmount.val(amount);
+             }
+         });
+    });
+    
+    function toTime(iTime){
+	var iNowTime=new Date().getTime();
+	var iDisTime=iTime-iNowTime;
+	if(iDisTime<=0)
+	{
+            clearInterval(oTimer);
+            $(".time em").text("");
+	}else
+	{
+            var iDate=parseInt(iDisTime/86400000);
+            var iHours=parseInt((iDisTime%86400000)/3600000);
+            var iMin=parseInt((iDisTime%3600000)/60000);
+            var iSec=parseInt((iDisTime%60000)/1000);
+            $(".time em").text("剩余"+iDate+"天 "+ iHours+":"+iMin+":"+iSec);
+	}
+    }
+    if($("input[name='isRobOver']").val() === 'false'){
+        var iTime = new Date($("input[name='endTime']").val()).getTime();
+        oTimer = setInterval(function(){
+                toTime(iTime);
+        },14);
+    }
+    
+    
+</script>
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>      
+</body>
+</html>

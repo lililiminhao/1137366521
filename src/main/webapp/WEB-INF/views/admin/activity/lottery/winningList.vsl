@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>中奖名单</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">中奖名单</span>
+</div>
+<div id="iframePage">
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/lottery/winningList/${lotteryId}.php" method="get">
+                <table>
+                    <tr>
+                       <td>
+                            <select  name="type" class="common h24 w160">
+                                <option value="">全部奖品类型</option>
+                                <option value="integral" #if($!type == 'integral') selected="selected" #end>积分</option>
+                                <option value="exist_award" #if($!type == 'exist_award') selected="selected" #end>已上传奖品</option>
+                                <option value="custom_award"#if($!type == 'custom_award') selected="selected" #end>自定义奖品</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select  name="status" class="common h24 w160">
+                                <option value="">全部奖品状态</option>
+                                <option value="no_receive" #if($!status == 'no_receive') selected="selected" #else#end>未领取</option>
+                                <option value="no_sent" #if($!status == 'no_sent') selected="selected" #else#end>未发放</option>
+                                <option value="has_sent"#if($!status == 'has_sent') selected="selected" #else#end>已发放</option>
+                                <option value="enter_account" #if($!status == 'enter_account') selected="selected" #else#end>已入帐</option>
+                                <option value="enter_order_process" #if($!status == 'enter_order_process') selected="selected" #else#end>进入订单流程</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="kw" value="$!kw" class="common ml10 h24 w160" placeholder="用户名/手机号"/>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                        <td><span class="btn-grey2 ml10" id="js_do_export">导出中奖名单</span></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:80px" />
+                <col style="width:120px" />
+                <col style="width:150px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+            </colgroup>
+            <tr>
+<!--                <th><label><input type="checkbox" id="select_all">全选</label></th>-->
+                <th>用户名</th>
+                <th>中奖时间</th>
+                <th>奖品名称</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th>收件人</th>
+                <th>收件人电话</th>
+                <th>收货地址</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+            #if($winners.hasContent())
+                #foreach($winner in $winners)
+                <tr>
+<!--                    <td class="tc"><label><input type="checkbox" class="select-item" name="ids[]" value="108"></label></td>-->
+                    <td class="tc"><a href="/jdvop/admin/websiteUser/view.php?id=$!winner.websiteUser.id" class="blue">$!esc.html($winner.websiteUser.loginName)</a></td>
+                    <td class="tc">$!dateTool.format('yyyy-MM-dd HH:mm', $!winner.createTime)</td>
+                    <td class="tc">$!winner.awardName</td>
+                    <td class="tc">$!winner.awardType.getDescription()</td>
+                    <td class="tc">$!winner.awardStatus.getDescription()</td>
+                    <td class="tc">$!esc.html($winner.receiverName)</a></td>
+                    <td class="tc">$!esc.html($winner.receiverMobile)</td>
+                    <td class="tc">$!winner.province.name$!winner.city.name$!winner.county.name$!winner.town.name$!esc.html($!winner.receiverAddr)</td>
+                    <td class="tc">$!winner.remark</td>
+                    <td class="tc">#if($!winner.awardType.getDescription()=='已上传奖品'&&$!winner.awardStatus.getDescription() =='进入订单流程')
+                        <a href="/jdvop/admin/order.php?id=$!winner.ext.get('orderId')"><div class="js-viewOrder btn-grey2">查看订单</div></a>
+                        #elseif($!winner.awardType.getDescription()=='自定义奖品' && $!winner.awardStatus.getDescription() =='未发放')
+                        <div class="js-tagAward btn-grey2" data-log="$!winner.logId">标记发奖</div>
+                        #else#end
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无中奖名单
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        <div class="btn-wrap">
+<!--            <span class="btn-orange batch-action">标记发奖</span>-->
+        </div>
+        $adminPg.pager($link, $winners.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+<script type="text/javascript">
+$(function(){
+    $(document).on('click', '#js_do_export', function(e){
+        var l   = location.href.replace('/jdvop/admin/lottery/winningList/${lotteryId}.php', '/jdvop/admin/lottery/winningList/export/${lotteryId}.php');
+        $('#export_ifrm').attr('src', l);
+    });
+
+    $(document).on('click', '.js-viewOrder', function(e){
+       location = "/jdvop/order/view.php?id=$order.id";
+    });
+
+    $(document).on('click', '.js-tagAward', function(e){
+        logId = this.dataset.log;
+        dialog({
+            width   : 360,
+            height  : 80,
+            title   : '确认标记已发奖',
+            content : '备注：<input type="text" id="remark" class="common w280 h30"/>',
+            okValue : '保存',
+            ok      : function() {
+                $.post("/jdvop/admin/lottery/tagAward.php", {id:logId, remark:$("#remark").val()}, function(){ 
+                    location.reload();
+                },'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){ return;  }
+        }).showModal();
+        
+       
+    });
+});
+</script>
+</body>
+</html>

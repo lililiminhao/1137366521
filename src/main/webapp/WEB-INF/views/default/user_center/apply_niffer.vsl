@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="keywords" content="$!esc.html($websiteTool.getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/common.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<!--[if lt IE 9]>
+<script type='text/javascript' src="/jdvop/script/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+    <!--topmenu-->
+ #parse('header.vsl')  
+<div class="user-personal">
+#include('user_center/sider_bar.vsl')
+<div class="user-content-wrap">
+        <h3 class="user-title">申请换货</h3>
+        <div class="delivery-address">
+        <form id="dataForm" action="/jdvop/my/order/niffer.php" method="POST">
+            <input type="hidden" name="id" value="$order.id"/>
+            <table>
+                <colgroup>
+                    <col style="width:140px"/>
+                    <col style=""/>
+                </colgroup>
+                <tr><td height="30" colspan="2"></td></tr>
+                <tr>
+                    <td class="tar"  valign="top"><i class="orange">*</i> 请选择换货产品：</td>
+                    <td>
+                        <table class="user-tab">
+                            <colgroup>
+                                <col style="width:78px"/>
+                                <col style="width:400px"/>
+                                <col style="width:164px"/>
+                            </colgroup>
+                            <tr>
+                                <th></th>
+                                <th>换货商品名称</th>
+                                <th>数量</th>
+                            </tr>
+                            #foreach($entry in $entryList)
+                            #set($bp = $productTool.getByStorageUnitId($entry.storageUnitId))
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="selected[]" value="true" class="js_checkbox" checked/> 
+                                    <input type="hidden" name="sui[]" value="$!entry.storageUnitId"/>
+                                </td>
+                                <td>
+                                    #if($bp.ownerType == "jingdong" || $bp.ownerType == "system")
+                                        <img src="$!bp.thumbnailImage" width="60" height="60" class="fl"/> 
+                                    #else
+                                        <img src="$configTool.getImageHost()/small$!bp.thumbnailImage" width="60" height="60" class="fl"/> 
+                                    #end
+                                    <em class="fl mt20p ml5p">$!bp.name</em> 
+                                </td>
+                                <td>
+                                    <span class="but_reduction js_sub">-</span>
+                                    <input type="text" name="amount[]" class="addmun tac" value="$entry.amount" max="$entry.amount" style="width:60px; border: 1px solid #dedede;" readonly/>
+                                    <span class="but_add js_add">+</span>
+                                </td>
+                            </tr>
+                            #end
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tar" valign="top"><br/><i class="orange">*</i> 换货原因：</td>
+                    <td>
+                        <textarea  name="remark" class="textinput" placeholder="请详细描述您遇到的问题，您的描述将有助于客服人员更快处理您的申请！" ></textarea>
+                        <p style="margin-left:430px;"><i>500字以内</i></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tar"><p class="mt15p"> <i class="orange">*</i> 联系人：</td>
+                    <td>
+                        <input type="text" name="consumerName" value="$!order.receiverName" class="com_input  mt20p"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tar"><p class="mt15p"><i class="orange">*</i>手机号：</p></td>
+                    <td>
+                        <input type="text" name="consumerMobile" value="$!order.receiverMobile" maxlength="11" class="com_input mt20p"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" value="" class="but_apply"/>
+                    </td>
+                </tr>
+            </table>  
+        </form>
+        <!--提交ok-->
+        <div class="apply_refund_ok" style="display:none;">
+            <p class="title">提交成功！</p>
+            <p class="mt20p">我们收到您的申请，会尽快跟您核实回复，请耐心等待~~~</p>
+            <p class="hrefDEI"><a href="#" class="blue" title="返回首页">返回首页</a>&nbsp; |&nbsp;<a href="#" class="blue" title="查看我的换货">查看我的换货</a></p>
+        </div>
+    </div>
+</div>
+</div>
+<!--content end-->
+#parse('footer.vsl')
+<script type="text/javascript">
+$(function(){
+    $("span.js_sub").click(function(e){
+        e.preventDefault();
+        var amount = $(this).siblings("input[name='amount[]']");
+        var currentAmount = amount.val();
+        if(currentAmount >= 2){
+            amount.val(parseInt(currentAmount)-1);
+        }
+    });
+    $("span.js_add").click(function(e){
+        e.preventDefault();
+        var amount = $(this).siblings("input[name='amount[]']");
+        var maxAmount = amount.attr("max");
+        var currentAmount = amount.val();
+        if(currentAmount < maxAmount){
+            amount.val(parseInt(currentAmount)+1);
+        }
+    });
+    $(".js_checkbox").click(function(){
+        if($(this).val() === "true"){
+            $(this).val('false');
+        }else{
+            $(this).val('true');
+        }
+    });
+    $("#dataForm").submit(function(e){
+        e.preventDefault();
+        if(checkForm()){
+            $.post($(this).attr("action"), $(this).serialize(), function(data){
+               if(data.isOk) {
+                    location    = "/jdvopmy/order/applyNifferOk.php";
+               } else {
+                    messageBox("warning", "数据错误", data.message);
+               }
+            }, 'json');
+        } else {
+             messageBox("warning", "温馨提示", "您提交的数据可能存在问题，请核实！");
+        }
+    });
+    function checkForm(){
+        if($("input[name='selected[]']:checked").size() < 1){
+            messageBox("warning", "数据错误", "请至少选择一件商品");
+            return false;
+        }
+        if($("textarea[name='remark']").val() === ''){
+            messageBox("warning", "数据错误", "请填写换货原因,有助于客服人员更快的处理您的申请");
+            return false;
+        }
+        if($("input[name='consumerName']").val() === ''){
+            messageBox("warning", "数据错误", "请填写您的称呼");
+            return false;
+        } 
+        var mobile = $("input[name='consumerMobile']").val();
+        if(mobile === ''){
+            messageBox("warning", "数据错误", "请填写您的联系方式,方便客服人员联系到您");
+            return false;
+        } else {
+            var myreg = /^\d{11}$/;
+            if(mobile != '' && (mobile.length !== 11 || !myreg.test(mobile)))
+            {
+               messageBox("warning", "提示信息", "请填写正确的手机号码");
+               return false;  
+            }
+        }
+        return true;
+    }
+});
+</script>
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>  
+</body>
+</html>

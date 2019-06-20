@@ -1,0 +1,155 @@
+.quan_area{
+	height:40px;
+	position:relative;
+	box-sizing:border-box;
+	padding:0 7.5px;
+	display:flex;
+	line-height:40px;
+}
+.quan_area h2{
+	font-size:14px;
+	line-height:40px;
+}
+.quan_area:before{
+	content:"";
+	position:absolute;
+	height:1px;
+	width:100%;
+	background:#dfdfdf;
+	bottom:0;
+	left:0;
+	transform:scale(1,.5);
+}
+.quan_item .tips{
+	color:#999;
+}
+.quan_item{
+	display:flex;
+	flex:1;
+	justify-content:space-between;
+	font-size:14px;
+}
+#quan_list{
+	position:fixed;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	background: #f0f0f0;
+	z-index:200;
+	transform:translateX(100%);
+	transition:0.3s all;
+}
+#quan_list.active{
+	transform:translateX(0);
+}
+
+.quan_back{
+	height:44px;
+	position:relative;
+	background:#fff;
+}
+.quan_back i{
+	position:absolute;
+	width:12px;
+	height:12px;
+	border-top:1px solid #333;
+	border-right:1px solid #333;
+	top:50%;
+	left:21px;
+	transform:translateY(-50%) rotate(-135deg);
+}
+.no-use {
+  background: #fff;
+  line-height: 44px;
+  height: 44px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 0 21px; }
+
+.no-use.selected label {
+  border: 0;
+  background: url(/jdvop/images/mobile/icon_xuanzhong@2x.png) no-repeat;
+  background-size: cover; }
+
+label {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #d7d7d7;
+  border-radius: 50%;
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%); }
+
+input[type="radio"] {
+  display: none; }
+
+.content {
+  margin-top: 18px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 0 4%; }
+  .content .quan-item {
+    height: 100px;
+    background: url(/jdvop/images/mobile/icon_huidi@2x.png) no-repeat center;
+    background-size: cover;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    text-align: center;
+    color: #999;
+    margin-bottom: 6px; }
+  .content li.selected {
+    background: url(/jdvop/images/mobile/icon_lvdi@2x.png) no-repeat center;
+    background-size: cover;
+    color: #333; }
+    .content li.selected label {
+      border: 0;
+      background: url(/jdvop/images/mobile/icon_xuanzhong@2x.png) no-repeat;
+      background-size: cover; }
+  .content .price {
+    width: 34%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center; }
+    .content .price .kan span {
+      font-size: 25px; }
+  .content .desc {
+    -webkit-box-flex: 1;
+        -ms-flex: 1;
+            flex: 1;
+    text-align: left;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    padding-left: 12px; }
+  .content label {
+    margin-right: 6px; }
+  .content .nomore {
+    color: #999;
+    text-align: center;
+    line-height: 36px; }

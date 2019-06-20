@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css?versions =$configTool.getVersion()"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css?versions =$configTool.getVersion()"/>
+<script src="/jdvop/script/jquery-1.8.3.min.js?versions =$configTool.getVersion()"></script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>订单支付失败</title>
+</head>
+<body class="pm56">
+    <div class="submit-ok">
+        <p class="img errow"> </p>
+        <p class="text tc">
+            失败原因：<i>$!message</i>
+        </p>
+    </div>
+    <div class="webkitbox-h submit-ok-btn">
+        <p class="flex1"><a href="/jdvop/index.php"><span class="btn btn-orange">返回首页</span></a></p>
+	<p class="flex1"><a href="/jdvop/my/mobile/orders.php"><span class="btn btn-orange">订单列表</span></a></p>
+    </div>
+    #parse('footer_nav.vsl')
+</body>
+</html>

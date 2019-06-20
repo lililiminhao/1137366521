@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>数据统计</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">总对账</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li><a href="/jdvop/admin/statistics/payment.php?timeType=payTime" title="支付对账">支付对账</a></li>
+                <li><a href="/jdvop/admin/statistics/shipmentProductStatistics.php?timeType=shipmentTime">发货对账</a></li>
+                <li><a href="/jdvop/admin/statistics/returnProductStatistics.php?timeType=acceptTime">退货对账</a></li>
+                <li class="curr">总对账</li>
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/statistics/totalStatistics.php" method="get">
+                <table>
+                    <tr>
+                       <td class="pl20">按时间查询： 
+                                                        <input type="text" id="st" name="st" value="$!dateTool.format('yyyy-MM-dd 00:00:00', $request.getParameter('st'))" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh',dateFmt:'yyyy-MM-dd 00:00:00',maxDate:'#F{$dp.$D(\'et\')}'});" class="Wdate common h22 w160"/>
+                            到&nbsp;&nbsp; 
+                            <input type="text" id="et" name="et" value="$!dateTool.format('yyyy-MM-dd 23:59:59', $request.getParameter('et'))" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh',dateFmt:'yyyy-MM-dd 23:59:59',minDate:'#F{$dp.$D(\'st\')}'});" class="Wdate common h22 w160"/>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" /> 
+                        </td>
+                        <td class="tl">
+                            <span class="btn-grey2 ml10" id="js_do_export">导出Excel</span>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:260px;"/>
+                <col style="width:200px;"/>
+                <col style="width:160px;"/>
+                <col style="width:160px;"/>
+                <col style="width:120px;"/>
+                <col style="width:120px;"/>
+                <col style="width:120px;"/>
+                <col style="width:120px;"/>
+            </colgroup>
+            <tr>
+                <th>产品名称</th>
+                <th>品牌</th>
+                <th>产品编号</th>
+                <th>条码</th>
+                <th>发货数量</th>
+                <th>退货数量</th>
+                <th>单价</th>
+                <th>总价</th>
+            </tr>
+            #if($totals.hasContent())
+                #foreach($total in $totals)
+                <tr>
+                    <td class="tc" >$total.productName</td>
+                    <td class="tc" >$total.brand.name</td>
+                    <td class="tc" >$total.productCode</td>
+                    <td class="tc" >$total.skuBarCode</td>
+                    <td class="tc" >$total.amount</td>
+                    <td class="tc" >
+                        #set($returnAmount = 0)
+                        #if($returnMap.get($total.skuId))
+                            #set($returnAmount = $returnMap.get($total.skuId).amount)
+                        #end
+                         $returnAmount
+                    </td>
+                    #set($product =  $productService.findOne($total.getProductId()))
+                    #set($amount = $total.amount - $returnAmount)
+                    <td class="tr">
+                        #set($price = $!math.ceil($math.mul($product.retailPrice, $websiteTool.getWebsite().getRatio())))
+                        #set($totalPrice = $!math.ceil($math.mul($amount,$price)))
+                        $!price
+                    </td>
+                    <td class="tr">$!totalPrice</td>
+                </tr>
+                #end
+            #else
+                <td class="tc" colspan = "8">暂无相关记录</td>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $totals.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $('select[name="area"]').change(function(e){
+            var selObj  = $(this);
+            var cid = parseInt($(this).val());
+            if (cid > 0)
+            {
+                $.get('/region/ajax.php', {parentId : cid}, function(d){
+                    var len = d.length;
+                    if (len <= 0)
+                    {
+                        return;
+                    }
+                    var html    = '<option value="0">请选择城市</option>';
+                    var i = 0;
+                    for (; i < len; ++ i)
+                    {
+                        html    += '<option value="' + d[i].id + '">' + d[i].name + "</option>";
+                    }
+                    $('select[name="cityId"]').html(html);
+                }, 'json');
+            }
+        });
+        
+        $('.js-time').live("click",function(e){
+            e.preventDefault();
+            var thiz = $(this);
+            thiz.addClass('curr').siblings().removeClass('curr');
+            if(thiz.html() === "年"){
+                $('input[name="sp"]').val('year');
+            }else if(thiz.html() === "月"){
+                $('input[name="sp"]').val('month');
+            }else if(thiz.html() === "日"){
+                $('input[name="sp"]').val('day');
+            }
+        });
+        
+        $('#js_do_export').click(function(e){
+            e.preventDefault();
+            var  l   = location.href.replace('/jdvop/admin/statistics/totalStatistics.php', '/jdvop/admin/statistics/totalExport.php');
+            $('#export_ifrm').attr('src', l);
+        });
+    });
+</script>
+
+</body>
+</html>

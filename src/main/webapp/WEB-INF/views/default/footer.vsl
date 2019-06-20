@@ -1,0 +1,38 @@
+<div class="footer">
+    <div style="background: #f2f2f2;">
+        <div class="w1200 w990 con clearfix">
+            <dl>
+            <dt>新手上路</dt>
+            <dd><a href="/jdvop/help/view.php?key=关于商城" target="_blank" title="关于商城">关于商城</a> </dd>
+            <dd><a href="/jdvop/help/view.php?key=积分查询" target="_blank" title="积分查询">积分查询</a> </dd>
+            <dd><a href="/jdvop/help/view.php?key=兑换流程" target="_blank" title="兑换流程">兑换流程</a> </dd>
+            <dd><a href="/jdvop/help/view.php?key=规则及条款" target="_blank" title="规则及条款">规则及条款</a> </dd>
+        </dl>
+        <dl>
+            <dt>配送服务</dt>
+            <dd><a href="/jdvop/help/view.php?key=配送流程" target="_blank" title="配送流程">配送流程</a> </dd>
+            <dd><a href="/jdvop/help/view.php?key=配送时限" target="_blank" title="配送时限">配送时限</a> </dd>
+            <dd><a href="/jdvop/help/view.php?key=签收提醒" target="_blank" title="签收提醒">签收提醒</a> </dd>
+            <dd><a href="/jdvop/help/view.php?key=关于订单" target="_blank" title="关于订单">关于订单</a> </dd>
+        </dl>
+        <dl>
+            <dt>售后服务</dt>
+            <dd><a href="/jdvop/help/view.php?key=常见问题" target="_blank" title="常见问题">常见问题</a> </dd>
+            <dd><a href="/jdvop/help/view.php?key=换货政策" target="_blank" title="换货政策">换货政策</a> </dd>
+        </dl>
+        <dl class="mun">
+            <dt>$!websiteTool.getWebsite().customerServiceHotLine</dt>
+            <dd>
+               <p>服务时间：9:00-18:00</p>
+               #set($qqs = $websiteTool.getWebsite().customerServiceQQ)
+               #if($qqs.length() > 0)
+               <a href="tencent://message/?uin=$qqs[0]&amp;Site=&amp;Menu=yes" title="在线咨询">
+                  <span class="but-qq bg-red60">联系在线客服</span>
+               </a>
+               #end
+            </dd>
+        </dl>
+        </div>
+    </div>
+    <p class="w1200 copyright">$!websiteTool.getWebsite().icpNo</p>
+</div>

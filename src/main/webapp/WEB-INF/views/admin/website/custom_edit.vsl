@@ -1,0 +1,270 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>$!esc.html($websiteTool.getWebsite().getName())-管理平台</title>
+        <link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+        <link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+        <link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/wx-index.css'/>
+        <script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script>
+        <script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+        <script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+        <script type='text/javascript' src="/jdvop/script/admin/main.js"></script>
+        <script type='text/javascript' src='/jdvop/script/admin/dragsort-0.5.1.min.js'></script>
+        <!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+        <script type='text/javascript'>
+            #if($blocks)
+                var serial_num = $blocks.size();
+            #else
+                var serial_num = 0;
+            #end
+            $(function() {
+                $('.js-img').each(function() {
+                    /*产品图片的高度*/
+                    var tHeight = $(this).width();
+                    $(this).height(tHeight);
+                });
+            });
+        </script>
+        <script type='text/javascript' src='/jdvop/script/admin/wx-block.js?v=20179'></script>
+        <style>
+        #quan_list{
+        	padding:12px 0;
+        }
+        .quan_wrapper {
+		  display: -webkit-box;
+		  display: -ms-flexbox;
+		  display: flex;
+		  overflow: hidden;
+		  width: 1000px;
+		  padding: 0 15px; }
+		
+		#quan_list {
+		  width: 100%;
+		  overflow: hidden; }
+		
+		.quan_item {
+		  width: 120px;
+		  height: 74px;
+		  margin-right: 3px;
+		  background: url(/jdvop/images/admin/icon_baidi@2x.png) no-repeat;
+		  background-size: cover;
+		  display: -webkit-box;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-pack: justify;
+		      -ms-flex-pack: justify;
+		          justify-content: space-between;
+		  text-align: center;
+		  -webkit-box-sizing: border-box;
+		          box-sizing: border-box;
+		  padding: 5px; }
+		  .quan_item .q_l {
+		    width: 94px;
+		    display: -webkit-box;
+		    display: -ms-flexbox;
+		    display: flex;
+		    -webkit-box-orient: vertical;
+		    -webkit-box-direction: normal;
+		        -ms-flex-direction: column;
+		            flex-direction: column;
+		    -webkit-box-pack: center;
+		        -ms-flex-pack: center;
+		            justify-content: center; }
+		    .quan_item .q_l span {
+		      font-size: 24px; }
+		  .quan_item .q_r {
+		    -webkit-box-flex: 1;
+		        -ms-flex: 1;
+		            flex: 1;
+		    color: #da525e;
+		    display: -webkit-box;
+		    display: -ms-flexbox;
+		    display: flex;
+		    -webkit-box-orient: vertical;
+		    -webkit-box-direction: normal;
+		        -ms-flex-direction: column;
+		            flex-direction: column;
+		    -webkit-box-pack: center;
+		        -ms-flex-pack: center;
+		            justify-content: center;
+		    padding-right: 5px;
+		    letter-spacing: 0;
+		    -webkit-transform:scale(.6);
+		    transform:scale(.6); }
+        </style>
+        <style>
+        	.layout-grid2 .js-product-ul{ width: 362px;box-sizing:border-box;padding:0 15px;display:flex;flex-wrap:wrap;justify-content:space-between}
+        	.layout-grid2 li{
+        		border:0;width:164px;background:#fff;margin-bottom:5px;
+        	}
+        	.a-title{
+        		padding: 0;
+    			margin: 0 15px;
+        	}
+        	.couponCode{
+        		margin-top:12px;
+        	}
+        	.couponCode input{
+        		width:260px;
+        	}
+        	.uploadBgImage{
+        		overflow:hidden;
+        		margin-top:12px;
+        	}
+        	.upload-wrapper{
+        		
+        		float:left;
+        		width:90px;
+        		height:90px;
+        		border: 2px dashed #d0d7e1;
+        		text-align: center;
+        		position:relative;
+        		
+        	}
+        	.upload-wrapper img{
+        		position:absolute;
+        		width:100%;
+        		height:100%;
+        		display:none;
+        		top:0;
+        		left:0;
+        	}
+        	.uploadBgImage input[type="file"]{
+    			display:none;
+    		}
+    		.uploadBgImage .bg{
+    			margin-top: 34px;
+			    display: inline-block;
+			    width: 26px;
+			    height: 26px;
+			    background: url(/jdvop/images/admin/sprite.png) no-repeat -224px 0;
+    		}
+        </style>
+    </head>
+    <body>
+        <!--主导航-->
+        <div class="mainNav borderOrange clearfix">
+            <span class="text">首页模板配置</span>
+        </div>
+        <div id="iframePage">
+            <div class="app-content clearfix">
+                <form id="form1" action="/jdvop/admin/custom/save.php" method="POST">
+                    <div class="app-preview">
+                        <img src="/jdvop/images/admin/bg-wxTop.png" style="margin:-1px 0 0 -1px; width:402px;"/>
+                        <div class="add-show " id="index-wrap">
+                            <dl id="dragsort">
+                                #set($ratio = $websiteTool.getWebsite().getRatio())
+                                #if($blocks && $blocks.size() > 0)
+                                    #foreach($block in $blocks)
+                                        #if($block.bloKey == 'NOTICE_BLOCK')
+                                            $!backRenderTool.getNotice($block)
+                                        #end
+                                        #if($block.bloKey == 'PRODUCT_BLOCK_1' || $block.bloKey == 'PRODUCT_BLOCK_2' ||
+                                            $block.bloKey == 'PRODUCT_BLOCK_3' || $block.bloKey == 'PRODUCT_BLOCK_4')
+                                            #set($ids = $backRenderTool.getCustomBlocks($block))
+                                            #if($ids)
+                                                #set($products = $productTool.findAsMap($ids))
+                                            #end
+                                            $!backRenderTool.getProducts($block, $products, $ratio)
+                                        #end
+                                        #if($block.bloKey == 'SLIDER_BLOCK')
+                                            $!backRenderTool.getSlider($block)
+                                        #end
+                                        #if($block.bloKey == 'IMAGE_BLOCK')
+                                            $!backRenderTool.getImage($block)
+                                        #end
+                                        #if($block.bloKey == 'NAVIGATION_BLOCK')
+                                            $!backRenderTool.getNavigation($block)
+                                        #end
+                                        #if($block.bloKey == 'PRODUCT_SEARCH_BLOCK')
+                                            $!backRenderTool.getSearchBox($block)
+                                        #end
+                                    #end
+                                #end
+                                <dd class="js-temp"></dd>
+                            </dl>
+                        </div>
+                        <div class="grid">
+                            <p class="title"><img src="/jdvop/images/admin/ico-arrow.png"/> 添加内容</p>
+                            <ul class="clearfix">
+                                <li class="js-add-slider">图片广告</li>
+                                <li class="js-add-search">商品搜索</li>
+                                <li class="js-add-notice">公告栏</li>
+                                <li class="js-add-product">商品列表</li>
+                                <li class="js-add-nav">导航按钮</li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+                <form id="form2" method="GET">
+                    <input type="hidden" name="blockId" />
+                    <input type="hidden" name="bloKey" />
+                    <div class="app-sidebar" id="js-edit-block">
+                    </div>
+                </form>
+            </div>
+            <div class="layout-footer _fixed">
+                <div class="btn-wrap">
+                    <button type="submit" class="btn-orange js-submit-btn">保存</button>
+                </div>
+            </div>
+        </div>
+        <script type='text/javascript' src='/jdvop/script/admin/idangerous.swiper-1.9.1.min.js'></script>
+        <script>
+                //模块拖动排序
+                $('#dragsort').dragsort({
+                    dragSelector: "dd.js-dragsort",
+                    dragEnd: function() {
+                        $(this).find('span.js-btnEdit').click();
+                    },
+                    dragBetween: 'false',
+                    dragSelectorExclude: '.actions-wrap span',
+                    placeHolderTemplate: '<dd class="a-dashed"></dd>',
+                    scrollSpeed: 5
+                });
+                //微信轮播
+                window.onload=function(){
+                    textMove();
+                    swiper1();
+                };
+                function swiper1(){
+                    var swiper = new Swiper('.js-main-banner', {
+                        pagination: '.swiper-pagination',
+                        nextButton: '.swiper-button-next',
+                        prevButton: '.swiper-button-prev',
+                        paginationClickable: true,
+                        centeredSlides: true,
+                        autoplay: 2500,
+                        autoplayDisableOnInteraction: false
+                    });
+                }
+                //文字公告
+                function textMove() {
+                    var oCon = document.getElementById("textMove");
+                    if(oCon !== null) {
+                        var seep = -2;
+                        var _move = null;
+                        function autoRoll() {
+                            if (oCon.offsetLeft < -oCon.offsetWidth / 2) {
+                                oCon.style.left = 0;
+                            };
+                            if (oCon.offsetLeft > 0) {
+                                oCon.style.left = -oCon.offsetWidth / 2 + 'px';
+                            };
+                            oCon.style.left = oCon.offsetLeft + seep + 'px';
+                        };
+                        clearInterval(_move);
+                        _move = setInterval(autoRoll, 80);
+                        if (oCon.innerHTML.length <= 22) {
+                            clearInterval(_move)
+                        } else {
+                            oCon.innerHTML += oCon.innerHTML;
+                        }; 
+                    }
+                }
+
+        </script>
+    </body>
+</html>

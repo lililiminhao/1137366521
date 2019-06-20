@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+</head>
+<body>
+ #parse('header.vsl')   
+<div class="user-personal">
+    #include('user_center/sider_bar.vsl')
+    <div class="user-content-wrap">
+        <h3 class="user-title"><a href="/jdvop/my/profile.php" class="blue fr mr10p">返回</a>编辑个人信息</h3>
+        <div class="delivery-address">
+            <form id="edit_form" action="/jdvop/my/profile/edit.php" method="POST">
+                <table width="100%" class="revisetab">
+                    <tr>
+                        <td height="20" colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">用户名:</td>
+                        <td>$!user.loginName</td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">昵称:</td>
+                        <td>
+                            <input name="nickName" value="$!user.nickName" class="com_input" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">性别:</td>
+                        <td>
+                            <select name="gender" class="com_input" style="height:28px;width: 182px">
+                                #foreach($gender in $genders)
+                                    <option value="$gender.name()" #if($user.gender.name() == $gender.name())  selected #end>$gender.description</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">生日:</td>
+                        <td>
+                            <input type="text" name="birthday" value="$!user.date1" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh',dateFmt:'yyyy-MM-dd'});" class="Wdate common com_input"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">手机号码:</td>
+                        <td>
+                            <input name="mobile" value="$!user.mobile" class="com_input" /><label id="mobile-error" style="color: red; line-height: 22px;margin-left: 10px;"></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">邮箱:</td>
+                        <td>
+                            <input name="email" value="$!user.email" class="com_input" /><label id="email-error" style="color: red; line-height: 22px;margin-left: 10px;"></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">电话:</td>
+                        <td>
+                            <input name="phone" value="$!user.phone" class="com_input" /><label id="phone-error" style="color: red; line-height: 22px;margin-left: 10px;"></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">省市:</td>
+                        <td>
+                            #if($userAddress)
+                                <label class="mr5p">
+                                    <select name="regions[]" class="com_input ajax-change" style="height:28px; width:160px">
+                                        <option value="0">请选择</option>
+                                        #foreach($prov in $provinces)
+                                        <option value="$prov.getId()" #if($userAddress.province.id == $prov.id) selected #end>$prov.getName()</option>
+                                        #end
+                                    </select>
+                                </label>
+                                <label class="mr5p">
+                                    <select name="regions[]" class="com_input ajax-change" style="height:28px;width: 160px">
+                                        <option value="0">请选择</option>
+                                        #foreach($city in $geoRegionService.allChilds($userAddress.province))
+                                        <option value="$city.getId()" #if($userAddress.city.id == $city.id) selected #end>$city.getName()</option>
+                                        #end
+                                    </select>
+                                </label>
+                                <label class="mr5p">
+                                    <select name="regions[]" class="com_input ajax-change" style="height:28px;width: 160px">
+                                        <option value="0">请选择</option>
+                                        #foreach($county in $geoRegionService.allChilds($userAddress.city))
+                                        <option value="$county.getId()" #if($userAddress.county.id == $county.id) selected #end>$county.getName()</option>
+                                        #end
+                                    </select>
+                                </label>
+                                #if($userAddress.town)
+                                    <label class="mr5p">
+                                        <select name="regions[]" class="com_input ajax-change" style="height:28px;width: 160px">
+                                            <option value="0">请选择</option>
+                                            #foreach($town in $geoRegionService.allChilds($userAddress.county))
+                                                <option value="$town.getId()" #if($userAddress.town.id == $town.id) selected #end>$town.getName()</option>
+                                            #end
+                                        </select>
+                                    </label>
+                                #end
+                            #else
+                                <label class="mr5p">
+                                    <select name="regions[]" class="com_input ajax-change" style="height:28px;width: 182px">
+                                        <option value="0">请选择</option>
+                                        #foreach($prov in $provinces)
+                                        <option value="$prov.getId()">$prov.getName()</option>
+                                        #end
+                                    </select>
+                                </label>
+                            #end
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">地址:</td>
+                        <td>
+                            <input type="hidden" name="userAddressId" value="$!userAddress.id"/>
+                            <input name="address" value="$!userAddress.address" type="text" class="com_input"/>
+                            <label class="null" style="margin-right: 230px;"><span></span></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">注册时间：</td>
+                        <td>$!dateTool.format("yyyy-MM-dd HH:mm:ss",$user.createTime)</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type="submit" class="input-btn" value="保存"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="30" colspan="2"></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+<!--footer-->
+#parse('footer.vsl')   
+<!--footer  end-->
+<script type="text/javascript">
+$(function(){
+    $('select.ajax-change').live('change', function(e){
+        var selObj  = $(this);
+        selObj.parent('label.mr5p').nextAll().remove();//删除后面所有的框
+        var cid = parseInt($(this).val());
+        if (cid > 0)
+        {
+            if ($('label.mr5p select').size() >= 4)
+            {
+                return;
+            }
+            $.get('/jdvop/region/ajax.php', {parentId : cid}, function(d){
+                var len = d.length;
+                if (len <= 0)
+                {
+                    return;
+                }
+                var html = '<label class="mr5p"><select name="regions[]" class="com_input ajax-change" style="height:28px;width: 160px"><option value="0">请选择</option>';
+                var i = 0;
+                for (; i < len; ++ i)
+                {
+                    html    += '<option value="' + d[i].id + '">' + d[i].name + "</option>";
+                }
+                html    += '</select></label>';
+                selObj.parent('label.mr5p').after(html);
+            }, 'json');
+        }
+    });
+    
+    var isOk    = true;
+    $('#edit_form').submit(function(e){
+        e.preventDefault();
+        var thiz    = $(this);
+        isOk    = true;
+        thiz.find('input[type="text"], input[type="text"]').blur();
+        if (!isOk)
+        {
+            return false;
+        }
+        $.post(thiz.attr('action'), thiz.serialize(), function(d){
+            if (d.isOk)
+            {
+                messageBox("success", "提示信息", "修改成功", true, function(){
+                    window.location = "/jdvop/my/profile.php";
+                });
+            } else {
+                messageBox("error", "错误信息", d.message);
+                return false;
+            }
+        }, 'json');
+    });
+});
+</script>   
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>  
+</body>
+</html>

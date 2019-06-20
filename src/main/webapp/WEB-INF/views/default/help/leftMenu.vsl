@@ -1,0 +1,29 @@
+<div class="user-sidebar">
+    <dl>
+        <dt>新手上路</dt>
+        <dd>
+            <ul>
+                <li #if($websiteAttr.key == "关于商城") class="curr" #end><a href="/jdvop/help/view.php?key=关于商城">关于商城</a></li>
+                <li #if($websiteAttr.key == "积分查询") class="curr" #end><a href="/jdvop/help/view.php?key=积分查询">积分查询</a></li>
+                <li #if($websiteAttr.key == "兑换流程") class="curr" #end><a href="/jdvop/help/view.php?key=兑换流程">兑换流程</a></li>
+                <li #if($websiteAttr.key == "规则及条款") class="curr" #end><a href="/jdvop/help/view.php?key=规则及条款">规则及条款</a></li>
+            </ul>
+        </dd>
+        <dt>配送服务</dt>
+        <dd>
+            <ul>
+                <li #if($websiteAttr.key == "配送流程") class="curr" #end><a href="/jdvop/help/view.php?key=配送流程">配送流程</a></li>
+                <li #if($websiteAttr.key == "配送时限") class="curr" #end><a href="/jdvop/help/view.php?key=配送时限">配送时限</a></li>
+                <li #if($websiteAttr.key == "签收提醒") class="curr" #end><a href="/jdvop/help/view.php?key=签收提醒">签收提醒</a></li>
+                <li #if($websiteAttr.key == "关于订单") class="curr" #end><a href="/jdvop/help/view.php?key=关于订单">关于订单</a></li>
+            </ul>
+        </dd>
+        <dt>售后服务</dt>
+        <dd>
+            <ul>
+                <li #if($websiteAttr.key == "常见问题") class="curr" #end><a href="/jdvop/help/view.php?key=常见问题">常见问题</a></li>
+                <li #if($websiteAttr.key == "换货政策") class="curr" #end><a href="/jdvop/help/view.php?key=换货政策">换货政策</a></li>
+            </ul>
+        </dd>
+    </dl>
+</div>

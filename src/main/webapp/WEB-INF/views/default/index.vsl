@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta content="telephone=no" name="format-detection" />
+<meta name="keywords" content="" />
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script src="/jdvop/script/mobile/zepto.min.js"></script>
+<script src="/jdvop/script/mobile/swiper.min.js"></script>
+<script src="/jdvop/script/mobile/imgDelayedLoad.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<script type="text/javascript">
+    $(function() {
+        $('.js-img').each(function() {
+            /*产品图片的高度*/
+            var tHeight = $(this).width();
+            $(this).height(tHeight);
+        });
+        $('.custom-notice .js-del').click(function() {
+            $(this).parents(".custom-notice").remove();
+        });
+        
+        var swiper = new Swiper('.js-main-banner', {
+            pagination: '.swiper-pagination',
+            nextButton: '.swiper-button-next',
+            prevButton: '.swiper-button-prev',
+            paginationClickable: true,
+            centeredSlides: true,
+            autoplay: 2500,
+            autoplayDisableOnInteraction: false
+        });
+        $('#searchBtn').click(function(){
+            $('#form1').submit();
+        });
+        //文字公告
+        var oCon = document.getElementById("textMove");
+        if(oCon !== null) {
+            var seep = -2;
+            var _move = null;
+            function autoRoll() {
+                if (oCon.offsetLeft < -oCon.offsetWidth / 2) {
+                    oCon.style.left = 0;
+                };
+                if (oCon.offsetLeft > 0) {
+                    oCon.style.left = -oCon.offsetWidth / 2 + 'px';
+                };
+                oCon.style.left = oCon.offsetLeft + seep + 'px';
+            };
+                    clearInterval(_move);
+            _move = setInterval(autoRoll, 80);
+                    if (oCon.innerHTML.length <= 22) {
+                        clearInterval(_move);
+            } else {
+                oCon.innerHTML += oCon.innerHTML;
+            };
+        };
+        fgm.on(window, "load", function (){
+            if($('#bannnerImg').length>0){new LazyLoad("bannnerImg");} //轮播
+            if($('#aM1').length>0){new LazyLoad("aM1");} //a-module-1
+            if($('#aM2').length>0){new LazyLoad("aM2");} //a-module-2
+            if($('#aM3').length>0){new LazyLoad("aM3");} //a-module-3
+            if($('#aM4').length>0){ new LazyLoad("aM4");}//a-module-4
+            if($('#aM5').length>0){ new LazyLoad("aM5");} //a-module-5
+        });
+        
+    });
+</script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+</head>
+<body style="background: #f0f0f0;">
+    #set($blocks = $websiteTool.getBlocks())
+    #set($ratio = $websiteTool.getWebsite().getRatio())
+    #if($blocks && $blocks.size() > 0)
+        #foreach($block in $blocks) 
+            #if($block.bloKey == 'NOTICE_BLOCK')
+                $frontRenderTool.getNotice($block)
+            #end
+            #if($block.bloKey == 'PRODUCT_BLOCK_1' || $block.bloKey == 'PRODUCT_BLOCK_2' || 
+                $block.bloKey == 'PRODUCT_BLOCK_3' || $block.bloKey == 'PRODUCT_BLOCK_4')
+                #set($products = $productTool.findAsMap($frontRenderTool.getCustomBlocks($block)))
+                $!frontRenderTool.getProduct($block, $products, $ratio)
+            #end
+            #if($block.bloKey == 'SLIDER_BLOCK')
+                $!frontRenderTool.getSlider($block)
+            #end
+            #if($block.bloKey == 'IMAGE_BLOCK')
+                $!frontRenderTool.getImage($block)
+            #end
+            #if($block.bloKey == 'NAVIGATION_BLOCK')
+                $!frontRenderTool.getNavigation($block)
+            #end
+            #if($block.bloKey == 'PRODUCT_SEARCH_BLOCK')
+                $!frontRenderTool.getSearchBox($block)
+            #end
+        #end
+    #end
+    <div class="footer-nav js-footerNav">
+        <div class="list flex1 curr">
+             <a href="https://o2o.96225.com/period_1/index.html">
+             <img src="/jdvop/images/mobile/nav/icon-index.png" class="js-icon-com"/>
+             <img src="/jdvop/images/mobile/nav/icon-index-curr.png" class="js-icon-com-curr"/>
+                 精选
+             </a>
+        </div>
+        <div class="list flex1">
+            <a href="https://o2o.96225.com/catalog">
+            <img src="/jdvop/images/mobile/nav/icon-classify.png"  class="js-icon-com"/>
+            <img src="/jdvop/images/mobile/nav/icon-classify-curr.png" class="js-icon-com-curr"/>分类</a>
+        </div>
+        <div class="list flex1">
+            <a href="/jdvop/shoppingCart/myCart.php">
+            <img src="/jdvop/images/mobile/nav/icon-card.png"  class="js-icon-com"/>
+            <img src="/jdvop/images/mobile/nav/icon-card-curr.png" class="js-icon-com-curr"/>购物车</a>
+        </div>
+        <div class="list flex1">
+            <a href="https://o2o.96225.com/order">
+            <img src="/jdvop/images/mobile/nav/icon-my.png" class="js-icon-com"/>
+            <img src="/jdvop/images/mobile/nav/icon-my-curr.png" class="js-icon-com-curr"/>我的</a>
+        </div>
+    </div>
+</body>
+</html>

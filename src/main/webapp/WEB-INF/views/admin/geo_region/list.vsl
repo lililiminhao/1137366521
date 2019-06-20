@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>地址管理</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+    </p>
+    <span class="text">地址管理</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr"><a href="#" title="地址列表">地址列表</a></li>
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/geoRegion.php" method="get">
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="keyword" value="$!esc.html($request.getParameter('keyword'))" class="common ml10 w160" placeholder="地址名"/>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:200px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col/>
+            </colgroup>
+            <tr>
+                <th>地址ID</th>
+                <th>地址名</th>
+                <th>类型</th>
+##                <th>上级地址</th>
+                <th>是否禁用</th>
+                <th>操作</th>
+            </tr>
+            #if($geoRegions.hasContent())
+                #foreach($geoRegion in $geoRegions)
+                <tr>
+                    <td class="tc">$!geoRegion.id</td>
+                    <td class="tc">$!geoRegion.name</td>
+                    <td class="tc">$!geoRegion.type.description</td>
+##                    #set($test = $geoRegionService.findOne($!geoRegion.parentId))
+##                    <td class="tc">$!test.name</td>
+                    <td class="tc">#if($!geoRegion.enabled) 启用#else 禁用 #end
+                    </td>
+                    <td class="tc">
+                    	#if($!geoRegion.enabled)
+                        	<a href = "/jdvop/admin/geoRegion/setEnabled.php?enabled=false&id=$!geoRegion.id" method="GET" class="ajax-request" ok-message="reload" >禁用</a>
+                        #else
+                        	<a href = "/jdvop/admin/geoRegion/setEnabled.php?enabled=true&id=$!geoRegion.id" method="GET" class="ajax-request" ok-message="reload" >启用</a>
+                        #end
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关内容
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $geoRegions.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+
+</script>
+
+</body>
+</html>

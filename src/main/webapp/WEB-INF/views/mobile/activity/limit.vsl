@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>
+<title>限时兑换</title>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+</head>
+<body class="pm56 bg-gr">
+    <header class="bar-nav">
+        <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+        <h1 class="title">限时兑换 </h1>
+    </header>
+    <ul class="limit-product ui-justify clearfix">
+        <li class="disabled">
+            <a href="#" target="_blank">
+                <p class="img">
+                    <img src="//img.fygift.com/2015/6/339032988372430416.jpg"  alt="产品名称"/>
+                    <span class="icon-over"></span>
+                </p>
+                <p class="time"><i class="time-icon"></i>剩余2天 <em>12：34：56</em></p>
+                <p class="name overflow-h">
+                    CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm
+                </p>
+            </a>
+            <div class="bg">
+                <p class="yuanjia">4750积分</p>
+                <p class="xianjia">450000<i class="txt">积分</i></p>
+                <a  href="#" target="_blank"> <span class="btn">抢购结束</span></a>
+            </div>
+            <p class="bgzekou">7.3<i>折</i></p>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <p class="img">
+                    <img src="//img.fygift.com/2015/6/339032988372430416.jpg"  alt="产品名称"/>
+                </p>
+                <p class="time"><i class="time-icon"></i>剩余2天 <em>12：34：56</em></p>
+                <p class="name overflow-h">
+                    CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm
+                </p>
+            </a>
+            <div class="bg">
+                <p class="yuanjia">4750积分</p>
+                <p class="xianjia">450000<i class="txt">积分</i></p>
+                <a  href="#" target="_blank"> <span class="btn">立即抢购</span></a>
+            </div>
+            <p class="bgzekou">7.3<i>折</i></p>
+        </li>
+        <li>
+            <a href="#" target="_blank">
+                <p class="img">
+                    <img src="//img.fygift.com/2015/6/339032988372430416.jpg"  alt="产品名称"/>
+                </p>
+                <p class="time"><i class="time-icon"></i>剩余2天 <em>12：34：56</em></p>
+                <p class="name overflow-h">
+                    CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm
+                </p>
+            </a>
+            <div class="bg">
+                <p class="yuanjia">4750积分</p>
+                <p class="xianjia">450000<i class="txt">积分</i></p>
+                <a  href="#" target="_blank"> <span class="btn">立即抢购</span></a>
+            </div>
+            <p class="bgzekou">7.3<i>折</i></p>
+        </li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>数据统计</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">订单退款日志</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+            #if($shiro.isPermitted('duizhang:pay_view'))
+                <li><a href="/jdvop/admin/statistics/payment.php" title="支付对账">支付对账</a></li>
+              #end
+                <li class="curr"><a href="#" title="退款对账">退款对账</a></li>
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/statistics/return.php" method="get">
+                <table>
+                    <tr>
+                       <td class="pl20">
+                            支付方式： 
+                            <select name="pt" class="common h22 w160 mr20">
+                                <option value="">全部日志</option>
+                                <option #if($payType == "shiminka_pay") selected #end value="shiminka_pay">市民卡支付</option>
+                                <option #if($payType == "wechat") selected #end value="wechat">微信支付</option>
+                            </select>
+                            <input type="text" id="st" name="st" value="$!dateTool.format('yyyy-MM-dd 00:00:00', $st)" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh',dateFmt:'yyyy-MM-dd 00:00:00',maxDate:'#F{$dp.$D(\'et\')}'});" class="Wdate common h22 w160"/>
+                            到&nbsp;&nbsp; 
+                            <input type="text" id="et" name="et" value="$!dateTool.format('yyyy-MM-dd 23:59:59', $et)" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh',dateFmt:'yyyy-MM-dd 23:59:59',minDate:'#F{$dp.$D(\'st\')}'});" class="Wdate common h22 w160"/>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" /> 
+                        </td>
+                        <td class="tl">
+                         #if($shiro.isPermitted('duizhang:refund_export'))
+                            <span class="btn-grey2 ml10" id="js_do_export">导出Excel</span>
+                        	#end
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:100px;"/>
+                <col style="width:100px;"/>
+                <col style="width:160px;"/>
+                <col style="width:160px;"/>
+                <col style="width:160px;"/>
+                <col style="width:160px;"/>
+                <col style="width:160px;"/>
+            </colgroup>
+            <tr>
+                <th>退换货单号</th>
+                <th>原始订单号</th>
+                <th>退款账号</th>
+                <th>支付金额</th>
+                <th>退款金额</th>
+                <th>支付方式</th>
+                <th>退款完成时间</th>
+            </tr>
+            #if($nifferOrders.hasContent())
+                #foreach($nifferOrder in $nifferOrders)
+                     <tr>
+                         <td class="tc"><p><a href="/jdvop/admin/order.php?id=${nifferOrder.originalOrderId}" target="view_window">$!nifferOrder.afterSaleOrderKey</a></p></td>
+                         <td class="tc"><p><a href="/jdvop/admin/order.php?id=${nifferOrder.originalOrderId}" target="view_window">$nifferOrder.orderKey</a></p></td>
+                         <td class="tc">$!nifferOrder.loginName</td>
+                         <td class="tc">$numberTool.format('0.00',$!nifferOrder.needPay)</td>
+                         #set($returnTotalPrice=$!nifferOrder.refundAmount + $!nifferOrder.shipmentFee)
+                         <td class="tc">$numberTool.format('0.00',$!returnTotalPrice)</td>
+                         <td class="tc">$!nifferOrder.payType.description</td>
+                         <td class="tc">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.acceptTime)</td>
+                     </tr>
+                 #end
+            #else
+            <td class="tc" colspan = "7">暂无相关支付记录</td>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $nifferOrders.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $("#js_do_export").click(function(e){
+        e.preventDefault();
+        var l   = location.href.replace('/jdvop/admin/statistics/return.php', '/jdvop/admin/statistics/returnExport.php');
+        $('#export_ifrm').attr('src', l);
+    });
+    
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>账号管理</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+    </p>
+    <span class="text">管理员列表</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                #if($enabled == 'true')
+                    <li class="curr"><a href="#" title="已启用账号">已启用账号</a></li>
+                    <li><a href="/jdvop/admin/website/administrators.php?enabled=false&isProvider=false" title="已禁用账号">已禁用账号</a></li>
+                #elseif($enabled == 'false')
+                    <li><a href="/jdvop/admin/website/administrators.php?enabled=true&isProvider=false" title="已启用账号">已启用账号</a></li>
+                    <li class="curr"><a href="#" title="已禁用账号">已禁用账号</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/website/administrators.php" method="get">
+                <input type="hidden" name="enabled" value="#if(!$enabled || $enabled == 'false') false #{else} true #{end}" />
+                <table>
+                    <tr>
+                        <td>
+                            <select name="isProvider" class="common ml10 w160">
+                                <option value=" ">所有账号</option>
+<!--                                <option value="true" #if($isProvider == "true") selected="" #end>供应商</option>-->
+                                <option value="false" #if($isProvider == "false") selected="" #end>系统账号</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w160" placeholder="用户名/姓名/手机号/邮箱"/>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+            #if($shiro.isPermitted('account:create'))
+            <a href="/jdvop/admin/website/administrator/add.php"><span class="btn-green2">添加账号</span></a>
+            #end
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:60px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:100px" />
+                <col/>
+            </colgroup>
+            <tr>
+                <th><label><input type="checkbox" id="select_all" /></label></th>
+                <th>账号</th>
+                <!-- <th>账户类型</th> -->
+                <th>姓名</th>
+                <th>手机</th>
+                <th>角色名称</th>
+                <!-- <th>状态</th> -->
+                <th>操作</th>
+            </tr>
+            #if($adminstrators.hasContent())
+                #foreach($user in $adminstrators)
+                <tr>
+                    <td class="tc"><label><input type="checkbox" class="select-item" name="ids[]" value="$!user.id" /></label></td>
+                    <td>$!esc.html($user.loginName)</td>
+                    <!-- #if($user.provider)
+                        <td>供应商</td>
+                    #else
+                        <td>管理员</td>
+                    #end -->
+                    <td>$!esc.html($user.workerName)</td>
+                    <td>$!esc.html($user.mobile)</td>
+                    #if($!user.roleName)
+                     <td class="tr">$!esc.html($user.roleName)</td>
+                    #else
+                     <td class="tr">无角色</td>
+                    #end
+                   
+                    <!-- <td class="tc">
+                        #if($user.enabled)
+                            <font color="#245C08;">启用</font>
+                        #else 
+                            <font color="red">禁用</font>
+                        #end
+                    </td> -->
+                    <td class="tc js-option-parents">
+                        
+                        #if($admin.loginName == "admin" || $admin.loginName == "administrator")
+                            <div class="drop-down js-dropDown">
+                                <span class="ico"></span>
+                                <p class="s-inp">操作</p>
+                            </div>
+                            <dl class="s-option js-sOption">
+                                <dd><a href = "/jdvop/admin/website/administrator/edit.php?adminId=$!user.id">编辑</a></dd>
+                                    #if($user.loginName != "admin")
+                                        #if($user.enabled)
+                                         	#if($shiro.isPermitted('account:endUse'))
+                                            	<dd><a class="ajax-request"    onclick="operate($!user.id,0)">禁用</a></dd>
+                                        	#end
+                                        #else
+                                        #if($shiro.isPermitted('account:startUse'))
+                                            <dd><a class="ajax-request"   onclick="operate($!user.id,1)">启用</a></dd>
+                                            #end
+                                            #if($websiteUserService.isDeleteable($user))
+                                                <dd><a class="ajax-request"  onclick="operate($!user.id,-1)">删除</a></dd>
+                                            #end
+                                        #end
+                                        #if($shiro.isPermitted('account:delete'))
+                                        <dd><a href="/jdvop/admin/website/administrator/delete.php?adminId=$!user.id"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要删除这个账号么?">删除</a></dd>
+                                   		#end
+                                    #end
+                            </dl>
+                        #else
+                            #if($user.loginName == "admin")
+                            <font color="red">禁止操作</font>
+                            #else
+                            <div class="drop-down js-dropDown">
+                                <span class="ico"></span>
+                                <p class="s-inp">操作</p>
+                            </div>
+                            <dl class="s-option js-sOption">
+                                #if($shiro.isPermitted('account:edit'))
+                                    <dd><a href = "/jdvop/admin/website/administrator/edit.php?adminId=$!user.id">编辑</a></dd>
+                                #end
+                                #if($user.enabled)
+                                    #if($shiro.isPermitted('account:endUse'))
+                                         <dd><a href="/jdvop/admin/website/administrator/setEnabled.php?ids[]=$!user.id&enabled=false"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要禁用这位账号么?">禁用</a></dd>
+                                	#end
+                                #else
+                                #if($shiro.isPermitted('account:startUse'))
+                                    <dd><a href="/jdvop/admin/website/administrator/setEnabled.php?ids[]=$!user.id&enabled=true" method="GET" class="ajax-request" ok-message="reload">启用</a></dd>
+                                #end
+                                #end
+                                #if($shiro.isPermitted('account:delete'))
+                                <dd><a href="/jdvop/admin/website/administrator/delete.php?adminId=$!user.id"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要删除这个账号么?">删除</a></dd>
+                            	#end
+                            </dl>
+                            #end
+                        #end
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关账号
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        <ul class="multipage clearfix">
+            <li>共(18)条</li><li style="margin:0px 20px 0px 15px;">当前显示 1-20 条</li>
+            <li><span class="no-page h-page">首页</span></li>
+            <li><span class="no-page p-page">前一页</span></li>
+            <li><span class="current"> 1 </span></li>
+            <li><span class="no-page n-page">后一页</span></li>
+            <li><span class="no-page e-page">尾页</span></li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+
+function operate(userid,type){
+    if(type==0){
+        top.artConfirm('请注意', '您真的要禁用这位账号么?', function(v){
+            if (v) {
+                top.artProgress('禁用中，请稍后...');
+                $.get('/jdvop/admin/website/administrator/setEnabled.php?',{enabled : false,'ids[]':userid}, function(d){
+                    top.artProgress('[close]');
+                    if (d.isOk) {
+                        top.artAlert('温馨提示', '禁用成功',function(){
+                            location.reload();
+                        } );
+                    } else {
+                        top.artAlert('温馨提示', d.message, 'error');
+                    }
+                }, 'json');
+            }
+        });
+    }else if(type==1){
+        top.artConfirm('请注意', '您真的要启用这位账号么?', function(v){
+            if (v) {
+                top.artProgress('启用中，请稍后...');
+                $.get('/jdvop/admin/website/administrator/setEnabled.php?',{enabled : true,'ids[]':userid}, function(d){
+                    top.artProgress('[close]');
+                    if (d.isOk) {
+                        top.artAlert('温馨提示', '启用成功',function(){
+                            location.reload();
+                        } );
+
+                    } else {
+                        top.artAlert('温馨提示', d.message, 'error');
+                    }
+                }, 'json');
+            }
+        });
+    }else if(type==-1){
+        top.artConfirm('请注意', '您真的要删除这位账号么?一旦删除将无法恢复!', function(v){
+            if (v) {
+                top.artProgress('删除中，请稍后...');
+                $.get('/jdvop/admin/administrator/delete.php?',{'ids[]':userid}, function(d){
+                    top.artProgress('[close]');
+                    if (d.isOk) {
+                        top.artAlert('温馨提示', '删除成功',function(){
+                            location.reload();
+                        } );
+
+                    } else {
+                        top.artAlert('温馨提示', d.message, 'error');
+                    }
+                }, 'json');
+            }
+        });
+    }
+
+}
+function  disableBatch(data) {
+    top.artConfirm('请注意', '您真的要禁用这' + data.length + '位账号么?', function(v){
+        if (v) {
+            top.artProgress('禁用中，请稍后...');
+            $.get('/jdvop/admin/website/administrator/setEnabled.php?' + data.join('&'), {enabled : false}, function(d){
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    location.reload();
+                } else {
+                    top.artAlert('温馨提示', d.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+}
+function  restoreBatch(data) {
+    top.artProgress('启用中，请稍后...');
+    $.get('/jdvop/admin/website/administrator/setEnabled.php?' + data.join('&'), {enabled : true}, function(d){
+        top.artProgress('[close]');
+        if (d.isOk) {
+            location.reload();
+        } else {
+            top.artAlert('出错啦', d.message);
+        }
+    }, 'json');
+}
+function  doBatchAction(action) {
+    var data        = [];
+    $('input[name="ids[]"]:checked').each(function(){
+        var thiz    = $(this);
+        var id  = thiz.val();
+        if (id !== undefined) {
+            id  = parseInt(id);
+            if (id !== NaN && id > 0) {
+                data.push('ids[]=' + id);
+            }
+        }
+    });
+    if (data.length > 0) {
+        if (action === 'disable') {
+            disableBatch(data);
+        } else if (action === 'restore') {
+            restoreBatch(data);
+        }
+    } else {
+        top.artAlert('温馨提示', '您必须选中一些账号才可以执行此操作!');
+    }
+}
+
+
+</script>
+
+</body>
+</html>

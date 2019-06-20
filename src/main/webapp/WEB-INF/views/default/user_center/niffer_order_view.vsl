@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/common.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<!--[if lt IE 9]>
+    <script type='text/javascript' src="/jdvop/script/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+ #parse('header.vsl')    
+<div class="user-personal clearfix">
+#include('user_center/sider_bar.vsl')
+<div class="user-content-wrap">
+    <h3 class="user-title">换货详情</h3>
+    <div class="user-wrap-tab" >
+        <table>
+            <colgroup>
+                <col style="width:70px;"/>
+                <col style="width:120px;"/>
+                <col style="width:100px;"/>
+                <col style="width:220px;"/>
+                <col style="width:52px;"/>
+                <col style="width:80px;"/>
+                <col style="width:70px;"/>
+                <col style="width:220px;"/>
+            </colgroup>
+            <tr>
+                <td class="fwb tar">单号：</td>
+                <td><a href="/jdvop/my/order/${order.id}.php" class="blue">$order.key</a></td>
+                <td class="fwb tar">申请时间：</td>
+                <td class="blue">$dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.applyTime) </td>
+                <td class="fwb tar">状态：</td>
+                <td class="fwb" style="color:#85c143;">$nifferOrder.status.description</td>
+            </tr>
+        </table>
+    </div>
+    <div class="state mt10p">
+        #set($pgClass = 'nav1')
+        #if($nifferOrder.status == 'waiting_audit')
+            #set($pgClass = 'nav1')
+        #end
+        #if($nifferOrder.status == 'waiting_accept')
+            #set($pgClass = 'nav2')
+        #end
+        #if($nifferOrder.acceptTime && $nifferOrder.status != 'accepted')
+            #set($pgClass = 'nav4')
+        #end
+        #if($nifferOrder.status == 'accepted' || ($refundOrder && $refundOrder.status == 'refunded'))
+            #set($pgClass = 'nav5')
+        #end
+        <p class="$pgClass"></p>
+        <span class="navsubmit">提交申请</span>
+        <span class="service" style="left: 217px;">客服审核</span>
+        <span class="Return" style="left: 390px;">退回商品</span>
+        <span class="Warehouse" style="left: 563px;">仓库验收</span>
+        <span class="last">已发货</span>
+    </div>
+    <table class="user-return">
+        <colgroup>
+            <col style="width:176px"/>
+            <col />
+        </colgroup>
+        <tr>
+            <th class="fwb">换货描述</th>
+            <th></th>
+        </tr>
+        <tr>
+            <td class="pl45p">联系人</td>
+            <td class="pl20p">$nifferOrder.consumerName</td>
+        </tr>
+         <tr>
+            <td class="pl45p">联系方式</td>
+            <td class="pl20p">$!nifferOrder.consumerMobile &nbsp;&nbsp; $!nifferOrder.consumerPhone</td>
+        </tr>
+        <tr>
+            <td class="pl45p">原因</td>
+            <td class="pl20p">$!nifferOrder.remark</td>
+        </tr>
+        #if($nifferOrder.type == 'niffer')
+        <tr>
+            <td class="pl45p">换货产品</td>
+            <td class="pl20p">
+            #foreach($entry in $outEntry)
+            #set($bp = $productTool.getByStorageUnitId($entry.storageUnitId))
+            <a href="/jdvop/product/${bp.id}.php" class='blue ml10p' target="_blank">$!bp.name</a>×$entry.amount&nbsp;&nbsp;
+            #end
+            </td>
+        </tr>
+        #end
+    </table>
+    <table class="user-return mt20p">
+        <col style="width:176px"/>
+        <col />
+        <tr>
+            <th class="fwb">换货进度反馈</th>
+            <th></th>
+        </tr>
+        <tr>
+            <td class="pl45p">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.applyTime)</td>
+            <td class="pl20p">申请换货成功，正在等待客服审核中。</td>
+        </tr>
+        #if($nifferOrder.status == 'declined')
+            <tr>
+                <td class="pl45p red" colspan="2">客服拒绝了您的换货申请，备注信息：$!nifferOrder.remarkByWorker</td>
+            </tr>
+        #else
+            #if($nifferOrder.auditTime)
+            <tr>
+                <td class="pl45p">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.auditTime)</td>
+                <td class="pl20p">客服审核已通过，请将商品寄回仓库。备注信息：$!nifferOrder.remarkByWorker</td>
+            </tr>
+            #end
+            #if($nifferOrder.acceptTime)
+            <tr>
+                <td class="pl45p">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.acceptTime)</td>
+                <td class="pl20p">仓库确认收到商品并登记验收。备注信息：$!nifferOrder.remarkByStorehouse</td>
+            </tr>
+            #end
+            #if($nifferOrder.type == 'niffer' && $shipmentLog)
+            <tr>
+                <td class="pl45p">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $shipmentLog.shipmentTime)</td>
+                <td class="pl20p">新的货品已经由仓库发出，请留意收货。快递公司:$shipmentLog.shipmentCompany.name，快递单号：$shipmentLog.shipmentOrder</td>
+            </tr>    
+            #end
+            #if($refundOrder)
+                <tr>
+                    <td class="pl45p">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $refundOrder.createTime)</td>
+                    <td class="pl20p">退款单生成成功，退款金额:$!refundOrder.refundAmount，收款人:$!refundOrder.payee。财务审核通过后，将在2-3个工作日内打款，请耐心等待。</td>
+                </tr>
+                #if($refundOrder.status == 'declined')
+                <tr>
+                    <td colspan="2" class="pl45p red">财务拒绝了退款请求。备注信息:$!refundOrder.remarkByFinance</td>
+                </tr>    
+                #elseif($refundOrder.refundTime)
+                <tr>
+                    <td class="pl45p">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $refundOrder.refundTime)</td>
+                    <td class="pl20p">财务打款成功，请注意查收您的银行卡到账情况。</td>
+                </tr>
+                #end
+            #end
+        #end
+    </table>
+</div>
+</div>
+<!--content end-->
+#parse('footer.vsl')   
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>  
+</body>
+</html>

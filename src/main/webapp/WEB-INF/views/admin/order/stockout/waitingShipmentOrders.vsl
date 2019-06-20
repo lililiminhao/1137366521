@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link rel='stylesheet'  type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/dragsort-0.5.1.min.js'></script>
+<script type="text/javascript" src='/jdvop/script/admin/my97/WdatePicker.js'></script>
+<script type="text/javascript" src="/jdvop/script/admin/lmf.filter.select.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>订单管理</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+##    #if($shiro.isPermitted('order_after_sale:view'))
+##    <a href="/jdvop/admin/order/niffers.php?isSystem=false" title="售后订单列表"><p class="right fr btn-green2">售后订单列表</p></a>
+##    #end
+##    #if($shiro.isPermitted('system_order:view'))
+##        <a href="/jdvop/admin/order/systemOrders.php?type=system" title="系统订单列表"><p class="right fr btn-green2">系统订单列表</p></a>
+##    #end
+    <span class="text">待发货订单</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li><a href="/jdvop/admin/orders.php" title="全部订单">全部订单</a></li>
+                #if($shiro.isPermitted('order:examine'))
+                <li><a href="/jdvop/admin/orders.php?status=waiting_audit" title="待审核订单">待审核订单</a></li>
+                #end
+                <li class="curr" ><a href="#" title="待发货订单">待发货订单</a></li>
+                <li><a href="/jdvop/admin/orders/deliveriedOrders.php" title="已发货订单">已发货订单</a></li>
+                <li><a href="/jdvop/admin/orders.php?status=completed" title="已完成订单">已完成订单</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form id="data-form" action="/jdvop/admin/orders/waitingShipmentOrders.php" method="get">
+                <input type="hidden" name="status" value="$!request.getParameter('status')"/>
+                <table>
+                    <tr>
+                        <td class="pl20">关键字：<input type="text" name="kw" value="$!request.getParameter('kw')" placeholder="订单号/父订单号/收件人" class="common w160"/></td>
+                        <td class="p120">供应商：
+                            <select name="providerId" class="common h22 w140">
+                                <option value="0">请选择</option>
+                                #foreach($provider in $providerMap)
+                                <option value="$provider.id" #if($provider.id == $request.getParameter('providerId')) selected #end>$provider.workerName</option>
+                                #end
+                            </select>
+                        </td>
+                        <td class="pl20">所在省份：
+                            <select name="province" class="common h22 w140">
+                                <option value="0">请选择</option>
+                                #foreach($prov in $provinces)
+                                <option value="$prov.id" #if($prov.id == $request.getParameter('prov')) selected #end>$prov.name</option>
+                                #end
+                            </select>
+                        </td>
+
+
+                    </tr>
+                    <tr>
+                        <td class="p120">
+                            是否企业订单：
+                            <select name="isEnterprise"class="common w160" style="height:28px; width:80px">
+                                <option value="">请选择  </option>
+                                <option #if($request.getParameter('isEnterprise')==true) selected #end  value="true" >是</option>
+                                <option #if($request.getParameter('isEnterprise')==false) selected #end  value="false" >否</option>
+                            </select>
+                        </td>
+                        <td class="p120">
+                            企业名：
+                            <input type="hidden" name="enterpriseId" value="$!request.getParameter('enterpriseId')"/>
+                            <select class="common w160 h32 mr6 model-select js-select-enterprise">
+                                <option value="">请选择  </option>
+                                #foreach($enterprise in $enterpriseList)
+                                    <option value="$enterprise.name/$enterprise.id" #if($enterprise.id == $request.getParameter('enterpriseId')) selected #end  #if($enterprise.id == $!enterpriseId) selected #{end}>$enterprise.name</option>
+                                #end
+                            </select>
+                        </td>
+                        <td colspan="2">
+                            <button type="submit" class="btn-grey2 ml10">搜索</button>
+                            <span class="btn-grey2 ml10 js-excel-export">高级导出</span>
+                        </td>
+                        <!--                        <td>
+                                                    <span onclick="" class="btn-grey2 ml10 js-excel-export">导出</span>
+                                                    <iframe id='hiden_frm' name="hiden_frm" src="javascript:void(0);" style="display:none;"></iframe>
+                                                </td>-->
+
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width: 42px;" />
+                <col style="width: 70px;" />
+                <col style="width: 70px;" />
+                <col style="width: 80px;" />
+                <col style="width: 80px;" />
+                <col style="width: 200px;" />
+                <col style="width: 100px;" />
+                <col style="width: 100px;" />
+                <col style="width: 100px;" />
+                <col style="width: 103px;" />
+                <col/>
+            </colgroup>
+            <tr>
+                <th><label><input type="checkbox" id="select_all" /></label></th>
+                <th>订单编号</th>
+                <th>所属供应商</th>
+                <th>企业名</th>
+                <th>收件人 </th>
+                <th>客户地址 </th>
+                <th>手机号码 </th>
+                <th>订单状态</th>
+                <th>下单时间</th>
+                <th>操作</th>
+            </tr>
+            #if($orders && $orders.hasContent())
+                #foreach($order in $orders)
+                <tr>
+                    <td class="tc"><label><input type="checkbox" class="select-item" name="ids[]" value="$!order.id" /></label></td>
+                    <td class="tc"><a href="/jdvop/admin/order.php?id=$order.id" class="blue">$!order.key</a></td>
+                    <td $fontStyle class="tc">
+						#if($order.deliveryObjectId)
+							$!providerMap.get($order.deliveryObjectId).workerName
+						#end
+					</td>
+                    #set($enterpriseInfo = '')
+                    #set($enterpriseInfo = $enterpriseMap.get($!order.enterpriseId))
+                    <td $fontStyle class="tc">$!enterpriseInfo.name</td>
+                    <td class="tc">$!order.receiverName</td>
+                    <td class="tc">$!order.province.name $!order.city.name $!order.county.name $!order.town.name $!order.receiverAddr</td>
+                    <td class="tc">$!order.receiverMobile</td>
+                    <td class="tc">$!order.status.description</td>
+                    <td class="tc">$!date.format('yyyy-MM-dd HH:mm:ss',$order.createTime)</td>
+                    <td class="tc js-option-parents">
+                        <div class="drop-down js-dropDown">
+                            <span class="ico"></span>
+                            <p class="s-inp">操作</p>
+                        </div>
+                        <dl class="s-option js-sOption">
+                            #if($order.status == "waiting_shipment")
+                                #if($shiro.isPermitted('order:examine'))
+                                <dd><a href="/jdvop/admin/order/deaudit.php?ids[]=$order.id" method="POST" class="ajax-request" ok-message="reload" cfm-message="是否确认取消客服审核？" >取消客审</a></dd>
+                                #end
+                                #if($shiro.isPermitted('order:shipment'))
+                                <dd class="js-do-shipment" oid='$order.id' sid='$order.shipmentCompany.id'>发货</dd>
+                                #end
+                            #end
+                            #if($shiro.isPermitted('order:view'))
+                            <dd><a href="/jdvop/admin/order.php?id=$order.id" >详情</a></dd>
+                            #end
+                        </dl>
+                    </td>
+                </tr>   
+                #end
+            #else
+                <tr>
+                    <td class="tc fs18p fb" colspan="8">
+                        暂无相关订单
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $orders.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script>
+$(function(){
+
+    //设置企业ID
+    var enterpriseSelect = $(".js-select-enterprise").filterSelect();
+    enterpriseSelect.on("change", function(){
+        var inputKey = $(this).val();
+        $("input[name='enterpriseId']").val(inputKey.split("/")[1]);
+    });
+    
+    $(document).on("click",".js-do-shipment",function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        var sid  = thiz.attr("sid");
+        var options = '';
+        #foreach($company in $shipmentCompanys)
+            var companyId = '$company.id';
+            if(companyId === sid)
+                options += '<option value="$company.id" selected>$company.name</option>';
+            else
+                options += '<option value="$company.id">$company.name</option>';
+        #end
+        top.dialog({
+            width: 400,
+            title: '快递信息',
+            content:'<table>'
+                + '<colgroup>'
+                + '<col style="width: 100px;">'
+                + '<col>'
+                + '</colgroup>'
+                + '<tr>'
+                + '<td class="tr">快递公司:</td>'
+                + '<td>'
+                + '<select name="shipmentCompanyId" class="common ml10 w260">'
+                + options
+                + '</select>'
+                + '</td>'
+                + '</tr>'
+                + '<tr>'
+                + '<td class="tr">快递单号:</td>'
+                + '<td><input name="shipmentOrder" type="text" class="common ml10 w260" placeholder="请填写快递单号" /></td>'
+                + '</tr>'
+                + '</table>',
+            okValue: '确定',
+            ok: function (){
+                var oid = thiz.attr("oid");
+                var shipmentCompanyId = top.$("select[name='shipmentCompanyId']").val();
+                var shipmentOrder   = top.$("input[name='shipmentOrder']").val();
+                if(shipmentCompanyId == ''){
+                    top.artAlert('温馨提示', '请选择快递公司!', 'error');
+                    return false;
+                }
+                if(shipmentOrder == ''){
+                    top.artAlert('温馨提示', '请填写快递单号!', 'error');
+                    return false;
+                }
+                $.post('/jdvop/admin/order/setToShipment.php', {id : oid, shipmentCompanyId : shipmentCompanyId, shipmentOrder : shipmentOrder}, function(data){
+                    if (data.isOk) {
+                        location.reload();
+                    } else {
+                        top.artAlert('温馨提示', data.message, 'error');
+                        return;
+                    }
+                }, 'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            },
+            
+        }).showModal();
+    });
+});
+//批量导出
+$(function () {
+    $(".js-excel-export").on("click", function (e) {
+        e.preventDefault();
+        var URL = "/jdvop/admin/order/doExportExcel.php?" + $("#data-form").serialize();
+        $("#hiden_frm").attr("src", URL);
+    });
+});
+
+$(".js-excel-export").on("click", function(e){
+        e.preventDefault();
+        window['SAVE_DIALOG']   = dialog({
+            title   : '高级导出',
+            height  : 250,
+            width   : 500,
+            content : '<div class="con" style="padding-left:20px;">'
+                      + '<form id="export-data-from" action="/jdvop/admin/order/doExportExcel.php" method="post">'
+                      + '<input name="type" type="hidden" value="${request.getParameter("type")}"/>'
+                      + '<table><colgroup><col style="width: 100px;"><col></colgroup>'
+                      + '<tr><td class="tr">关键字:</td><td><input type="text" name="kw" placeholder="订单号/父订单号/收件人" class="common w260 ml10"/></td></tr>'
+                      + '<tr><td class="tr">供应商:</td><td>'  
+                      + '<select name="providerId" class="common ml10 h26 w260">'
+                      + '<option value="" selected="selected">全部供应商</option>'
+                      + '#foreach($provider in $providerMap)'
+                      + '<option value="$provider.id">$provider.workerName</option>'
+                      + '#end'  
+                      + '</select></td></tr>'
+                      + '<tr><td class="tr">订单状态:</td><td>'
+                      + '<select name="status" class="common ml10 h26 w260">'
+                      + '<option value=" ">全部订单</option>'
+                      + '<option value="waiting_audit">等待客服审核</option>'
+                      + '<option value="waiting_shipment">等待发货</option>'
+                      + '<option value="waiting_confirmed">等待确认收货</option>'
+                      + '<option value="completed">订单已完成</option>'
+                      + '</select></td></tr>'
+                      + '<tr><td class="tr">时间类型:</td><td>'
+                      + '<select name="timeType" class="common h26 ml10 w260">'
+                      + '<option value="createTime">订单创建时间</option>'
+                      + '<option value="shipmentTime">发货时间</option>'
+                      + '<option value="confirmTime">订单完成时间</option>'
+                      + '</select></td></tr>'
+                      + '<tr><td class="tr">时间范围:</td><td>'
+                      + '<input type="text" id="st_export" name="st" class="common w140  ml10" value="$dateTool.format("yyyy-MM-dd 00:00:00", $startDate)" onfocus="WdatePicker({readOnly:true, skin:\'blueFresh\', dateFmt:\'yyyy-MM-dd 00:00:00\',maxDate:\'#F{$dp.$D(\\\'et_export\\\')}\'});" placeholder="起始日期"/>'
+                      + ' - <input type="text" id="et_export" name="et" class="common w140" value="$dateTool.format("yyyy-MM-dd 23:59:59", $endDate)" onfocus="WdatePicker({readOnly:true, skin:\'blueFresh\', dateFmt:\'yyyy-MM-dd 23:59:59\',minDate:\'#F{$dp.$D(\\\'st_export\\\')}\'});" placeholder="截至日期"/>'
+                      + ' </tr>'
+
+                      + '<tr><td class="tr">是否企业订单:</td><td>'
+                      + ' <select name="isEnterprise"class="common ml10 h26 w260">'
+                      + ' <option value="">请选择  </option>'
+                      + '<option #if($request.getParameter('isEnterprise')==true) selected #end  value="true" >是</option>'
+                      + '<option #if($request.getParameter('isEnterprise')==false) selected #end  value="false" >否</option>'
+                      + ' </select>'
+                      + ' </td>'
+                      + ' </tr>'
+
+                      + '<tr><td class="tr">企业名:</td><td>'
+                      + ' <select name="enterpriseId"class="common ml10 h26 w260">'
+                      + ' <option value="0">请选择  </option>'
+                      + '#foreach($enterprise in $enterpriseList)'
+                      + '<option value="$enterprise.id" #if($enterprise.id == $request.getParameter('enterpriseId')) selected #end  #if($enterprise.id == $!enterpriseId) selected #{end}>$enterprise.name</option>'
+                      + ' #end'
+                      + ' </select>'
+                      + ' </td>'
+                      + ' </tr>'
+
+                      + '</table></from></div>',
+            onclose : function() {
+                this.remove();
+                window['EDIT_ONE_FORM'] = undefined;
+            },
+            okValue : '确认导出',
+            ok      : function() {
+                $("#export-data-from").submit();
+            }
+        });
+        window['SAVE_DIALOG'].showModal();
+    });
+
+
+</script>
+
+
+</body>
+</html>

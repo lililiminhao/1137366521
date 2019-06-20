@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=7"/>
+        <meta name="keywords" content=""/>
+        <meta name="Description" content=""/>
+        <title>$websiteTool.name</title>
+        <style>
+          .all{width: 580px; min-height: 330px; position:fixed!important;top: 50%;left: 50%;z-index:9999;margin-left: -280px;margin-top: -250px;}
+          .r-index{ display:inline-block; width:112px; height: 36px; background:url(/jdvop/images/scr.png) no-repeat -282px -356px; }
+          .r-page{ display:inline-block; width:112px; height: 36px; background:url(/jdvop/images/scr.png) no-repeat -282px -397px; }
+        </style>
+    </head>
+    <body>
+        <div  class="all">
+            <div class="img">
+                <img src="/jdvop/images/404.png"/>
+            </div>
+            <p style=" margin:20px 0px 0px 100px;">
+                <a href="/jdvop/index.php" class="r-index" title="返回首页"></a>
+                <a href="javascript:history.go(-1);" title="返回上一页" class="r-page"></a>
+            </p>
+       </div>
+    </body>
+</html>

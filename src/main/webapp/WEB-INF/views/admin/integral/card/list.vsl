@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>积分卡管理</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+        <a href="/jdvop/admin/integral/card/generateLogs.php" ><span class="btn-green2 mr10">积分卡日志</span> </a>
+    </p>
+    <span class="text">积分卡管理</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr"><a href="#" title="全部积分卡">积分卡列表</a></li>
+                <li style="margin-right: 40px; float: right">
+                    <p class="fr ml20">
+                        <span style="background:red; color:red; ">设置</span>未激活&nbsp; &nbsp;&nbsp;
+                        <span style="background:green;color:green;">设置</span>已激活&nbsp;&nbsp;&nbsp;
+                        <span style="background:#F87B00; color:#F87B00;">设置</span>已被使用&nbsp;&nbsp;&nbsp;
+                        <s><span style="background:#737D80;color:#737D80;">设置</span>设置作废</s>&nbsp;&nbsp;
+                        <span style="background:black; color:black;">设置</span>已过期&nbsp;&nbsp;&nbsp;
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/integral/integralCards.php" method="get">
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w160" placeholder="兑换码"/>
+                        </td>
+                        <td>
+                            <select  name="templateId" class="common ml10 w160">
+                                <option value=" ">所属模版</option>
+                                #foreach($template in $templates)
+                                    <option value="$template.id" #if($template.id == $templateId) selected #end>$template.templateName</option>
+                                #end
+                            </select>
+                        </td>
+                        <td>
+                            <select name="status"  class="common ml10 w160">  
+                                <option value=' '>全部状态</option>
+                                #foreach($ts in $tokenStatus)
+                                    <option value = "$ts.name()" #if($ts.name() == $status) selected  #end>$ts.description</option>
+                                #end
+                            </select>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                        <td><span class="btn-grey2 ml10" id="js_do_export">导出</span></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+            <a href="" class="js-create-integralCard"><span class="btn-green2">创建积分卡</span></a>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:60px" />
+                <col style="width:140px" />
+                <col style="width:180px" />
+                <col style="width:180px" />
+                <col style="width:150px" />
+                <col style="width:120px" />
+                <col style="width:180px" />
+                <col style="width:180px" />
+                <col style="width:180px" />
+                <col style="width:200px" />
+            </colgroup>
+            <tr>
+                <th><label><input type="checkbox" id="select_all" /></label></th>
+                <th>兑换码</th>
+                <th>模版名称</th>
+                <th>所属用户</th>
+                <th>积分值</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>过期时间</th>
+                <th>录入时间</th>
+                <th>操作</th>
+            </tr>
+            #if($cards.hasContent())
+                #foreach($card in $cards)
+                    #if($card.status == 'inactive' && !$card.isExpired())
+                         #set($fontStyle = "style='color:red;'")
+                    #elseif($card.status == 'active' && !$card.isExpired())
+                        #set($fontStyle = "style='color:green;'")
+                    #elseif($card.status == 'used')
+                        #set($fontStyle = "style='color:#F87B00;'")
+                    #elseif($card.status == 'invalid')
+                        #set($fontStyle = "style='color:#737D80; text-decoration:line-through;'")
+                    #elseif($card.status == 'expired' || $card.isExpired())
+                        #set($fontStyle = "style='color:black;'")
+                    #end
+                <tr>
+                    <td class="tc" $fontStyle><label><input type="checkbox" class="select-item" name="ids[]" value="$!card.cardId" /></label></td>
+                    <td class="tc" $fontStyle>$!esc.html($card.token)</td>
+                    <td class="tc" $fontStyle><a href="/jdvop/admin/integral/integralCardTemplate/view.php?id=$card.template.id" class="blue">$!esc.html($card.template.templateName)</a></td>
+                    <td class="tc" $fontStyle>
+                        #if($card.userId)
+                            #set($websiteUser = $!websiteUserSerivce.findOne($card.userId))
+                            $!websiteUserSerivce.findOne($card.userId).loginName
+                        #end
+                    </td>
+                    <td class="tc" $fontStyle>$!esc.html($card.integral)</td>
+                    <td class="tc" $fontStyle>$!esc.html($card.status.description)</td>
+                    <td class="tc" $fontStyle>
+                        $!date.format('yyyy-MM-dd HH:mm:ss', $card.createTime)
+                    </td>
+                    <td class="tc" $fontStyle>
+                        $!date.format('yyyy-MM-dd HH:mm:ss', $card.expireTime)
+                    </td>
+                    <td class="tc" $fontStyle>
+                        #if($card.userId)
+                            #set($consumeLogs = $integralCardLogService.findOneByCardId($card))
+                            $!date.format('yyyy-MM-dd HH:mm:ss', $consumeLogs.consumeTime)
+                        #end
+                    </td>
+                    <td class="tc js-option-parents">
+                        #if($card.status.name() == "active" || $card.status.name() == "inactive")
+                        <div class="drop-down js-dropDown">
+                            <span class="ico"></span>
+                            <p class="s-inp">操作</p>
+                        </div>
+                        <dl class="s-option js-sOption">
+                            #if($card.status.name() == "active")
+                                <dd><a href="/jdvop/admin/integral/card/deActive.php?ids[]=$!card.cardId"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您确定要反激活这张积分卡吗?">反激活</a></dd>
+                            #elseif($card.status.name() == "inactive")
+                                <dd><a href="/jdvop/admin/integral/card/active.php?ids[]=$!card.cardId" method="GET" class="ajax-request" ok-message="reload">激活</a></dd>
+                                <dd><a href="/jdvop/admin/integral/card/invalid.php?ids[]=$!card.cardId"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要作废这张积分卡吗？一旦作废将无法恢复!">作废</a></dd>
+                            #end
+                            <dd><a href="/jdvop/admin/integral/card/expire.php?ids[]=$!card.cardId"  method="GET" class="ajax-request" ok-message="reload">过期处理</a></dd>
+                            <dd><a href=""  rel="$!card.cardId" expireTime="$!date.format('yyyy-MM-dd HH:mm:ss', $card.expireTime)" method="GET" class="js-update-expireTime" >修改过期时间</a></dd>
+                        </dl>
+                        #end
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关积分卡
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        <div class="btn-wrap">
+            #if(!$enabled || $enabled == 'false')
+                <span class="btn-red batch-action" batch-action="restore">激活</span>
+                <span class="btn-grey batch-action" batch-action="delete">作废</span>
+            #else
+                <span class="btn-grey batch-action" batch-action="disable">反激活</span>
+            #end
+        </div>
+        $adminPg.pager($link, $cards.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+    
+function  disableBatch(data) {
+    top.artConfirm('请注意', '您真的要反激活这' + data.length + '张积分卡么?', function(v){
+        if (v) {
+            top.artProgress('反激活中，请稍后...');
+            $.get('/jdvop/admin/integral/card/deActive.php?' + data.join('&'), {}, function(d){
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    top.artAlert('温馨提示', d.message, '/jdvop/admin/integral/integralCards.php', 'ok');
+                } else {
+                    top.artAlert('温馨提示', d.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+}
+function  cancelBatch(data) {
+    top.artConfirm('请注意', '您真的要作废这' + data.length + '张积分卡么?一旦作废，将无法恢复!', function(v){
+        if (v) {
+            top.artProgress('操作中，请稍后...');
+            $.get('/jdvop/admin/integral/card/invalid.php?' + data.join('&'), function(d){
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    top.artAlert('温馨提示', d.message, '/jdvop/admin/integral/integralCards.php', 'ok');
+                } else {
+                    top.artAlert('温馨提示', d.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+}
+function  restoreBatch(data) {
+    top.artProgress('激活中，请稍后...');
+    $.get('/jdvop/admin/integral/card/active.php?' + data.join('&'), {}, function(d){
+        top.artProgress('[close]');
+        if (d.isOk) {
+            top.artAlert('温馨提示', d.message, '/jdvop/admin/integral/integralCards.php', 'ok');
+        } else {
+            top.artAlert('温馨提示', d.message, 'error');
+        }
+    }, 'json');
+}
+function  doBatchAction(action) {
+    var data        = [];
+    $('input[name="ids[]"]:checked').each(function(){
+        var thiz    = $(this);
+        var id  = thiz.val();
+        if (id !== undefined) {
+            id  = parseInt(id);
+            if (id !== NaN && id > 0) {
+                data.push('ids[]=' + id);
+            }
+        }
+    });
+    if (data.length > 0) {
+        if (action === 'disable') {
+            disableBatch(data);
+        } else if (action === 'delete') {
+            cancelBatch(data);
+        } else if (action === 'restore') {
+            restoreBatch(data);
+        }
+    } else {
+        top.artAlert('温馨提示', '您必须选中一些积分卡才可以执行此操作!', 'error');
+    }
+}
+
+$(function(){
+    
+    $(document).on('click', '#js_do_export', function(e){
+        e.preventDefault();
+        var l   = location.href.replace('/jdvop/admin/integral/integralCards.php', '/jdvop/admin/integral/card/export.php');
+        $('#export_ifrm').attr('src', l);
+    });
+    
+    $('.batch-action').on('click', function(e){
+        e.preventDefault();
+        var action  = $(this).attr('batch-action');
+        if (action !== undefined) {
+            doBatchAction(action);
+        }
+    });
+    
+    $(document).on("click",".js-update-expireTime",function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        var currentExpireTime = thiz.attr("expireTime");
+        top.dialog({
+            width: 500,
+            title: '修改过期时间',
+            content:'<div class="con">'
+                    +   '<table>'
+                    +   '<colgroup>'
+                    +   '<col style="width: 100px;">'
+                    +   '<col>'
+                    +   '</colgroup>'
+                    +   '<tr><td class="tr">当前过期时间：</td><td>' + currentExpireTime + '</td></tr>'
+                    +   '<tr><td class="tr">过期时间：</td><td><input type="text" name="expireTime"  onfocus="WdatePicker({readOnly: true, skin: \'blueFresh\',minDate:\'%y-%M-%d\',dateFmt:\'yyyy-MM-dd 23:59:59\'});"  class="Wdate common h22 w220" />   </td></tr>'
+                    +   '</table>'
+                    +'</div>',
+            okValue: '确定',
+            ok: function (){
+                var id  = thiz.attr("rel");
+                var expireTime = top.$('input[name="expireTime"]').val();
+                $.post('/jdvop/admin/integral/card/setExpireTime.php', {'ids[]' : id, expireTime : expireTime}, function(data){
+                    if (data.isOk) {
+                        location.reload();
+                    } else {
+                        top.artAlert('温馨提示', data.message, 'error');
+                        return;
+                    }
+                }, 'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            }
+            
+        }).showModal();
+    });
+    
+    $(document).on("click",".js-create-integralCard",function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        top.dialog({
+            width: 500,
+            title: '创建积分卡',
+            content:'<div class="con">'
+                    +   '<table>'
+                    +   '<colgroup>'
+                    +   '<col style="width: 100px;">'
+                    +   '<col>'
+                    +   '</colgroup>'
+                    +   '<tr><td class="tr"><i class="orange"> *</i>积分卡模版：</td><td>'
+                    +   '<select name = "templateId"  class="common w180">'
+                    +   '<option value = " ">请选择</option>'
+                    #foreach($template in $templates)
+                        +'<option value="$template.id" >$template.templateName</option>'
+                    #end
+                    +   '</select></td></tr>'
+                    +   '<tr><td class="tr"><i class="orange"> *</i>积分卡数量：</td><td><input type="text" name="amount" class="common w180"/></td></tr>'
+                    +   '<tr><td class="t"><i class="orange"> *</i>是否立即激活：</td><td class="tr"><select name="isActive"  class="common h22 w180"><option value="true">是</option><option value="false">否</option></select></td></tr>'
+                    +   '<tr><td class="tr"><i class="orange"> *</i>过期时间：</td><td><input type="text" name="expireTime"  onfocus="WdatePicker({readOnly: true, skin: \'blueFresh\',minDate:\'%y-%M-%d\',dateFmt:\'yyyy-MM-dd 23:59:59\'});"  class="Wdate common h22 w180" /> </td></tr>'
+                    +   '</table>'
+                    +'</div>',
+            okValue: '确定',
+            ok: function (){
+                var templateId  = top.$('select[name="templateId"]').val();
+                if(templateId == ' ') {
+                    top.artAlert('温馨提示', '请选择积分卡模版', 'error');
+                    return false;
+                }
+                var amount      = top.$('input[name="amount"]').val();
+                if(amount == '') {
+                    top.artAlert('温馨提示', '请输入创建数量', 'error');
+                    return false;
+                }
+                var isActive    = top.$('select[name="isActive"]').val();
+                var expireTime  = top.$('input[name="expireTime"]').val();
+                if(expireTime == '') {
+                    top.artAlert('温馨提示', '请选择过期时间', 'error');
+                    return false;
+                }
+                $.post('/jdvop/admin/integral/card/batchAdd.php', {templateId : templateId, amount : amount, isActive : isActive, expireTime : expireTime}, function(data){
+                    if (data.isOk) {
+                        top.artAlert('温馨提示', data.message, '/jdvop/admin/integral/integralCards.php', 'ok');
+                    } else {
+                        top.artAlert('温馨提示', data.message, 'error');
+                        return;
+                    }
+                }, 'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            }
+            
+        }).showModal();
+    });
+    
+});
+</script>
+
+</body>
+</html>

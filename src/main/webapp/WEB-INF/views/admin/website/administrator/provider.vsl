@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+<script type="text/javascript">
+$(function(){
+    // 鼠标悬浮
+    $('.js-showImgList li:not(.btn-add)').hover(function(){
+        $(this).find('.js-moveWrap').animate({'bottom': '0px'},100);
+    },function(){
+        $(this).find('.js-moveWrap').animate({'bottom': '-25px'}, 100);
+    }); 
+    
+    $('#change_passwd').click(function(){
+        if($('#change_passwd').attr("checked") === "checked"){
+            $('input[name="password"]').attr("disabled", false);
+        }else{
+            $('input[name="password"]').attr("disabled", true);
+        }
+    });
+    
+    $(document).on("submit", "#js-data-form", function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        if($("input[name='loginName']").val() === ""){
+            top.artAlert('温馨提示', '请填写账号信息', 'error');
+            return;
+        }
+        if($("input[name='workerName']").val() === ""){
+            top.artAlert("温馨提示", "请填写员工供应商名称", 'error');
+            return;
+        }
+        if($("input[name='mobile']").val() === ""){
+            top.artAlert("温馨提示", "请填写手机号码", 'error');
+            return;
+        }
+        $.post(thiz.attr("action"), thiz.serialize(), function(data){
+            if(data.isOk){
+                top.artAlert("温馨提示", "数据保存成功", "/jdvop/admin/website/administrators.php", 'ok');
+            }else{
+                top.artAlert("温馨提示", data.message, 'error');
+            }
+        }, "json");
+    });
+});
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="/jdvop/admin/website/administrators.php"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">#if($admin) 编辑供应商账号 #else 添加供应商账号 #end</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                #if($admin)
+                    #if($admin.provider)
+                        <li class="curr js-tab"><a href="#" title="供应商账号">供应商账号</a></li>
+                    #else
+                        <li class="curr js-tab"><a href="#" title="员工账号">员工账号</a></li>
+                    #end
+                #else
+                    <li class="js-tab"><a href="/jdvop/admin/website/administrator/add.php" title="员工账号">员工账号</a></li>
+                    <li class="curr js-tab"><a href="#" title="供应商账号">供应商账号</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+    <form id="js-data-form" action="#if($admin)/jdvop/admin/website/administrator/providerEdit.php#{else}/jdvop/admin/website/administrator/providerAdd.php#{end}" method="POST">
+        #if($admin)
+            <input type="hidden" name="adminId" value="$admin.id"/>
+        #end
+        <div class="automatic-box clearfix highlight_e4e4e4" style="border-top: none;">
+            <div class="add-product">
+                <table>
+                    <colgroup>
+                        <col style="width: 120px;" />
+                        <col style="width: 300px;"  />
+                        <col style="width: 120px;" />
+                        <col  />
+                    </colgroup>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>账号：</td>
+                        <td>
+                            <input type="text" name="loginName" value="$!admin.loginName" #if($admin) readonly="true" #end class="common h30 w180" />
+                        </td>
+                        <td class="tr"><i class="red">*</i>密码：</td>
+                        <td>
+                            <input id="password" type="text" name="password" value="" class="common h30 w240" #if($admin) disabled="disabled" #end/> 
+                            #if($admin)
+                            <label><input id="change_passwd" name="changePwd" type="checkbox" value="true"></label>
+                            <div class="topTip-wrap">
+                                <i class="topTip js-topTip"></i>
+                                <em class="help-title js-topTip-title">勾选后可以修改账号登录密码</em>
+                            </div>
+                            #end
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr"><i class="red">*</i> 供应商名称：</td>
+                        <td>
+                            <input type="text" name="workerName" value="$!admin.workerName" class="common h30 w240" />
+                        </td>
+                        <td class="tr"><i class="red">*</i> 手机：</td>
+                        <td>
+                            <input type="text" name="mobile" value="$!admin.mobile" maxlength="11" class="common h30 w240" /> 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">邮箱：</td>
+                        <td>
+                            <input type="text" name="email" value="$!admin.email" class="common h30 w240" />
+                        </td>
+                        <td class="tr">微信：</td>
+                        <td>
+                            <input type="text" name="wechat" value="$!admin.wechat" class="common h30 w240" />
+                        </td>
+                    </tr>
+                    #if($admin)
+                    <tr>
+                        <td class="tr">状态：</td>
+                        <td colspan="3">
+                            <select class="common h30 w240" name="enabled">
+                                <option value="true" #if(!$admin || $admin.isEnabled()) selected #end>启用</option>
+                                <option value="false" #if($admin && !$admin.isEnabled()) selected #end>禁用</option>
+                            </select>
+                            <div class="topTip-wrap">
+                                <i class="topTip js-topTip"></i>
+                                <em class="help-title js-topTip-title">账号禁用后将无法登录此系统</em>
+                            </div>
+                        </td>
+                    </tr>
+                    #end
+                </table>
+            </div>
+        </div>
+        <div class="layout-footer pb30">
+            <div class="btn-wrap">
+                <button type="submit" class="btn-orange">确定</button>
+                <a href="/jdvop/admin/website/administrators.php" class="btn-grey"> 取消 </a>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

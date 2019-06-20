@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+        <meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+        <meta name="Description" content="" />
+        <meta name="website" content="$!websiteTool.getWebsite().id" />
+        <meta name="usertype" content="website_user" />
+        <meta name="userid" content="$!userTool.getUserId()" />
+        <meta name="pagetype" content="other" />
+        <meta name="pageid" content="" />
+        <title>$!esc.html($websiteTool.getWebsite().getName())</title>
+        <link rel="stylesheet" type="text/css" href="/jdvop/css/global.css"/>
+        <link rel="stylesheet" type="text/css" href="/jdvop/css/main.css"/>   
+        <script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+        <!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+    </head>
+    <body style="background: #fafafc;">
+        #parse('header.vsl')
+        <div class="w1200 seckill-warp">
+            <div class="seckill-nav">
+                <dl class="tab-warp clearfix">
+                    <dd class="curr"><i class="icon a"></i><a href="/jdvop/activity/toLimitTimeKillView.php" title="今日秒杀">今日秒杀</a></dd>
+                    <dd ><i class="icon b"></i><a href="/jdvop/activity/toLimitTimeKillView.php?day=tomorry" title="明日预告">明日预告</a></dd>
+                </dl>
+            </div>
+            <!--floor-1-->
+            #if($productsToday.size()==0)
+            <div class="null-wrap">
+                <img src="/jdvop/images/img-actNull.png" alt="没有活动显示的图片"/><br/>
+                <a href="/jdvop/index.php"><input type="button" value="返回首页"  class="btn-orange"/></a>
+            </div>
+            #else
+            #foreach($activity in $productsToday)
+
+            #set($isOk = $!activity.endTime.getTime() < $!nowDate.getTime())
+            #if($isOk)
+            <div class="nav-time">
+                <p class="left">
+                    $!date.format('HH:mm',$!activity.endTime)  <i>开始</i>
+                </p>
+                #set($nums = $!activity.num)
+                #if($nums==0)
+                <p class="countdown">本轮秒杀已结束</p>
+                #else
+                <p class="countdown"> 疯狂秒杀中</p>
+                #end
+            </div>
+            #else
+            <div class="nav-time js-kill">
+                <p class="left">
+                    $!date.format('HH:mm',$!activity.endTime) <i>开始</i>
+                </p>
+                <p class="countdown" id="juli">
+                    <input type="hidden" name="endTime" id="endTime" value="$!dateTool.format('yyyy-MM-dd HH:mm',$!activity.endTime)">
+                    <em>
+                    </em>
+                </p>
+            </div>
+            #end
+            #set($products = $timeSpikeService.findOne($activity.id))
+            <ul class="limit-product clearfix">
+                #foreach($product in $products)
+                #set($num=$product.remaindAmount)  
+                #set($storage = $productService.findOne($product.productId))
+                #set($isStrock = $orderHelper.checkExistStockBeforeBuy($storage, $website, $request, $model))
+                <!--如果秒杀没开始，一概显示可以抢-->
+                #if(!$isOk)
+                <li>
+                    <a href="#" target="_blank" title="$!product.name">
+                        <p class="img">
+                            <a href="/jdvop/activity/toTimeSpikeDetail.php?productId=$!product.id&aid=$!activity.id&time=$!todayTime"><img src="$!product.thumbnailImage"/></a>
+                            #set($num=$product.remaindAmount)  
+                            #if($num==0)
+                            <span class="icon-over"></span>
+                            #else
+                            #end
+                            <span class="balance">限$!product.remaindAmount件</span>
+                        </p>
+                        <p class="name overflow-h">
+                            $!product.name
+                        </p>
+                    </a>
+                    <div class="bg">
+                        <div class="left clearfix">
+                            <p class="bgzekou">
+                                #set($price=$product.discountRate*10)
+                                $!numberTool.format('#0.0',$price)<i>折</i>
+                            </p>
+                            <p class="num">
+                                #set($startJiFen = ($product.displayDiscountPrice*$websiteTool.getWebsite().getRatio())/100)
+                                #set($nowJeFen = ($product.displayOriginalPrice*$websiteTool.getWebsite().getRatio())/100)
+                                <span class="yuanjia">$nowJeFen积分</span>
+                                <span class="xianjia">$startJiFen<i class="txt">积分</i></span>
+                            </p>
+                        </div>
+                        <!--<a href="#" target="_blank" title="秒杀结束"><span class="btn">秒杀<br/>结束</span></a>-->
+
+                        <a href="/jdvop/activity/toTimeSpikeDetail.php?productId=$!product.id&aid=$!activity.id&time=$!todayTime"  title="立即抢购"><span class="btn">立即<br/>抢购</span></a>
+
+                    </div>
+                </li>
+                #else
+                #if($isStrock)
+                <!--如果产品有库存 判断剩余的数量  如果剩余数量没有了 则显示抢光，有的话则显示可以抢-->
+                #if($num==0)
+                <li class="disabled">
+                    <a target="_blank" title="$!product.name">
+                        <p class="img">
+                            <img src="$!product.thumbnailImage"/>
+
+                            <span class="icon-over"></span>
+
+                            <span class="balance">限$!product.remaindAmount件</span>
+                        </p>
+                        <p class="name overflow-h">
+                            $!product.name
+                        </p>
+                    </a>
+                    <div class="bg">
+                        <div class="left clearfix">
+                            <p class="bgzekou">
+
+                                #set($price=$product.discountRate*10)
+                                $!numberTool.format('#0.0',$price)<i>折</i>
+                            </p>
+                            <p class="num">
+                                #set($startJiFen = ($product.displayDiscountPrice*$websiteTool.getWebsite().getRatio())/100)
+                                #set($nowJeFen = ($product.displayOriginalPrice*$websiteTool.getWebsite().getRatio())/100)
+                                <span class="yuanjia">$nowJeFen</span>
+                                <span class="xianjia">$startJiFen<i class="txt">积分</i></span>
+                            </p>
+                        </div>
+                        <!--<a href="#" target="_blank" title="秒杀结束"><span class="btn">秒杀<br/>结束</span></a>-->
+                        <span class="btn">抢购<br/>结束</span>
+                    </div>
+                </li>
+                #else
+                <li>
+                    <a href="#" target="_blank" title="$!product.name">
+                        <p class="img">
+                            <a href="/jdvop/activity/toTimeSpikeDetail.php?productId=$!product.id&aid=$!activity.id&time=$!todayTime"><img src="$!product.thumbnailImage"/></a>
+
+                            <span class="balance">限$!product.remaindAmount件</span>
+                        </p>
+                        <p class="name overflow-h">
+                            $!product.name
+                        </p>
+                    </a>
+                    <div class="bg">
+                        <div class="left clearfix">
+                            <p class="bgzekou">
+                                #set($price=$product.discountRate*10)
+                                $!numberTool.format('#0.0',$price)<i>折</i>
+                            </p>
+                            <p class="num">
+                                #set($startJiFen = ($product.displayDiscountPrice*$websiteTool.getWebsite().getRatio())/100)
+                                #set($nowJeFen = ($product.displayOriginalPrice*$websiteTool.getWebsite().getRatio())/100)
+                                <span class="yuanjia">$nowJeFen</span>
+                                <span class="xianjia">$startJiFen<i class="txt">积分</i></span>
+                            </p>
+                        </div>
+                        <!--<a href="#" target="_blank" title="秒杀结束"><span class="btn">秒杀<br/>结束</span></a>-->
+
+                        <a href="/jdvop/activity/toTimeSpikeDetail.php?productId=$!product.id&aid=$!activity.id&time=$!todayTime"  title="立即抢购"><span class="btn">立即<br/>抢购</span></a>
+                    </div>
+                </li>
+                #end
+                #else
+                <li class="disabled">
+                    <a target="_blank" title="$!product.name">
+                        <p class="img">
+                            <img src="$!product.thumbnailImage"/>
+                            <span class="icon-over"></span>
+                            <span class="balance">限$!product.remaindAmount件</span>
+                        </p>
+                        <p class="name overflow-h">
+                            $!product.name
+                        </p>
+                    </a>
+                    <div class="bg">
+                        <div class="left clearfix">
+                            <p class="bgzekou">
+                                #set($price=$product.discountRate*10)
+                                $!numberTool.format('#0.0',$price)<i>折</i>
+                            </p>
+                            <p class="num">
+                                #set($startJiFen = ($product.displayDiscountPrice*$websiteTool.getWebsite().getRatio())/100)
+                                #set($nowJeFen = ($product.displayOriginalPrice*$websiteTool.getWebsite().getRatio())/100)
+                                <span class="yuanjia">$nowJeFen</span>
+                                <span class="xianjia">$startJiFen<i class="txt">积分</i></span>
+                            </p>
+                        </div>
+                        <!--<a href="#" target="_blank" title="秒杀结束"><span class="btn">秒杀<br/>结束</span></a>-->
+                        <span class="btn">抢购<br/>结束</span>
+                    </div>
+                </li>
+                #end
+                #end
+                #end
+            </ul>
+            #end
+            #end
+            <!--floor-2-->
+        </div>
+        #parse('footer.vsl')    
+    </body>
+    <script>
+        function toTime(iTime, _this) {
+            var em = _this.find("em");
+            var iNowTime = new Date().getTime();
+            var iDisTime = iTime - iNowTime;
+            if (iDisTime <= 0)
+            {
+                clearInterval(oTimer);
+                em.text("疯狂秒杀中");
+            }
+            else
+            {
+                var iDate = parseInt(iDisTime / 86400000);
+                var iHours = parseInt((iDisTime % 86400000) / 3600000);
+                var iMin = parseInt((iDisTime % 3600000) / 60000);
+                var iSec = parseInt((iDisTime % 60000) / 1000);
+                var iMSec = iDisTime % 1000;
+                em.text("剩余" + iDate + "天 " + iHours + ":" + iMin + ":" + iSec);
+                if (iDate === 0 && iHours === 0 && iMin === 0 && iSec === 0 && iMSec === 0) {
+                    em.text("疯狂秒杀中");
+                }
+            }
+        }
+        $(".js-kill").each(function(i) {
+            var _this = $(this);
+            var endTime = _this.find("#endTime").val();
+            var iTime = new Date(endTime).getTime();
+            oTimer = setInterval(function() {
+                toTime(iTime, _this);
+            }, 14);
+        });
+    </script>
+</html>

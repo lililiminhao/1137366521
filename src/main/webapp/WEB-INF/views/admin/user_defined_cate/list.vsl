@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link  rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/script/dtree/dtree.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src='/jdvop/script/dragsort-0.5.1.min.js'></script>
+<script type='text/javascript' src='/jdvop/script/dtree/dtree.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>自定义分类管理</title>
+<script type="text/javascript">
+    var tree    = new dTree('tree');
+    function  renderTree()
+    {
+        //渲染这棵树
+        tree.add(0, -1, '自定义分类', '/jdvop/admin/userDefinedCates.php');
+        #foreach($c in $rootCates)
+            #if($c.id > 0)
+                tree.add($c.id, #if(!$c.parentId) 0 #{else} $c.parentId #{end}, '$c.name', '#if(!$c.parentId) /jdvop/admin/userDefinedCates.php?parentId=$c.id#end');
+            #end
+        #end
+        document.getElementById('tree_view').innerHTML  = tree;
+    }
+    
+    $(function(){
+        //初始化树结构
+        renderTree();
+    });
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">自定义分类</span>
+</div>
+<div id="iframePage">
+<div class="automatic-box  clearfix">
+    <table>
+        <tr>
+            <td  class="vt">
+                <div class="web-layoutLeft fl">
+                    <p class="title"> 分类结构图</p>
+                    <div id="tree_view"></div>  
+                </div>
+            </td>
+            <td class="vt">
+                <div class="fl ml20">
+                    <div class="tab-column">
+                        <div class="con">
+                            #if($shiro.isPermitted('zdy_brand:create'))
+                            <a href="/jdvop/admin/userDefinedCate/add.php?parentId=$!parentId" class="btn-grey2 fr mt4 mr20">添加分类</a>
+                            #end
+                            <p class="text fwb">基本信息</p>
+                        </div>
+                    </div>
+                    <div class="table-list">
+                        <table class="common">
+                            <colgroup>
+                                <col style="width: 250px;" />
+                                <col style="width: 250px;" />
+                                <col style="width: 250px;" />
+                                <col style="width: 250px;" />
+                            </colgroup>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>层级</th>
+                                <th>操作</th>
+                            </tr>
+                            #if(!$cates.isEmpty())
+                                #foreach($cate in $cates)
+                                    <tr>
+                                        <td class="tc">$cate.id</td>
+                                        <td class="tc">$cate.name</td>
+                                        <td class="tc">
+                                        #if(!$cate.parentId || $cate.parentId == 0)
+                                            顶级分类
+                                        #else
+                                            二级分类
+                                        #end
+                                        </td>
+                                        <td class="tc js-option-parents">
+                                            <div class="drop-down js-dropDown">
+                                                <span class="ico"></span>
+                                                <p class="s-inp">操作</p>
+                                            </div>
+                                            <dl class="s-option js-sOption">
+                                                #if(!$cate.parentId || $cate.parentId == 0)
+                                                    <dd><a href="/jdvop/admin/userDefinedCates.php?parentId=$!cate.id">查看子分类</a></dd>
+                                                    #if($shiro.isPermitted('zdy_brand:create'))
+                                                    <dd><a href="/jdvop/admin/userDefinedCate/add.php?parentId=$cate.id" >添加子分类</a></dd>
+                                                    #end
+                                                #end
+                                                #if($shiro.isPermitted('zdy_brand:edit'))
+                                                    <dd><a href="/jdvop/admin/userDefinedCate/edit.php?id=$cate.id" >编辑</a></dd>
+                                                    #if($cate.enable)
+                                                        <dd><a href="/jdvop/admin/userDefinedCate/setEnable.php?id=$cate.id" class="ajax-request" ok-message="reload" cfm-message="继续该操作将导致您选中的分类无法再前端显示！">禁用</a></dd>
+                                                    #else
+                                                        <dd><a href="/jdvop/admin/userDefinedCate/setEnable.php?id=$cate.id" class="ajax-request" ok-message="reload" >启用</a></dd>
+                                                    #end
+                                                #end
+                                                #if($shiro.isPermitted('zdy_brand:delete'))
+                                                    #if(!$productUserDefinedCateService.isDeleteable($cate.id))
+                                                        <dd><a href="/jdvop/admin/userDefinedCate/delete.php?id=$cate.id" class="ajax-request" ok-message="reload" cfm-message="继续该操作将导致您选中的分类彻底删除，一旦删除，将无法恢复!" >删除</a></dd>
+                                                    #end
+                                                #end
+                                                #if($shiro.isPermitted('zdy_brand:edit'))
+                                                <dd><a href="/jdvop/admin/userDefinedCate/choose.php?id=$cate.id" >关联产品</a></dd>
+                                                #end
+                                            </dl>
+
+                                        </td>
+                                    </tr>
+                                #end
+                            #else
+                            <tr>
+                                <td colspan="5" style="text-align:center;">暂无任何产品分类数据</td>
+                            </tr>
+                            #end
+                        </table>
+                     </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div> 
+</div>
+</body>
+</html>

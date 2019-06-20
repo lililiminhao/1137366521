@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css"/>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css"/>   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/date.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+</head>
+<body>
+#parse('header.vsl') 
+<div class="activity-wrap">
+    <div class="w1200 clearfix">
+        <div class="top-img">
+            <img src="#if($lottery.pcPublicityImage=='')../jdvop/images/imgbg1.png#else$lottery.pcPublicityImage#end"  alt="配置图片大小为780*225" width="780" height="225"/>
+        </div>
+        <div class="marquee-box" id="gameContent">
+            <div id="shade_box"></div>
+            <table id="gameTable">
+                ##遍历第一行的盒子
+                <tr>
+                    #foreach($i in [1..3])
+                        #set($has = false)
+                        #foreach($award in $lottery.getAwards())
+                            #if($award.boxIndex == $i)
+                                #set($has = true)
+                                <td rel='$i'>
+                                    <div class="img_bg">
+                                    <img src="/jdvop/images/img6.png" alt='积分图片' class="jifen"  width="72" height="72"/>
+                                        <p class="name">$award.ext.get('points')积分</p>
+                                    </div>
+                                </td>
+                            #end
+                        #end
+                        #if($has == false)
+                            <td rel='$i'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                        #end
+                    #end
+                </tr>
+                <tr>
+                    ##遍历第二行的第一个盒子
+                        #set($has = false)
+                        #foreach($award in $lottery.getAwards())
+                            #if($award.boxIndex == 8)
+                                #set($has = true)
+                                <td rel='8'>
+                                    <div class="img_bg">
+                                    <img src="/jdvop/images/img6.png" alt='积分图片' class="jifen"  width="72" height="72"/>
+                                        <p class="name">$award.ext.get('points')积分</p>
+                                    </div>
+                                </td>
+                                #break
+                            #end
+                        #end
+                        #if($has == false)
+                            <td rel='8'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                        #end
+                    <td></td>
+                        ##遍历第二行的第三个盒子
+                        #set($has = false)
+                            #foreach($award in $lottery.getAwards())
+                                #if($award.boxIndex == 4)
+                                    #set($has = true)
+                                    <td rel='4'>
+                                        <div class="img_bg">
+                                        <img src="/jdvop/images/img6.png" alt='积分图片' class="jifen"   width="72" height="72"/>
+                                            <p class="name">$award.ext.get('points')积分</p>
+                                        </div>
+                                    </td>
+                                    #break
+                                #end
+                            #end
+                            #if($has == false)
+                                <td rel='4'>
+                                    <p class="default-text">谢谢参与</p>
+                                </td>
+                            #end
+                </tr>
+                <tr>
+                    ##遍历第三行的盒子
+                    #foreach($i in [7..5])
+                        #set($has = false)
+                        #foreach($award in $lottery.getAwards())
+                            #if($award.boxIndex == $i)
+                                #set($has = true)
+                                <td rel='$i'>
+                                    <div class="img_bg">
+                                        <img src="/jdvop/images/img6.png" alt='积分图片' class="jifen"  width="72" height="72"/>
+                                        <p class="name">$award.ext.get('points')积分</p>
+                                    </div>
+                                </td>
+                            #end
+                        #end
+                        #if($has == false)
+                            <td rel='$i'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                        #end
+                    #end
+                </tr>
+            </table>
+        <div id="btn_center_box">
+            <!--这个就是中间的表情按钮-->
+            <img src="../jdvop/images/btn-draw.png" id="start_lottery_draw" alt="点击抽奖" class="cup" title="点击抽奖"/>
+        </div>
+        <p class="text-rules">活动规则：每次抽奖花费<i>$!lottery.needIntegral</i>积分；
+            #if($lottery.limitPeople != 0) 每人限制参与<i>$!lottery.limitPeople</i> 次；#end</p>  
+        </div>
+        <div class="right-box">
+            <div class="winning">
+                <p class="title">中奖名单</p>
+                <div class="th clearfix">
+                    <p class="tl">获奖用户</p>
+                    <p class="tr">获奖名称</p>
+                </div>
+                <div class="list" id="boxMove">
+                    <ul>
+                        #if($winlist)
+                             #foreach($win in $winlist)
+                                <li>
+                                    <p class="tl">$win.websiteUser.loginName</p>
+                                    <p class="tr">积分$win.ext.points</p>
+                                </li>
+                             #end
+                        #end
+                        
+                    </ul>
+                </div>
+            </div>
+            <div class="explain">
+                <p class="title">活动说明</p>
+                <div class="text">
+                    $!lottery.remark
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--抽奖中奖显示的弹框提示-->
+<div class="dialog-act js-dialogOk"> 
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <p class="title1">恭喜你中奖了!</p>
+    <div class="contentOk">
+        <p class="text1">您获得了<i></i></p>
+        <p class="img"><img src="/jdvop/images/img6.png" width="72" height="72" alt="中奖奖品的图片"/></p>
+        <p class="text2">积分已入账，请查收</p>
+    </div>
+</div>
+<!--抽奖未中奖显示的弹框提示-->
+<div class="dialog-act hide js-dialogError">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img"></p>
+        <div class="text">
+            <p class="title">很遗憾未抽中</p>
+            <p class="text">就差一点点，再试试吧</p>
+        </div>
+    </div>
+</div>
+<!--抽奖扣除积分 显示的弹框提示-->
+<div class="dialog-act hide js-deductIntegral">
+    <div class="contentError2 clearfix">
+        <p class="img"></p>
+        <div class="text">
+            <p class="title">-1000 积分</p>
+        </div>
+    </div>
+</div>
+<!--活动未开始-->
+<div class="dialog-act w488 js-notStarted">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img img2"></p>
+        <div class="text">
+            <p class="title title2">活动未开始</p>
+            <p class="text">请在耐心等等吧</p>
+        </div>
+    </div>
+</div>
+<!--活动已结束-->
+<div class="dialog-act w488 js-actEnd">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img img3"></p>
+        <div class="text">
+            <p class="title title2">活动已结束</p>
+            <p class="text">下次请早点来哦</p>
+        </div>
+    </div>
+</div>
+<!--活动参与次数已用完-->
+<div class="dialog-act w488 js-actOver">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img img4"></p>
+        <div class="text">
+            <p class="title title2">活动参与次数已用完</p>
+            <p class="text">可以看看其他活动哦</p>
+        </div>
+    </div>
+</div>
+<!--积分不够  -->
+<div class="dialog-act w488 js-noIntegral">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img img5"></p>
+        <div class="text">
+            <p class="title title2">积分不够参与抽奖</p>
+            <p class="text">可以看看其他活动哦</p>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="id" value="$!lottery.id"/>
+<input type="hidden" id="beginTime" value="$!dateTool.format('yyyy-MM-dd HH:mm:ss', $lottery.beginTime)"/>
+<input type="hidden" id="expireTime" value="$!dateTool.format('yyyy-MM-dd HH:mm:ss', $lottery.expireTime)"/>
+<!--footer-->
+#parse('footer.vsl')   
+<!--footer  end-->
+<script type="text/javascript">
+var beginD =Date.parse($("#beginTime").val().replace(/-/g, "/"));
+var expireD =Date.parse($("#expireTime").val().replace(/-/g, "/"));
+var sysD = Date.parse(new Date().format("yyyy-MM-dd hh:mm:ss"));
+$(function(){
+    //如果活动未开始 弹出提示
+    if(sysD < beginD){
+        $('.js-notStarted').show();
+    }
+     //如果活动已结束 弹出提示
+    if(sysD > expireD){
+        $('.js-actEnd').show();
+    }
+    var winlist = function(){
+        $.get("/jdvop/activity/lottery/winningList.php",{id: $("[name='id']").val()}, function(data){
+            $("#boxMove ul li").remove();
+           $.each(data.message, function (i, item) {
+               var h = "<li><p class='tl'>"+item.websiteUser.loginName+"</p><p class='tr'>积分"+item.ext.points+"</p></li>";
+                $("#boxMove ul").append(h);
+           });
+        },'json');
+    };
+    setInterval(winlist, 3000);
+//中奖名单文字滚动
+    var oBoxMove=document.getElementById("boxMove");
+    var oUl=oBoxMove.getElementsByTagName("ul")[0];
+    var oLi=oBoxMove.getElementsByTagName("li");
+    var seep=-1;
+    var _move= null;
+    function textMove(){
+        if(oUl.offsetTop<-oUl.offsetHeight/2){
+            oUl.style.top=0;
+        };
+        if(oUl.offsetTop>0){
+            oUl.style.top=-oUl.offsetHeight/2+'px';
+        };
+        oUl.style.top=oUl.offsetTop+seep+'px';
+    };
+    _move=setInterval(textMove,100);
+    if(oLi.length<4){ 
+        clearInterval(_move);
+
+    }else if(oLi.length>=4){
+        oUl.innerHTML+=oUl.innerHTML; 
+        oUl.style.width=oLi[0].offsetHeight*oLi.length+24+"px";  
+    oBoxMove.onmouseover=function(){
+            clearInterval(_move);
+        };
+        oBoxMove.onmouseout=function(){
+            _move=setInterval(textMove,100);
+        };
+    };
+});
+</script>
+<script type="text/javascript">
+ /*-------------------------------------------活动效果--------------------------------------------*/
+    var stopNum;
+    var message;
+    var win;
+    var flag_starting = false;
+    $(function() {
+        var index = 0, //当前亮区位置
+            prevIndex = 0, //前一位置
+            Speed = 300, //初始速度
+            Time, //定义对象
+            arr = GetSide(3, 3), //初始化数组 
+            EndIndex = 0, //决定在哪一格变慢
+            cycle = 0, //转动圈数  
+            EndCycle = 0, //计算圈数
+            flag = false, //结束转动标志 
+            quick = 0; //加速
+        $("#start_lottery_draw").click(function(){
+            //如果活动未开始 弹出提示
+            if(sysD < beginD){
+                $('.js-notStarted').show();
+                return;
+            }
+             //如果活动已结束 弹出提示
+            if(sysD > expireD){
+                $('.js-actEnd').show();
+                return;
+            }
+            //是否正在抽奖中
+            if(flag_starting){
+                return false;
+            }else{
+                flag_starting = true;
+            }
+             //获取抽奖信息
+             $.post("/jdvop/activity/lottery.php", {id: $("[name='id']").val()}, function(data){
+                 if(data.isOk){
+                    message = data.message.MSG;
+                    stopNum = data.message.NUM;//最后将停在此数上
+                    win     = data.message.WIN;//是否中奖
+                    console.log("最后将停在此数上"+stopNum);
+                    console.log("是否中奖"+win);
+                    cycle = 0;
+                    flag = false;
+                    EndIndex = Math.floor(Math.random() * 8);
+                    EndCycle = 1;
+                    Time = setInterval(Star, Speed);
+                 }else{
+                    if(data.message.nologin){
+                        location = "/jdvop/login.php?retUrl="+data.message.retUrl;
+                    }else{
+                        if(data.message == 'noIntegral'){
+                             $('.js-noIntegral').show();
+                        }
+                        if(data.message == 'overlimit'){
+                            $('.js-actOver').show();
+                        }
+                        return;
+                    }
+                 }
+             },'json');
+        });
+        function Star(){
+            //改变色块
+            var gameContentBox = $("#gameContent");
+            var currentTd = $('#gameTable tr:eq('+ arr[index][0] +') td:nth-child('+ (arr[index][1]+1) +')');
+            var point_x = $(currentTd).offset().left - gameContentBox.offset().left + 1;
+            var point_y = $(currentTd).offset().top - gameContentBox.offset().top;
+            $("#shade_box").css({"left":point_x+11, "top":point_y+9});
+            if (index > 0) {
+                prevIndex = index - 1;
+            } else {
+                prevIndex = arr.length - 1;
+            };
+            index++;
+            quick++;
+            if (index >= arr.length){
+                index = 0;
+                cycle++;
+            };
+            //跑马灯变速
+            if (flag == false){
+                //走五格开始加速
+                if (quick == 5){
+                    clearInterval(Time);
+                    Speed = 50;
+                    Time = setInterval(Star, Speed);
+                };
+                //跑N圈减速
+                if (cycle == EndCycle + 1 && index == EndIndex){
+                    clearInterval(Time);
+                    Speed = 300;
+                    flag = true;       //触发结束
+                    Time = setInterval(Star, Speed);
+                };
+            };
+            if (flag == true && (index == stopNum || (stopNum == 8 && index ==0))) {
+                quick = 0;
+                clearInterval(Time);
+                flag_starting = false;
+                if(win && win !== ''){
+                    $(".contentOk p i").empty();
+                    $(".contentOk p i").append(message);
+                    //中奖msg
+                    $(".js-dialogOk").show();
+                }else{
+                    //没中奖msg
+                    $('.js-dialogError').show();
+                };
+            };
+        };
+        //初始化数组
+        function GetSide(m, n) {
+            var arr = [];
+            for (var i = 0; i < m; i++) {
+                arr.push([]);
+                for (var j = 0; j < n; j++) {
+                    arr[i][j] = i * n + j;
+                };
+            };
+            //获取数组最外圈
+            var resultArr = [];
+            var tempX = 0,
+                tempY = 0,
+                direction = "Along",
+                count = 0;
+            while (tempX >= 0 && tempX < n && tempY >= 0 && tempY < m && count < m * n) {
+                count++;
+                resultArr.push([tempY, tempX]);
+                if (direction == "Along") {
+                    if (tempX == n - 1)
+                        tempY++;
+                    else
+                        tempX++;
+                    if (tempX == n - 1 && tempY == m - 1)
+                        direction = "Inverse"
+                }
+                else {
+                    if (tempX == 0)
+                        tempY--;
+                    else
+                        tempX--;
+                    if (tempX == 0 && tempY == 0)
+                        break;
+                }
+            }
+            return resultArr;
+        };
+        //删除按钮
+        $('.js-btnDel').click(function(){
+            $(this).parents(".dialog-act").hide();
+        });
+    /*-------end-------*/
+});
+</script>
+</body>
+</html>

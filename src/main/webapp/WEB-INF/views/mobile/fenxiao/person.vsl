@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>个人信息</title>
+    <link rel="stylesheet" href="/jdvop/css/admin/public.css">
+    <link rel="stylesheet" href="/jdvop/css/mobile/vant/index.css">
+    <style>
+        .floor {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+        }
+        [v-cloak]{
+        	display:none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <van-cell-group>
+            <van-cell>
+                <div class="floor">
+                    <span>手机号</span>
+                    <span>$!mobile</span>
+                </div>
+            </van-cell>
+            <van-cell>
+                <div class="floor">
+                    <span>分销等级</span>
+                    <span>$!rankName</span>
+                </div>
+            </van-cell>
+            <van-cell>
+                <div class="floor">
+                    <span>一级分销</span>
+                    <span>$!percent%</span>
+                </div>
+            </van-cell>
+            #if($!parentID==0||$!parentID=='')
+            <van-cell>
+                <div class="floor">
+                    <span>二级分销</span>
+                    <span>$!secPer%</span>
+                </div>
+            </van-cell>
+            #end
+        </van-cell-group>
+    </div>
+    <script src="/jdvop/script/mobile/vue.js"></script>
+    <script src="/jdvop/script/mobile/vant.js"></script>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: function () {
+                return {
+
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

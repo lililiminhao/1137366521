@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta content="telephone=no" name="format-detection"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+        <script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+        <title>售后服务</title>
+    </head>
+    <body class="bgfff">
+        <header class="bar-nav js-header">
+            <a href="javascript:history.go(-1)" class="btn btn-back fl" ></a>
+            <h1 class="title">售后服务</h1>
+        </header>
+        <div class="pt44">
+            <div class="after-sale-state error">
+                <i class="icon-error mui-icon"></i>客服拒绝了本次申请
+            </div>
+            <ul class="customer-service-list view">
+                 <li class="return-policy">
+                    <p class="title">拒绝原因：</p>
+                    <p style="font-size: 13px;">#if($aso.remarkByWorker && $aso.remarkByWorker.length()>0) $!esc.html($!aso.remarkByWorker) #else 无 #end</p>
+                    <p class="time tr" style="padding:2% 4%;"></p>
+                </li>
+                <li class="return-policy">
+                    <p class="title">问题描述：</p>
+                    <p style="font-size: 13px;">#if($aso.remark && $aso.remark.length()>0)$esc.html($!aso.remark)#else无#end</p>
+                    <p class="time tr" style="padding:2% 4%;">$!dateTool.format('yyyy-MM-dd HH:mm', $aso.applyTime)</p>
+                </li>
+                #if($allowAftersale)
+                <li class="webkitbox-h last">
+                    <p class="txt">如有异议，您可以：</p>
+                    <div class="flex1">
+                         <a href="$!after_sale_url"><i class="maincolor">重新申请</i></a>
+                    </div>
+                </li>
+                #end
+            </ul>
+        </div>
+    </body>
+</html>

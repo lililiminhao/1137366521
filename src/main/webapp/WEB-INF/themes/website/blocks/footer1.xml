@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<theme description="底部-风格1" key="footer1" type="footer" default="true">
+    <blocks>
+        <!-- 轮播图 -->
+       <block id="block_1" type="text">
+            <property no-link="true"/>   
+        </block>
+    </blocks>
+    <template>
+    <!-- html -->
+    <![CDATA[
+    <div class="footer">
+        <div style="background: #f2f2f2;">
+            <div class="w1200 con clearfix">
+                <dl>
+                <dt>新手上路</dt>
+                <dd><a href="#" target="_blank" title="关于商城">关于商城</a> </dd>
+                <dd><a href="#" target="_blank" title="积分查询">积分查询</a> </dd>
+                <dd><a href="#" target="_blank" title="兑换流程">兑换流程</a> </dd>
+                <dd><a href="#" target="_blank" title="规则及条款">规则及条款</a> </dd>
+            </dl>
+            <dl>
+                <dt>配送服务</dt>
+                <dd><a href="#" target="_blank" title="配送流程">配送流程</a> </dd>
+                <dd><a href="#" target="_blank" title="配送时限">配送时限</a> </dd>
+                <dd><a href="#" target="_blank" title="签收提醒">签收提醒</a> </dd>
+            </dl>
+            <dl>
+                <dt>售后服务</dt>
+                <dd><a href="#" target="_blank" title="常见问题">常见问题</a> </dd>
+                <dd><a href="#" target="_blank" title="退换货政策">退换货政策</a> </dd>
+                <dd><a href="#" target="_blank" title="退款说明">退款说明</a> </dd>
+            </dl>
+            <dl class="mun">
+                <dt>400-7251-666</dt>
+                <dd>
+                   <p>服务时间：9:00-18:00</p>
+                   <a href="tencent://message/?uin=910769998&amp;Site=&amp;Menu=yes" title="在线咨询">
+                      <span class="but-qq bg-red60">联系在线客服</span>
+                   </a>
+                </dd>
+            </dl>
+            </div>
+        </div>
+        <p class="w1200 copyright">XXX网定位:礼品网  礼品公司   企业一站式礼品服务平台！  XXX科技有限公司版权所有   京公网安备XXX号|<a href="http://www.miibeian.gov.cn/" target="_blank">京ICP备XXX号</a></p>
+    </div>
+    ]]>
+    </template>
+    <velocity>
+    <!-- html -->
+    <![CDATA[
+    <div class="footer">
+        <div style="background: #f2f2f2;">
+            <div class="w1200 w990 con clearfix">
+                <dl>
+                <dt>新手上路</dt>
+                <dd><a href="#" target="_blank" title="关于商城">关于商城</a> </dd>
+                <dd><a href="#" target="_blank" title="积分查询">积分查询</a> </dd>
+                <dd><a href="#" target="_blank" title="兑换流程">兑换流程</a> </dd>
+                <dd><a href="#" target="_blank" title="规则及条款">规则及条款</a> </dd>
+            </dl>
+            <dl>
+                <dt>配送服务</dt>
+                <dd><a href="#" target="_blank" title="配送流程">配送流程</a> </dd>
+                <dd><a href="#" target="_blank" title="配送时限">配送时限</a> </dd>
+                <dd><a href="#" target="_blank" title="签收提醒">签收提醒</a> </dd>
+            </dl>
+            <dl>
+                <dt>售后服务</dt>
+                <dd><a href="#" target="_blank" title="常见问题">常见问题</a> </dd>
+                <dd><a href="#" target="_blank" title="换货政策">换货政策</a> </dd>
+            </dl>
+            <dl class="mun">
+                <dt>400-7251-666</dt>
+                <dd>
+                   <p>服务时间：9:00-18:00</p>
+                   <a href="tencent://message/?uin=910769998&amp;Site=&amp;Menu=yes" title="在线咨询">
+                      <span class="but-qq bg-red60">联系在线客服</span>
+                   </a>
+                </dd>
+            </dl>
+            </div>
+        </div>
+        <p class="w1200 copyright">XXX网定位:礼品网  礼品公司   企业一站式礼品服务平台！  XXX科技有限公司版权所有   京公网安备XXX号|<a href="http://www.miibeian.gov.cn/" target="_blank">京ICP备XXX号</a></p>
+    </div>
+    ]]>
+    </velocity>
+    <preview><![CDATA[/jdvop/images/admin/img1_06.jpg]]></preview>
+</theme>

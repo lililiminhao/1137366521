@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>$!esc.html($websiteTool.getWebsite().getName())-管理平台</title>
+<style type="text/css">
+.w960{width:1200px; margin: 0 auto; }
+ .header{ height: 100px; overflow: hidden;} 
+ .header .logo{width: 360px; height: 80px; margin-top: 10px;  overflow: hidden;}
+ .header .logo img{width: 100%; height: 100%;}
+ 
+ .banner{position: relative; height: 480px; width: 100%; background:url(/jdvop/images/admin/bg2.jpg) no-repeat 50% 50% #fff4ee;}
+ .logo2{position: absolute; top:40px; left: 50%; width: 260px; height: 340px; overflow: hidden;}
+  .logo2 img{border: none; width: 260px; height: 340px;}
+ .login{position: absolute; top:40px; left: 50%; margin-left: 260px; padding-left: 30px; width: 310px; height: 340px; background: #fff;}
+ .login .title{ height: 45px; font: normal 24px/50px "微软雅黑"; }
+ .error{  height: 20px;  font: normal 12px/20px "微软雅黑"; color: #e66454;}
+ .login ul{width: 280px; overflow: hidden; margin-top: 10px;}
+ .login li{ height: 47px; font: normal 12px/47px "微软雅黑"; border:1px solid #ced4e0;}
+ .login li.name{ border-bottom: none;}
+ .login li .ico{ float: left; background: url('/jdvop/images/admin/sprite.png') no-repeat -167px -44px; width: 12px;height: 13px; margin:16px 0 0 12px;}
+ .login li .ico.psw{
+     background: url('/jdvop/images/admin/sprite.png') no-repeat -184px -41px;
+     width: 12px;
+     height: 16px;
+ }   
+ .login li input{  text-indent: 10px; color: #666; float: left; margin-left: 14px; margin-top: 10px; height: 28px; border:none; border-left:1px solid #d6d6d6; width: 230px;}
+ .login .code{ margin-top: 20px;}
+ .login .code input{ float:left; width: 106px; height: 38px; border:1px solid #d6d6d6;}
+ .login .code .img{float:left; width: 104px; height: 38px;border:1px solid #d6d6d6; margin-left: 10px;}
+ .login .code .img{width: 104px; height: 38px;}
+ .login .btn{ cursor: pointer; height: 40px; width: 280px; background: #eb5d01; color: #fff; text-align: center; font: normal 18px/40px "微软雅黑";}
+ .login .remember{ padding: 0px 0 14px 0;}
+ .login .remember input{  float: left; margin-top:5px;}
+</style>
+<script>
+    function change_vercode()
+    {
+        var img = document.getElementById('code_img');
+        img.src = '/jdvop/captcha.php?&seed=' + Math.random();
+    }
+    $(function(){
+        $("#fromSubmit").click(function(e){
+            e.preventDefault();
+            $("#dataForm").submit();
+        });
+    });
+</script>
+</head>
+<body>
+<div class="header">
+    <div class="w960">
+        <p class="logo">
+            <img src="$configTool.getImageHost()$!websiteTool.getWebsite().getLogo()" width="360" height="80" alt="$!esc.html($websiteTool.getWebsite().getName())"/>
+        </p> 
+    </div>
+</div>
+<div class="banner">
+    <form id ="dataForm" action="/jdvop/admin/login.php" method="POST">
+        <div class="login">
+            <h2 class="title">登录</h2>
+            #if ($errMsg)
+            <p class="error">$!errMsg</p>
+            #end
+            <ul class="clearfix">
+                <li class="name">
+                    <span class="ico"></span>
+                    <input type="text" name="username" class="con" placeholder="请输入账号"/>
+                </li>
+                <li>
+                    <span class="ico psw"></span>
+                    <input type="password" name="password" class="con" placeholder="请输入密码"/>
+                </li>
+            </ul>
+            <div class="code clearfix">
+                <input type="text" name="captcha" placeholder="验证码"/>
+                <p class="img cup"><img src="/jdvop/captcha.php" id="code_img" width="104" height="38" onClick="change_vercode();" /></p>
+                <span class="blue fl m10 cup" onClick="change_vercode();">换一张</span>
+            </div>
+            <div class="btn mt20" id="fromSubmit">
+                登录
+                <input type="submit" style="display: none;"/>
+            </div>
+            <p class="pt6">如需找回密码请联系:$!websiteTool.getWebsite().customerServiceHotLine</p>
+        </div>
+    </form>
+</div>
+<div class="tc pt10">
+    $!esc.html($websiteTool.getWebsite().getName()) - 管理平台
+</div>
+</body>
+</html>

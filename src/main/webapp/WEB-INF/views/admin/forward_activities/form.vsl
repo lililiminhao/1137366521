@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+</head>
+<body>
+<!--主导航-->
+    <div class="mainNav borderGreen clearfix">
+        <a href="/jdvop/admin/forward/list.php"><p class="right btn-grey2 fr">返回</p></a>
+        <span class="text">
+            #if($!activity)
+                编辑活动
+            #else
+                添加活动
+            #end
+        </span>
+    </div>
+    <form id="dateForm" #if($activity) action="/jdvop/admin/forward/edit.php?id=$activity.getId()" #else  action="/jdvop/admin/forward/add.php" #end method="POST">
+    <div id="iframePage">
+        <div class="automatic-box clearfix highlight_e4e4e4">
+            <div class="topTitle">
+                 <span>基本信息</span>
+            </div>
+            <div class="item">
+                <div class="add-product">
+                    <table class="ml20 pb10 js-box">
+                        <colgroup>
+                            <col style="width:160px;" />
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>活动名称：</td>
+                            <td class="tl">
+                                <input type="text" name="name" value="$!activity.getName()" class="common h22 w260" valid-rule="noempty" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>奖励积分：</td>
+                            <td class="tl">
+                                <input type="text" name="integral" value="$!activity.integral" class="common h22 w80 filter-input" valid-rule="noempty" filter-rule="isnumber"/> 积分
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>活动开始时间：</td>
+                            <td><input type="text" name="activityTime" value="$!date.format('yyyy-MM-dd 00:00:00', $activity.activityTime)" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh', minDate:'%y-%M-%d', dateFmt:'yyyy-MM-dd 00:00:00'});" class="common h22 w260 auto-valid"  valid-rule="required:true|max_length:32" error-label="开始时间"/></td>
+                        </tr>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>活动截至时间：</td>
+                            <td><input type="text" name="expireTime" value="$!date.format('yyyy-MM-dd 23:59:59', $activity.expireTime)" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh', minDate:'%y-%M-%d', dateFmt:'yyyy-MM-dd 23:59:59'});" class="common h22 w260 auto-valid"  valid-rule="required:true|max_length:32" error-label="截止时间"/></td>
+                        </tr>
+                        <tr>
+                            <td class="tr vt"><i class="orange"> *</i>活动说明：</td>
+                            <td class="tl">
+                                <textarea name="description" class="common h48 w260">$!activity.description</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>转发链接：</td>
+                            <td class="tl">
+                                <input type="text" name="forwardUrl" value="$!activity.forwardUrl" class="common h22 w260" valid-rule="noempty" />
+                                <div class="topTip-wrap">
+                                    <i class="topTip js-topTip"></i>
+                                    <em class="help-title js-topTip-title">注：请自行准备转发的文章或网站，建议使用微信文章链接</em>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr vt">转发图片：</td>
+                            <td>
+                                <div>
+                                    <input type="hidden" name="imageUrl" value="$!activity.image"/>
+                                    #if ($activity.image)
+                                        <img src="/jdvop/image/readImage.php?path=$!{activity.image}&width=160&height=160" class="js_show_img" width="160" height="160"/>
+                                    #else
+                                        <img src="" alt='' class="js_show_img" width="160" height="160"/>
+                                    #end 
+                                </div>
+                                <div class="mt10">
+                                    <span style="display:none;"><input type="file" name="thumbnail_upload" id="image_input" value="$!activity.image" /></span>
+                                    <span id="image_input_trigger" class="btn-grey">上传Logo</span><em class="orange">160*160像素（px）大小为jpg，png，gif的格式</em>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>    
+        </div>
+        <div class="layout-footer pb30">
+            <div class="btn-wrap">
+                <input type="submit" value="保存" class="btn-orange" />
+                <a href="/jdvop/admin/forward/list.php"  title="返回" ><span class="btn-grey">返回</span></a>
+            </div>
+        </div>
+    </div>
+    </form>
+    <script type="text/javascript">
+        $(function() {
+            $('#dateForm').submit(function(e){
+                e.preventDefault();
+                var integral = $('input[name=integral]').val();
+                var re = /^[1-9]+[0-9]*]*$/;
+                if(!re.test(integral)){
+                    top.artAlert('温馨提示', '请输入正确的奖励积分！', 'error');
+                    return false;
+                }
+                $.post($(this).attr('action'), $(this).serialize(), function(d){
+                    if(d.isOk){
+                        top.artAlert('温馨提示',  "数据保存成功", '/jdvop/admin/forward/list.php', 'ok');
+                    }else{
+                        top.artAlert('温馨提示', d.message, 'error');
+                    }
+                }, 'json');
+            });
+            
+            $('#image_input_trigger').click(function(){
+                $('#image_input').click();
+            });
+            
+            $('#image_input').fileupload({
+                url         : '/jdvop/admin/brand/image/uploead.php',
+                dataType    : 'json',
+                autoUpload  : true,
+                done        : function(e, data)
+                {
+                    if (!data.result.isOk)
+                    {
+                        top.dialog({
+                            width: 500,
+                            title: '添加活动',
+                            content: data.result.message,
+                            okValue: '确定',
+                            ok: function (){
+                            }
+                        }).showModal();
+                    }
+                    $('.js_show_img').attr('src', '/jdvop/image/readImage.php?path=' + data.result.message + '&width=160&height=160');
+                    $('input[name="imageUrl"]').val(data.result.message);
+                    $('input[name="thumbnail_upload"]').val(data.result.message);
+                }
+            });
+            
+        });
+    </script>
+</body>
+</html>

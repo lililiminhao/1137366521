@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css"/>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css"/>   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+</head>
+<body>
+    #parse('header.vsl')
+    <div class="w1200 limit-warp">
+        <div class="title-wrap">
+            <span class="txt">限时兑换</span>
+        </div>
+        <ul class="limit-product clearfix">
+            <li class="disabled">
+                <a href="#" target="_blank" title="CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm">
+                    <p class="img">
+                        <img src="//img.fygift.com/2015/6/339032988372430416.jpg"  alt="产品名称"/>
+                        <span class="icon-over"></span>
+                    </p>
+                    <p class="name overflow-h">
+                        CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm
+                    </p>
+                </a>
+                <p class="time"><i class="time-icon"></i>剩余2天 <em>12：34：56</em></p>
+                <div class="bg">
+                    <div class="left clearfix">
+                        <p class="bgzekou">
+                            7.3 <i>折</i>
+                        </p>
+                        <p class="num">
+                            <span class="yuanjia">4750积分</span>
+                            <span class="xianjia">450000<i class="txt">积分</i></span>
+                        </p>
+                    </div>
+                    <a href="#" target="_blank" title="秒杀结束"><span class="btn">秒杀<br/>结束</span></a>
+                </div>
+            </li>
+            <li>
+                <a href="#" target="_blank" title="CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm">
+                    <p class="img">
+                        <img src="//img.fygift.com/2015/7/6259280856117681019.jpg"  alt="产品名称"/>
+                    </p>
+                    <p class="name overflow-h">
+                        CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm
+                    </p>
+                </a>
+                <p class="time"><i class="time-icon"></i>剩余2天 <em>12：34：56</em></p>
+                <div class="bg">
+                    <div class="left clearfix">
+                        <p class="bgzekou">
+                            7.3 <i>折</i>
+                        </p>
+                        <p class="num">
+                            <span class="yuanjia">475000积分</span>
+                            <span class="xianjia">450<i class="txt">积分</i></span>
+                        </p>
+                    </div>
+                    <a href="#" target="_blank" title="秒杀结束"><span class="btn">立即<br/>抢购</span></a>
+                </div>
+            </li>
+            <li class="disabled">
+                <a href="#" target="_blank" title="CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm">
+                    <p class="img">
+                        <img src="//img.fygift.com/2015/6/339032988372430416.jpg"  alt="产品名称"/>
+                        <span class="icon-over"></span>
+                    </p>
+                    <p class="name overflow-h">
+                        CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm
+                    </p>
+                </a>
+                <p class="time"><i class="time-icon"></i>剩余2天 <em>12：34：56</em></p>
+                <div class="bg">
+                    <div class="left clearfix">
+                        <p class="bgzekou">
+                            7.3 <i>折</i>
+                        </p>
+                        <p class="num">
+                            <span class="yuanjia">4750积分</span>
+                            <span class="xianjia">45000<i class="txt">积分</i></span>
+                        </p>
+                    </div>
+                    <a href="#" target="_blank" title="秒杀结束"><span class="btn">秒杀<br/>结束</span></a>
+                </div>
+            </li>
+            <li>
+                <a href="#" target="_blank" title="CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm">
+                    <p class="img">
+                        <img src="//img.fygift.com/2015/7/6259280856117681019.jpg"  alt="产品名称"/>
+                    </p>
+                    <p class="name overflow-h">
+                        CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm
+                    </p>
+                </a>
+                <p class="time"><i class="time-icon"></i>剩余2天 <em>12：34：56</em></p>
+                <div class="bg">
+                    <div class="left clearfix">
+                        <p class="bgzekou">
+                            7.3 <i>折</i>
+                        </p>
+                        <p class="num">
+                            <span class="yuanjia">4750积分</span>
+                            <span class="xianjia">45000<i class="txt">积分</i></span>
+                        </p>
+                    </div>
+                    <a href="#" target="_blank" title="秒杀结束"><span class="btn">立即<br/>抢购</span></a>
+                </div>
+            </li>
+            <li class="disabled">
+                <a href="#" target="_blank" title="CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm">
+                    <p class="img">
+                        <img src="//img.fygift.com/2015/6/339032988372430416.jpg"  alt="产品名称"/>
+                        <span class="icon-over"></span>
+                    </p>
+                    <p class="name overflow-h">
+                        CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm
+                    </p>
+                </a>
+                <p class="time"><i class="time-icon"></i>剩余2天 <em>12：34：56</em></p>
+                <div class="bg">
+                    <div class="left clearfix">
+                        <p class="bgzekou">
+                            7.3 <i>折</i>
+                        </p>
+                        <p class="num">
+                            <span class="yuanjia">4750积分</span>
+                            <span class="xianjia">45000<i class="txt">积分</i></span>
+                        </p>
+                    </div>
+                    <a href="#" target="_blank" title="秒杀结束"><span class="btn">秒杀<br/>结束</span></a>
+                </div>
+            </li>
+            <li>
+                <a href="#" target="_blank" title="CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm">
+                    <p class="img">
+                        <img src="//img.fygift.com/2015/7/6259280856117681019.jpg"  alt="产品名称"/>
+                    </p>
+                    <p class="name overflow-h">
+                        CCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cmCCE猫眼石925银项链40cm
+                    </p>
+                </a>
+                <p class="time"><i class="time-icon"></i>剩余2天 <em>12：34：56</em></p>
+                <div class="bg">
+                    <div class="left clearfix">
+                        <p class="bgzekou">
+                            7.3 <i>折</i>
+                        </p>
+                        <p class="num">
+                            <span class="yuanjia">4750积分</span>
+                            <span class="xianjia">45000<i class="txt">积分</i></span>
+                        </p>
+                    </div>
+                    <a href="#" target="_blank" title="秒杀结束"><span class="btn">立即<br/>抢购</span></a>
+                </div>
+            </li>
+        </ul>
+        <div class="pages"><div class="multipage"><em>共(2637)条</em><em>当前显示 0-30 条</em><a class="no-page h-page">首页</a><a class="no-page p-page">前一页</a><a class="curr"> 1 </a><a href="/jdvop/products.php?page=2&amp;sort=time.desc" class="link" target="_self"> 2 </a><a href="/jdvop/products.php?page=3&amp;sort=time.desc" class="link" target="_self"> 3 </a><a href="/jdvop/products.php?page=4&amp;sort=time.desc" class="link" target="_self"> 4 </a><a href="/jdvop/products.php?page=5&amp;sort=time.desc" class="link" target="_self"> 5 </a><a href="/jdvop/products.php?page=6&amp;sort=time.desc" class="link" target="_self"> 6 </a><a href="/jdvop/products.php?page=7&amp;sort=time.desc" class="link" target="_self"> 7 </a><a href="/jdvop/products.php?page=8&amp;sort=time.desc" class="link" target="_self"> 8 </a><a href="/jdvop/products.php?page=9&amp;sort=time.desc" class="link" target="_self"> 9 </a><a href="/jdvop/products.php?page=10&amp;sort=time.desc" class="link" target="_self"> 10 </a><a href="/jdvop/products.php?page=11&amp;sort=time.desc" class="link" target="_self"> 11 </a><a href="/jdvop/products.php?page=12&amp;sort=time.desc" class="link" target="_self"> 12 </a><a href="/jdvop/products.php?page=13&amp;sort=time.desc" class="link" target="_self"> 13 </a><a href="/jdvop/products.php?page=2&amp;sort=time.desc" class="link n-bn n-page" target="_self">后一页</a><a href="/jdvop/products.php?page=88&amp;sort=time.desc" class="link e-bn e-page" target="_self">尾页</a></div></div>
+    </div>
+    #parse('footer.vsl')    
+</body>
+</html>

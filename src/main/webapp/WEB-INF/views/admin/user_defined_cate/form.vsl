@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/main.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.back(-1)"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">#if($cate) 编辑自定义分类 #else 添加自定义分类 #end</span>
+</div>
+<div id="iframePage">
+    <form class="js-data-form" action="#if($cate) /jdvop/admin/userDefinedCate/edit.php  #else /jdvop/admin/userDefinedCate/add.php #end" method="POST">
+        #if($cate)
+            <input type="hidden" name="id" value="$cate.id" />
+        #end
+        <input type="hidden" name="parentId" value="$!parentId" />
+        <div class="automatic-box clearfix highlight_e4e4e4">
+            <div class="topTitle">
+                 <span>基本信息</span>
+            </div>
+            <div class="add-product">
+                <table>
+                    <colgroup>
+                        <col style="width: 120px;" />
+                        <col style="width: 300px;"  />
+                        <col style="width: 120px;" />
+                        <col  />
+                    </colgroup>
+                    <tr>
+                        <td class="tr">父级分类：</td>
+                        <td colspan="3">
+                            #if($parentCate)
+                                <a href="/jdvop/admin/userDefinedCates.php?parentId=$parentId">$!parentCate.name</a>
+                            #else
+                                顶级分类
+                            #end
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">分类名称：</td>
+                        <td colspan="3">
+                           <input type="text" name="name" value="$!cate.name" class="common h30 w240" />
+                        </td>
+                    </tr>
+                    <!--
+                    <tr>
+                        <td class="tr">排序：</td>
+                        <td colspan="3">
+                           <input type="text" name="sortOrder" value="$!sortOrder" class="common h30 w240" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">分类图标：</td>
+                        <td colspan="3">
+                            <input type="hidden" name="icon" value="$!tag.icon"/>
+                            #if ($tag)
+                            <img src="$!tag.icon" alt='$!tag.name' class="js_show_img" width="80" height="80"/>
+                            #else
+                            <img src="" alt='' class="js_show_img" width="80" height="80"/>
+                            #end 
+                        </td>
+                    </tr>-->
+                </table>
+            </div>
+        </div>
+        <div class="layout-footer pb30">
+            <div class="btn-wrap">
+                <input type="submit" class="btn-orange" value="保存" />
+                <span class="btn-grey" onclick="javascript:history.back(-1);">取消</span>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $(document).on("submit", ".js-data-form", function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        if($("input[name='name']").val() === ""){
+            top.artAlert("数据错误", "请填写分类名称", 'error');
+            return;
+        }
+        $.post(thiz.attr("action"), thiz.serialize(), function(data){
+            if(data.isOk){
+                top.artAlert("操作成功", "数据保存成功", "/jdvop/admin/userDefinedCates.php", 'ok');
+            }else{
+                top.artAlert("数据错误", data.message, 'error');
+            }
+        }, "json");
+    });
+    
+    $(document).on('change', 'select[name="pCateId[]"]', function(){
+        var selObj = $(this);
+        selObj.nextAll().remove();//删除后面所有的框
+        var cid = parseInt($(this).val());
+        if (cid > 0)
+        {
+            var html = '<select name="pCateId[]" class="common h30 w160">';
+            html += '<option value="0">自身作为本级分类</option>';
+            html += '</select>';
+            selObj.after(html);
+        }
+    });
+    
+});
+</script>
+
+</body>
+</html>

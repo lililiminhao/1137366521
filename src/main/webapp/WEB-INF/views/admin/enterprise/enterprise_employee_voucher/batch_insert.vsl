@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+<style>
+	.automatic-box{
+		padding:15px;
+	}
+	h3{
+		font-size:16px;
+	}
+	li{
+		line-height:27px;
+	}
+	button,label{
+		background:#2196f8	;
+		outline:none;
+		border:0;
+		color:#fff;
+		padding:6px 12px;
+		border-radius:6px;
+		cursor:pointer;
+	}
+	label a{
+		display:inline-block;
+		color:#fff;
+	}
+	a:hover {
+	 color: #fff;
+	 text-decoration: none;
+	}
+</style>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.go(-1)"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">导入提货券</span>
+</div>
+<span style="display:none;"><input type="file" name="excelFile" class="excelFile" /></span>
+<div id="iframePage">
+    <div class="automatic-box clearfix highlight_e4e4e4" >
+        <h3>操作指引</h3>
+        <ul>
+        	<li>1：点击右侧按钮，下载批量导入模板；<button onclick="downTemplate()">下载《提货券导入模板》</button></li>
+        	<li>2：编辑步骤一下载的《提货券导入模板》，完成后保存该Excel；</li>
+        	<li>3：选择当前Excel提货券对应的企业名称；
+	        	<select name="enterpriseId" id="enterpriseId" class="common ml10 w160" style="height:28px; width:160px">
+	                <option value="0">请选择</option>
+	                #foreach($enterprise in $enterpriseList)
+	                    <option value="$enterprise.id" >$enterprise.name</option>
+	                #end
+	            </select>
+        	</li>
+        	<li>3：点击右侧按钮，上传步骤二保存的《提货券导入模板》Excel文件即可。<label><a class="js-upload" href="javascript:;" data-upload-url="/jdvop/admin/enterpriseEmployeeVoucher/batchInsert.php"> 上传《提货券导入模板》</a></label></li>
+        </ul>
+    </div>
+	<div id="tableAjax">
+	</div>
+</div>
+<script>
+	function downTemplate(){
+		location.href = '/jdvop/excel/EMPLOYEE_VOUCHERS_TEMPLATE.xls';
+	}
+	
+	$(document).on('click', 'a.js-upload', function(e){
+        e.preventDefault();
+        selectVal = $("#enterpriseId").val();
+        var url = $(this).attr('data-upload-url');
+        $('.excelFile').fileupload('option', 'url', url);
+        $('.excelFile').click();
+    });
+    
+    $('.excelFile').fileupload({
+        dataType    : 'json',
+        autoUpload  : true,
+        sequentialUploads   : true,
+        start       : function(e) {
+            top.artProgress('产品导入中，请稍后...');
+        },
+        always      : function(e, data) {
+            top.artProgress('[close]');
+        },
+        add         : function (e, data) {
+                    if (selectVal == 0) {
+                        top.artAlert('温馨提示', "请选择企业", 'error');
+                        return;
+                    } else {
+                        data.submit();
+                    }
+                },
+        done        : function(e, data) {
+            top.artProgress('[close]');
+            if (data.result.isOk) {
+                top.artAlert('温馨提示', "成功导入" + data.result.message.successCount + "条数据", 'ok');
+                createShowingTable(data.result.message);
+            } else {
+                top.artAlert('温馨提示', data.result.message, 'error');
+            }
+        },
+        fail    : function(e, data){
+            top.artProgress('[close]');
+            top.artAlert('温馨提示', '因为网络原因，上传失败!', 'error');
+        }
+    });
+    		//文件上传前触发事件
+            $('.excelFile').bind('fileuploadsubmit', function (e, data) {
+                data.formData = { id: selectVal };  //如果需要额外添加参数可以在这里添加
+            });
+            
+            //动态的创建一个table
+        function createShowingTable(data) {
+            var tableStr = "<table class='tab-list' width='99%'>";
+            tableStr = tableStr
+                    + "<tr class='list-header'>"
+                    +"<td width='5%'>员工手机号</td>"
+                    +"<td width='5%'>套餐名称</td>"
+                    +"<td width='5%'>提货券名称</td>"
+                    +"<td width='60%'>失败原因</td>"
+                    +"</tr>";
+            var len=5;
+            for ( var i = 0; i < data.failMsgList.length; i++) {
+                tableStr = tableStr + "<tr>"
+                        +"<td>"+ data.failMsgList[i].mobileNO + "</td>"
+                        +"<td>"+ data.failMsgList[i].packageName + "</td>"
+                        +"<td>"+ data.failMsgList[i].voucherName + "</td>"
+                        + "<td>"+ data.failMsgList[i].msg + "</td>"
+                        +"</tr>";
+            }
+            tableStr = tableStr + "</table>";
+            //添加到div中
+            $("#tableAjax").html(tableStr);
+        };
+</script>
+</body>
+</html>

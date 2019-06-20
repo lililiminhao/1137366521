@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>企业列表</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+    </p>
+    <span class="text">企业列表</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr"><a href="#" title="企业列表">企业列表</a></li>
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/enterprise.php" method="get">
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="name" value="$!esc.html($request.getParameter('name'))" class="common ml10 w160" placeholder="企业名称"/>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+         #if($shiro.isPermitted('enterprise_list:create'))
+            <a href="/jdvop/admin/enterprise/edit.php"><span class="btn-green2">新增企业</span></a>
+        #end
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:100px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:200px" />
+                <col style="width:100px" />
+                <col style="width:150px" />
+            </colgroup>
+            <tr>
+                <th>企业ID</th>
+                <th>企业名称</th>
+                <th>企业专享池</th>
+                <th>企业专题名称</th>
+                <th>企业专题专享链接</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+            #if($enterprises.hasContent())
+                #foreach($enterprise in $enterprises)
+                <tr>
+                    <td class="tc">$!esc.html($enterprise.id)</td>
+                    <td class="tc">$!esc.html($enterprise.name)</td>
+                    <td class="tc">$!productPoolMap.get($enterprise.productPoolId).name</td>
+                    <td class="tc">
+                        #set($specialActivity = "")
+						#set($specialActivity = $activityMap.get($enterprise.specialActivityId))
+						$!specialActivity.activityName
+					</td>
+                    <td class="tc">
+                        #if($!specialActivity.activityName)
+                            https://mall.96225.com/jdvop/enterpriseActivity.php?enterpriseId=$!enterprise.id
+                        #end
+					</td>
+                    <td class="tc">$!esc.html($enterprise.remark)</td>
+                    <td class="tc js-option-parents">
+                        <div class="drop-down js-dropDown">
+                            <span class="ico"></span>
+                            <p class="s-inp">操作</p>
+                        </div>
+                        <dl class="s-option js-sOption">
+                        #if($shiro.isPermitted('enterprise_list:importEmployee'))
+                        <dd><a href = "/jdvop/admin/enterpriseEmployee/edit.php?enterpriseId=$!enterprise.id">添加员工</a></dd>
+                        #end
+                        #if($shiro.isPermitted('enterprise_list:edit'))
+                        <dd><a href = "/jdvop/admin/enterprise/edit.php?id=$!enterprise.id">编辑</a></dd>
+                        #end
+                        #if($shiro.isPermitted('enterprise_list:delete'))
+                        <dd><a href="/jdvop/admin/enterprise/delete.php?id=$!enterprise.id"  method="GET" class="ajax-request" cfm-message="您真的要删除该企业吗?一旦删除将无法恢复!" ok-message="reload" >删除</a></dd>
+                        #end
+                            
+                            
+                            
+                        </dl>
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关内容
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $enterprises.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+
+</script>
+
+</body>
+</html>

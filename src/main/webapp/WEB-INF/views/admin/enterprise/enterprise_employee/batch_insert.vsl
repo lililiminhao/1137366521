@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+    <link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+    <script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script>
+    <script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+    <script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+    <script type='text/javascript' src='/jdvop/script/main.js'></script>
+    <link rel="stylesheet" href="/jdvop/css/admin/ui-dialog.css"/>
+    <script src="/jdvop/script/admin/dialog-min.js"></script>
+    <script src="/jdvop/script/admin/dialog-plus-min.js"></script>
+    <!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+    <title>导入员工</title>
+    <style>
+	.automatic-box{
+		padding:15px;
+	}
+	h3{
+		font-size:16px;
+	}
+	li{
+		line-height:27px;
+	}
+	button,label{
+		background:#2196f8	;
+		outline:none;
+		border:0;
+		color:#fff;
+		padding:6px 12px;
+		border-radius:6px;
+		cursor:pointer;
+	}
+	label a{
+		display:inline-block;
+		color:#fff;
+	}
+	a:hover {
+	 color: #fff;
+	 text-decoration: none;
+	}
+</style>
+    
+    <script>
+        $(function(){
+            var selectVal = "0";
+            $(document).on('click', 'a.js-upload', function(e){
+                e.preventDefault();
+                selectVal = $("#enterpriseId").val();
+                var url = $(this).attr('data-upload-url');
+                $('.excelFile').fileupload('option', 'url', url);
+                $('.excelFile').click();
+            });
+
+            $('.excelFile').fileupload({
+                dataType    : 'json',
+                autoUpload  : true,
+                sequentialUploads   : true,
+
+                start       : function(e) {
+                    top.artProgress('数据加载中，请稍后...');
+                },
+                always      : function(e, data) {
+                    top.artProgress('[close]');
+                },
+                add         : function (e, data) {
+                    if (selectVal == 0) {
+                        top.artAlert('温馨提示', "请选择企业", 'error');
+                        return;
+                    } else {
+                        data.submit();
+                    }
+                },
+                done        : function(e, data) {
+                    top.artProgress('[close]');
+                    if (data.result.isOk) {
+                        createShowingTable(data.result.message);
+                        top.artAlert('温馨提示', "成功加入" + data.result.message.successCount + "个员工", 'ok');
+                    } else {
+                        top.artAlert('温馨提示', data.result.message, 'error');
+                    }
+                },
+                fail    : function(e, data){
+                    top.artProgress('[close]');
+                    top.artAlert('温馨提示', '因为网络原因，上传失败!', 'error');
+                }
+            });
+            //文件上传前触发事件
+            $('.excelFile').bind('fileuploadsubmit', function (e, data) {
+                data.formData = { id: selectVal };  //如果需要额外添加参数可以在这里添加
+            });
+
+        });
+
+        //动态的创建一个table
+        function createShowingTable(data) {
+            var tableStr = "<table class='tab-list' width='99%'>";
+            tableStr = tableStr
+                    + "<tr class='list-header'>"
+                    +"<td width='5%'>用户名</td>"
+                    +"<td width='5%'>手机号码</td>"
+                    +"<td width='60%'>失败原因</td>"
+                    +"</tr>";
+            var len=5;
+            for ( var i = 0; i < data.failMsgList.length; i++) {
+                tableStr = tableStr + "<tr>"
+                        +"<td>"+ data.failMsgList[i].name + "</td>"
+                        +"<td>"+ data.failMsgList[i].mobile + "</td>"
+                        + "<td>"+ data.failMsgList[i].msg + "</td>"
+                        +"</tr>";
+            }
+            tableStr = tableStr + "</table>";
+            //添加到div中
+            $("#tableAjax").html(tableStr);
+        };
+    </script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav  borderGreen clearfix">
+    <span class="text">导入员工</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr">导入员工</li>
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix highlight_e4e4e4 pt30 pb30" style="border-top: none; ">
+        <p class="pl10 fs16p fwb">操作指引</p>
+        <p class="pl10 fs16p pt16">
+            1. 点击右侧按钮，下载批量上传模板。
+            <a class="btn-blue2" title="下载文件" href="/jdvop/excel/EMPLOYEE_BATH_INSERT_TEMPLATE.xls" target="_blank">下载Excel模板</a>
+        </p>
+        <p class="pl10 fs16p pt16">
+            2.在您下载的Excel中编辑相应用户信息，当编辑完成后保存Excel，点击“上传EXCEL文件”，将编辑好的表格上传系统。
+        </p>
+        <p class="pl10 fs16p pt16">
+            3.输入要添加员工的公司，点击“上传”，即可添加员工到指定的公司中。上传成功后，在
+            <a href="/jdvop/admin/enterpriseEmployee.php" class="blue">企业员工管理</a>
+            中查看相应员工信息。
+        </p>
+        <p class="pl10 fs16p pt16">
+            <a class="btn-blue2 js-upload" data-upload-url="/jdvop/admin/enterpriseEmployee/batchInsert.php" title="选择文件">
+                上传Excel文件
+            </a>
+        </p>
+    </div>
+    <div>
+        <p class="pl10 fs16p pt16">
+            所属企业
+            <select name="enterpriseId" id="enterpriseId" class="common ml10 w160" style="height:28px; width:160px">
+                <option value="0">请选择</option>
+                #foreach($enterprise in $enterpriseList)
+                    <option value="$enterprise.id" >$enterprise.name</option>
+                #end
+            </select>
+        </p>
+        <div id="tableAjax">
+        </div>
+    </div>
+    <span style="display:none;"><input type="file" name="excelFile" class="excelFile" /></span>
+</div>
+</body>
+</html>

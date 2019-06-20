@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+        <meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+        <meta name="Description" content="" />
+        <meta name="website" content="$!websiteTool.getWebsite().id" />
+        <meta name="usertype" content="website_user" />
+        <meta name="userid" content="$!userTool.getUserId()" />
+        <meta name="pagetype" content="other" />
+        <meta name="pageid" content="" />
+        <title>$!esc.html($websiteTool.getWebsite().getName())</title>
+        <link rel="stylesheet" type="text/css" href="/jdvop/css/global.css"/>
+        <link rel="stylesheet" type="text/css" href="/jdvop/css/main.css"/>   
+        <script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+    </head>
+    <body>
+        #parse('header.vsl')
+        <div class="w1200 limit-warp">
+            <div class="title-wrap">
+                <span class="txt">限时兑换</span>
+            </div>
+            <ul class="limit-product clearfix">
+                #if($page.hasContent())
+                #foreach($fp in $page)
+                <li #if($fp.isRobOver == true) class="disabled" #end>
+                    <a href="/jdvop/product/${fp.productId}.php" title="$fp.name">
+                        <input type="hidden" name="endTime" value="$!dateTool.format('yyyy-MM-dd HH:mm',$fp.endTime)"/>
+                        <p class="img">
+                            #if($fp.ownerType == "jingdong" || $fp.ownerType == "system")
+                                <img src="$!fp.thumbnailImage" alt="$!fp.name"/>
+                                #if($fp.ownerType == "jingdong")
+                                    <img src="/jdvop/images/jd-ico.png" class="jd-ico"/>
+                                #end
+                            #else
+                                <img src="$configTool.getImageHost()/thumbnail$!fp.thumbnailImage" alt="$!fp.name"/>
+                            #end
+                            <span class="icon-over"></span>
+                        </p>
+                        <p class="name overflow-h">
+                            $fp.name
+                        </p>
+                    </a>
+                    <p class="time">
+                        #if($fp.isRobOver == true)
+                        <em></em>
+                        #else
+                        <i class="time-icon"></i><em></em>
+                        #end
+                    </p>
+                    <div class="bg">
+                        <div class="left clearfix">
+                            <p class="bgzekou">
+                                $!numberTool.format('#0.0',$fp.discountRate)<i>折</i>
+                            </p>
+                            <p class="num">
+                                #set($discountPrice = $fp.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                                #set($originalPrice = $fp.displayOriginalPrice*$websiteTool.getWebsite().getRatio())
+                                <span class="xianjia">$discountPrice<i class="txt">积分</i></span>
+                                <span class="yuanjia">$originalPrice积分</span>
+                            </p>
+                        </div>
+                        #if($fp.isRobOver == true)
+                        <a href="/jdvop/product/${fp.productId}.php" title="活动结束"><span class="btn">活动<br/>结束</span></a>
+                        #else    
+                        <a href="/jdvop/product/${fp.productId}.php"  title="立即抢购"><span class="btn">立即<br/>抢购</span></a>
+                        #end 
+                    </div>
+                </li>
+                #end
+                #else
+                <div class="null-wrap">
+                    <img src="/jdvop/images/img-actNull.png" alt="没有活动显示的图片"/><br/>
+                    <a href="/jdvop/index.php"><input type="button" value="返回首页"  class="btn-orange"/></a>
+                </div>
+                #end
+            </ul>
+            <div class="pages">$pg.pager($link, $page.getPagerSpec(), 4, '_self')</div>
+        </div>
+        #parse('footer.vsl')    
+    </body>
+    <script>
+        function toTime(iTime, _this) {
+            var em = _this.find("em");
+            var iNowTime = new Date().getTime();
+            var iDisTime = iTime - iNowTime;
+            if (iDisTime <= 0)
+            {
+                clearInterval(oTimer);
+                $(".time-icon").remove();
+                em.text(" ");
+            }
+            else
+            {
+                var iDate = parseInt(iDisTime / 86400000);
+                var iHours = parseInt((iDisTime % 86400000) / 3600000);
+                var iMin = parseInt((iDisTime % 3600000) / 60000);
+                var iSec = parseInt((iDisTime % 60000) / 1000);
+                var iMSec = iDisTime % 1000;
+                em.text("剩余" + iDate + "天 " + iHours + ":" + iMin + ":" + iSec);
+            }
+        }
+        $(".limit-product li").each(
+            function(i) {
+                var _this = $(this);
+                endTime = $("input", this).val();
+                var iTime = new Date(endTime).getTime();
+                var disable = _this.attr("class");
+                if (disable === undefined || disable === '' || disable.length <= 0) {
+                    oTimer = setInterval(function() {
+                        toTime(iTime, _this);
+                    }, 14);
+                }
+            });
+    </script>
+</html>

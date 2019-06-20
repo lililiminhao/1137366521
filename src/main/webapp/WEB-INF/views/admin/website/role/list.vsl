@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css' />
+    <link rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css' />
+    <link rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css" />
+    <link rel='stylesheet' type='text/css' href='/jdvop/css/admin/jquery.datetimepicker.css' />
+    <script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script>
+    <script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+    <script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+    <script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+    <script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+    <script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+    <script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+    <script src="/jdvop/script/admin/jquery.datetimepicker.full.min.js"></script>
+    <!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+    <title>账号管理</title>
+    <style>
+        tr.disabled{
+		text-decoration:line-through;
+		color:#bdb8b8;
+	}
+	
+	
+</style>
+</head>
+
+<body>
+    <iframe style="display:none;" name="hiden_frm"></iframe>
+    <!--主导航-->
+    <div class="mainNav borderGreen clearfix">
+        <p class="right fr">
+        </p>
+        <span class="text">角色名称</span>
+    </div>
+    <div id="iframePage">
+        <div class="automatic-box clearfix mt10">
+            <div class="fl mt4">
+
+            </div>
+            <div class="right fr p10 js-option-parents">
+
+                <a href="/jdvop/admin/website/role/toAdd.php"><span class="btn-green2">添加角色</span></a> </div>
+        </div>
+        <div class="table-list">
+            <table class="common">
+                <colgroup>
+                    <col style="width:60px" />
+                    <col style="width:150px" />
+                    <col style="width:150px" />
+                    <col style="width:150px" />
+                    <col style="width:150px" />
+                    <col style="width:150px" />
+                    <col style="width:120px" />
+                    <col style="width:120px" />
+                    <col style="width:120px" />
+                    <col style="width:100px" />
+                    <col />
+                </colgroup>
+                <tr>
+                    <th>角色名称</th>
+                    <th>角色类型</th>
+                    <th>角色状态</th>
+                    <th>备注</th>
+                    <th>操作</th>
+                </tr>
+                <tr>
+
+
+
+
+                    #if($roles && $roles.hasContent())
+                    #foreach($role in $roles)
+                <tr #if($role.dataFlag==-1) class="disabled" #end>
+                    <td $fontStyle class="tc">$!role.roleName</td>
+
+                    #if($role.roleType == 1)
+                    #set($type = '超级管理员')
+                    #elseif($role.roleType == 2)
+                    #set($type = '管理员')
+                    #elseif($role.roleType == 3)
+                    #set($type = '供应商')
+                    #else
+                    #set($type = '分销商')
+                    #end
+
+                    <td $fontStyle class="tc">$!type</td>
+                    #if($!role.roleStatus == 1)
+                    #set($s = '启用')
+                    #elseif($!role.roleStatus == -1)
+                    #set($s = '禁用')
+                    #else
+                    #set($s = '未知')
+                    #end
+                    
+                    
+                    
+                    <td $fontStyle class="tc">$s</td>
+                    <td $fontStyle class="tc">$!role.remark</td>
+                    <td class="tc js-option-parents">
+                        <div #if($coupon.dataFlag==-1) style="display:none" #end>
+                            <div class="drop-down js-dropDown">
+                                <span class="ico"></span>
+                                <p class="s-inp">操作</p>
+                            </div>
+                            <dl class="s-option js-sOption">
+
+                                <dd><a href="/jdvop/admin/website/role/show.php?id=$!role.id">查看</a></dd>
+                                <dd><a href="/jdvop/admin/website/role/toEdit.php?id=$!role.id">编辑</a></dd>
+                                #if($!role.roleStatus == -1)
+                     <dd><a onclick="startEndUse(1,$!role.id)" href="javascript:;">启用</a></dd>
+                    #else
+                     <dd><a onclick="startEndUse(-1,$!role.id)" href="javascript:;">禁用</a></dd>
+                    #end
+                            
+                                <dd><a href="/jdvop/admin/website/role/toPrivileges.php?id=$!role.id">设置权限</a></dd>
+                                <dd><a onclick="delCoupon($!role.id)" href="javascript:;">删除</a></dd>
+                               
+                            </dl>
+                        </div>
+
+                    </td>
+                </tr>
+                #end
+                #end
+
+                </tr>
+
+            </table>
+
+        </div>
+        <div class="layout-footer clearfix">
+            $adminPg.pager($link, $roles.getPagerSpec(), 4, '_self')
+        </div>
+    </div>
+
+    <script type="text/javascript">
+	
+	
+    $("#statusdefault").val("")
+        $.datetimepicker.setLocale('ch');
+        $('.startTime').datetimepicker({
+            format: "Y-m-d H:i"
+        });
+        $('.endTime').datetimepicker({
+            format: "Y-m-d H:i"
+        });
+        
+        function startEndUse(roleStatus,roleId){
+        	top.artConfirm('温馨提示','确认此操作？',function(v){
+        		if(v){
+        			$.ajax({
+                        url: '/jdvop/admin/Role/edit.php?roleStatus='+roleStatus +'&id='+roleId,
+                        type: 'get',
+                        success: function (res) {
+                            res = JSON.parse(res);
+
+                            top.artAlert('温馨提示', res.msg);
+                            if (res.code == 1) {
+                                location.href = "/jdvop/admin/role/list.php";
+                            }
+                        }
+                    })
+        		}
+        	})
+					
+		}
+		
+        function delCoupon(id) {//删除优惠券二次提示
+            top.artConfirm('温馨提示', '您确定删除该角色名称？删除后：\n 1.相关账号，将无法登陆管理平台；\n 2.相关账号，将无法再次恢复。', function (v) {
+                if (v) {
+                    $.ajax({
+                        url: '/jdvop/admin/Role/del.php?id=' + id,
+                        type: 'get',
+                        success: function (res) {
+                            res = JSON.parse(res);
+
+                            top.artAlert('温馨提示', res.msg);
+                            if (res.code == 1) {
+
+                                location.href = "/jdvop/admin/role/list.php";
+                            }
+                        }
+                    })
+                }
+            });
+        }
+
+
+		
+
+        function disableBatch(data) {
+            top.artConfirm('请注意', '您真的要禁用这' + data.length + '位账号么?', function (v) {
+                if (v) {
+                    top.artProgress('禁用中，请稍后...');
+                    $.get('/jdvop/admin/website/administrator/setEnabled.php?' + data.join('&'), { enabled: false }, function (d) {
+                        top.artProgress('[close]');
+                        if (d.isOk) {
+                            location.reload();
+                        } else {
+                            top.artAlert('温馨提示', d.message, 'error');
+                        }
+                    }, 'json');
+                }
+            });
+        }
+        function restoreBatch(data) {
+            top.artProgress('启用中，请稍后...');
+            $.get('/jdvop/admin/website/administrator/setEnabled.php?' + data.join('&'), { enabled: true }, function (d) {
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    location.reload();
+                } else {
+                    top.artAlert('出错啦', d.message);
+                }
+            }, 'json');
+        }
+        function doBatchAction(action) {
+            var data = [];
+            $('input[name="ids[]"]:checked').each(function () {
+                var thiz = $(this);
+                var id = thiz.val();
+                if (id !== undefined) {
+                    id = parseInt(id);
+                    if (id !== NaN && id > 0) {
+                        data.push('ids[]=' + id);
+                    }
+                }
+            });
+            if (data.length > 0) {
+                if (action === 'disable') {
+                    disableBatch(data);
+                } else if (action === 'restore') {
+                    restoreBatch(data);
+                }
+            } else {
+                top.artAlert('温馨提示', '您必须选中一些账号才可以执行此操作!');
+            }
+        }
+
+        $(function () {
+
+            $(document).on('click', '#js_do_export', function (e) {
+                e.preventDefault();
+                var l = location.href.replace('/jdvop/admin/websiteUser/list.php', '/jdvop/admin/websiteUser/export.php');
+                $('#export_ifrm').attr('src', l);
+            });
+
+            $('.batch-action').on('click', function (e) {
+                e.preventDefault();
+                var action = $(this).attr('batch-action');
+                if (action !== undefined) {
+                    doBatchAction(action);
+                }
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script  type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script  type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+</head>
+<body class="pm56">
+    <header class="bar-nav">
+        <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+        <h1 class="title"> 售后记录 </h1>
+    </header>
+    <div class="order-list">
+        <ul id="order_list">
+            #if($dataPage && $dataPage.hasContent())
+                #foreach($nifferOrder in $dataPage.getContent())
+                #set($isRefund = $refundDataMap.get($nifferOrder.id))
+                #set($order    = $orderDataMap.get($nifferOrder.id))
+                #set($afterSale    = $nifferOrder.type)
+                <li>
+                    #set($outEntry = $nifferEntriesAsMap.get($nifferOrder.id))
+                    #if($afterSale=='niffer')
+                        #set($entry = $outEntry.get($nifferOrderEntryType).get(0))
+                    #else
+                        #set($entry = $outEntry.get($refundOrderEntryType).get(0))
+                    #end
+                    <a href="/jdvop/my/mobile/order/niffer${nifferOrder.id}.php">
+                        <p class="top">申请时间：<i>$!dateTool.format('yyyy-MM-dd', $nifferOrder.applyTime) $dateTool.format('HH:mm:ss', $nifferOrder.applyTime)</i></p>
+                        #set($product = $productTool.asProduct($entry.productId))
+                        <div class="con clearfix">
+                            <p class="img">
+                                #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                    <img src="$!product.getThumbnailImage()" />
+                                #else
+                                    <img src="$configTool.getImageHost()/middle$!product.getThumbnailImage()" />
+                                #end
+                            </p>
+                            <p class="text">
+                                <span>订单编号 <i>$!order.key</i></span>
+                                <span>订单状态 <i class="color999">
+                                        #if($nifferOrder.isSystem)
+                                            <!--如果市民卡后台已拒绝，则取拒绝状态-->
+                                             #if($nifferOrder.status=="declined")
+                                                  #set($status=$nifferOrder.status)
+                                             #else
+                                                  #set($status=$nifferOrder.openStatus)
+                                             #end
+                                         #else
+                                             #set($status=$nifferOrder.status)
+                                         #end
+                                         $!status.description
+                                    </i></span>
+                            </p>
+                            <span class="ico-arrow"></span>
+                        </div>
+                    </a>
+                </li>
+                #end
+            #else
+                <div class="shopcart-none" style="padding-bottom: 100%; margin-bottom: -100%;"> 
+                    <i class="icon"></i>
+                    <p class="title" style="padding-bottom: 20px;">暂无售后记录！</p>
+                    <div class="mod-btns webkitbox-h">
+                        <p class="flex1">
+                            <a href="/jdvop/mobile/products.php" class="mod-btn" style="width: 60%; margin-left: auto; margin-right: auto;">去购物</a>
+                        </p>
+                    </div>
+                </div>
+            #end
+        </ul>
+    </div>
+    #parse('footer_nav.vsl')
+</body>
+</html>

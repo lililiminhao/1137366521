@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src='/jdvop/script/admin/echarts.min.js'></script>
+<script type="text/javascript" src='/jdvop/script/admin/my97/WdatePicker.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>数据分析-新增会员</title>
+<script>
+    function  check_date()
+    {
+        var st  = $('input[name="st"]').val();
+        var et  = $('input[name="et"]').val();
+        if (st === '' || et === '') {
+            top.artAlert('时间选择错误', '开始日期或结束日期不能为空', 'error');
+            return false;
+        }
+        var sta = st.split('-');
+        var eta = et.split('-');
+
+        var std = new Date(parseInt(sta[0]), parseInt(sta[1].replace(/^0+/, '')), parseInt(sta[2].replace(/^0+/, '')));
+        var etd = new Date(parseInt(eta[0]), parseInt(eta[1].replace(/^0+/, '')), parseInt(eta[2].replace(/^0+/, '')));
+        var sts = std.getTime();
+        var ets = etd.getTime();
+        if (sts > ets)
+        {
+            top.artAlert('时间选择错误', '开始日期不能晚于结束日期', 'error');
+            return false;
+        }
+        var tv  = ets - sts;
+        if (tv > (63 * 24 * 3600 * 1000))   //时间差超过65天
+        {
+            top.artAlert('时间选择错误', '开始时间和结束时间之间不能超过2个月', 'error');
+            return false;
+        }
+        return true;
+    }
+    $(function(){
+        $('.js-submit-btn').on('click', function(e){
+            e.preventDefault();
+            if (!check_date()) {
+                return;
+            }
+            $("#dataForm").submit();
+        });
+    });
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.back(-1)"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">新增会员</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li><a href="/jdvop/admin/statistics/regionStatistics.php">总体概览</a></li>
+                <li class="curr">新增会员</li>
+            </ul>
+        </div>
+    </div>
+    <div class=" clearfix highlight_e4e4e4 pt10 pb10 pl30" style="border-top: none;">
+        <form action="/jdvop/admin/statistics/newUserStatistics.php" id="dataForm" method="get">
+            <table class="">
+                <tr>
+                    <td>日期：</td>
+                    <td>
+                        <input type="text" name="st" value="$!dateTool.format('yyyy-MM-dd', $st)" class="common w140" onfocus="WdatePicker({readOnly:true, skin:'blueFresh'});" placeholder="起始日期"/> - 
+                        <input type="text" name="et" value="$!dateTool.format('yyyy-MM-dd', $et)" class="common w140" onfocus="WdatePicker({readOnly:true, skin:'blueFresh'});" placeholder="截至日期"/>
+                    </td>
+                    <td>
+                        <input type="button" class="btn-grey2 js-submit-btn ml10" value="搜索">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>  
+    <div class="lr-columns clearfix">
+    	<div class="map-wrap left">
+            <p class="title2">新增总量：<i>$provinceCount</i>人</p>
+            <div class="cont" id="js-addUser">
+
+            </div>
+    	</div>
+    	<div class="pie-chart right">
+            <p class="title2">新增总量：<i>$topCount</i>人</p>
+            <div class="cont" id="js-piechart"></div>
+    	</div>
+    </div>
+</div>
+    <script src="/jdvop/script/admin/china.js"></script>
+    <script type="text/javascript">
+   	var piechart = echarts.init(document.getElementById('js-piechart'));
+        var oAddUser = echarts.init(document.getElementById('js-addUser'));
+    
+   	addOption = {
+            title:{
+                text:'省份分布',
+                subtext: '数据来源于$websiteTool.getWebsite().getName()网站',
+                padding:20,
+                textStyle:{
+                        color: '#666',
+                        fontWeight: '700',
+                        fontSize: 16
+                }
+            },
+	    tooltip: {
+	        trigger: 'item',
+	    },
+	    series: [
+	        {
+	            name:'人数统计',
+	            type:'pie',
+	            radius: ['40%', '55%'],
+	            data:[$provinceBuilder]
+	        }
+	    ]
+	};
+	
+ 	//饼图显示当前省的底下市分布
+        sexRatio = {
+            title:{
+                    text:'TOP10城市',
+                    subtext: '数据来源于$websiteTool.getWebsite().getName()网站',
+                    padding:20,
+                    textStyle:{
+                            color: '#666',
+                            fontWeight: '700',
+                            fontSize: 16
+                    }
+            },
+	    tooltip: {
+	        trigger: 'item',
+	    },
+	    series: [
+	        {
+	            name:'人数统计',
+	            type:'pie',
+	            radius: ['40%', '55%'],
+	            data:[$topTenBuilder]
+	        }
+	    ]
+	};
+   	piechart.setOption(sexRatio);
+   	oAddUser.setOption(addOption);
+        window.addEventListener("resize", function(){
+    	oAddUser.resize();	
+    	piechart.resize();	
+    });
+</script>
+</body>
+</html>

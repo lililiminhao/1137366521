@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>	
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+</head>
+<body class="pm56" style="background: #f0f0f0;">
+<!--    <header class="bar-nav">
+        <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+        <h1 class="title">个人中心 </h1>
+    </header>    -->
+    <div class="personal-wrap">
+        <div class="top">
+            <img src="/jdvop/images/mobile/bg-name.png"  alt="640*180"/>
+            <dl>
+                <dd class="overflow-text">
+                    $!user.nickName
+                </dd>
+            </dl>
+            <p class="ico-name">
+                #if($user.headPortrait)
+                    <img src="$configTool.getImageHost()$user.headPortrait" onerror="javascript:this.src='/jdvop/images/mobile/imgDefault.jpg'"/>
+                #else
+                    <img src="/jdvop/images/mobile/imgDefault.jpg" />
+                #end
+            </p>
+        </div>
+        <div class="order-status webkitbox-h">
+            <div class="flex1">
+                    <a href="/jdvop/my/mobile/orders.php">全部订单</a>
+            </div>
+            <div class="flex1">
+                    <a href="/jdvop/my/mobile/orders.php?status=waiting_shipment">待发货</a>
+                    <i class="num">#if($waitingShipment) $waitingShipment #else 0 #end</i>
+            </div>
+            <div class="flex1">
+                    <a href="/jdvop/my/mobile/orders.php?status=waiting_confirmed">待收货</a>
+                    <i class="num">#if($confirmOrderCount) $confirmOrderCount #else 0 #end</i>
+            </div>
+            <div class="flex1">
+                    <a href="/jdvop/my/mobile/orders.php?status=completed">已完成</a>
+                    <i class="num">#if($okOrderCount) $okOrderCount #else 0 #end</i>
+            </div>
+        </div>
+        <ul>
+            #if($!specialActivityId)
+			<li>
+                 <a href="https://mall.96225.com/jdvop/enterpriseActivity.php?enterpriseId=$!enterpriseId">
+                    <i class="ico-a"><img src="/jdvop/images/mobile/us/img1-0.png" /></i>企业员工专享区
+                    <em class="ico-arrow "></em>
+                </a>
+            </li>
+            #end
+            <li>
+                <a href="/jdvop/shoppingCart/myCart.php">
+                    <i class="ico-a"><img src="/jdvop/images/mobile/us/img1-2.png" /></i>购物车
+                    <em class="ico-arrow "></em>
+                </a>
+            </li>
+            <li>
+                 <a href="/jdvop/my/mobile/mycoupon.php">
+                     <i class="ico-a"><img src="/jdvop/images/mobile/us/coupon.png" /></i>优惠券
+                    <em class="ico-arrow "></em>
+                </a>
+            </li>
+            <li>
+                 <a href="/jdvop/my/mobile/catchGoods.php">
+                     <i class="ico-a"><img src="/jdvop/images/mobile/us/icon_tihuoquan@2x.png" /></i>提货券
+                    <em class="ico-arrow "></em>
+                </a>
+            </li>
+            #if($fenxiao==1)
+            <li>
+                <a href="/jdvop/my/mobile/share.php">
+                    <i class="ico-a"><img src="/jdvop/images/mobile/us/icon_huifenxiang@2x.png" /></i>惠分享
+                    <em class="ico-arrow "></em>
+                </a>
+            </li>
+            #end
+            <li>
+                 <a href="/jdvop/my/mobile/nifferOrders.php">
+                     <i class="ico-a"><img src="/jdvop/images/mobile/us/img1-1.png" /></i>售后记录
+                    <em class="ico-arrow "></em>
+                </a>
+            </li>
+            <li>
+                <a href="/jdvop/my/mobile/address.php">
+                    <i class="ico-a"><img src="/jdvop/images/mobile/us/img1-3.png" /></i>收货地址管理
+                    <em class="ico-arrow "></em>
+                </a>
+            </li>
+        </ul>
+        <ul>
+            <li class="tc">
+                <a href="tel:$!websiteTool.getWebsite().customerServiceHotLine" class="red">
+##                    	热线服务：$!websiteTool.getWebsite().customerServiceHotLine
+                    	热线服务：0571-56053089
+                </a>
+            </li>
+            <li class="tc">
+                服务时间：周一至周五，上午9:00 - 17:30 
+            </li>
+            <li class="tc">
+                发货时间：一般3个工作日内安排发货，请耐心等待
+            </li>
+            <li class="tc red">
+                 售后服务：退换货等售后服务请拨打0571热线
+            </li>
+        </ul>
+    </div>
+    <!-- <div class="btn-return logout"> <a href="javascript:;">退出登录</a> </div> -->
+    #parse('footer_nav.vsl')
+    <script>
+    	$('.logout').click(function(){
+    	
+    		$.ajax({
+    			url:'/jdvop/my/mobile/logout.php',
+    			dataType:'json',
+    			success:function(res){
+    				if(res.isOk){
+    					location.reload();
+    					clearCookie();
+    					location.reload();
+    				}
+    			}
+    		})
+
+    		
+    	});
+    	function clearCookie(){
+		    var keys=document.cookie.match(/[^ =;]+(?=\=)/g);
+		    if (keys) {
+		        for (var i =  keys.length; i--;)
+		        	if(keys[i] == 'wap_token'){
+		        		document.cookie=keys[i]+'=0;expires=' + new Date( 0).toUTCString()+';path=/';
+		        	}else if(keys[i] == 'JSESSIONID'){
+		        		document.cookie=keys[i]+'=0;expires=' + new Date( 0).toUTCString()+';path=/jdvop';
+		        	}
+		            
+		    }    
+		}
+    </script>
+</body>
+</html>

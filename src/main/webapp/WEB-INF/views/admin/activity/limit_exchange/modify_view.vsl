@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/date.js"></script>
+<script type="text/javascript" src='/jdvop/script/admin/my97/WdatePicker.js'></script>
+<script type="text/javascript">
+    //校验非空
+    function validNull(fieldVal,msg){
+        fieldVal = $.trim(fieldVal);
+        if(fieldVal == undefined || fieldVal === '' || fieldVal.length < 1)
+        {
+            top.artAlert('温馨提示', msg+"不能为空",  'error');
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //校验数字整数
+    function validPositiveNumber(fieldVal,msg){
+        fieldVal = $.trim(fieldVal);
+        var number = Number(fieldVal);
+        if (isNaN(number) || number<=0)
+        {
+            top.artAlert('温馨提示', msg+"需为正数",  'error');
+            return true;
+        }
+    }
+        
+    //校验数字整数
+    function validNumber(fieldVal,msg){
+        fieldVal = $.trim(fieldVal);
+        var ex = /^[0-9]\d*$/;
+        if(fieldVal && !ex.test(fieldVal))
+        {
+            top.artAlert('温馨提示', msg+"需为正整数",  'error');
+            return true;
+        }
+    }
+    
+    
+    
+    var collectionData = function(){
+        var p;var fn;var _arr = [];
+        $(".edit-zhekou").each(
+            function(i){
+                p = {};
+                fn = $("input", this);
+                p["displayDiscountPrice"] = fn.eq(0).val();
+                p["displayOriginalPrice"] = fn.eq(1).val();
+                p["discountRate"] = fn.eq(0).val()/fn.eq(1).val();
+                p["limitNum"] = fn.eq(2).val();
+                p["buyNumPerPerson"] = fn.eq(3).val();
+                p["startTime"] = new Date(fn.eq(4).val());
+                p["endTime"] = new Date(fn.eq(5).val());
+                p["productId"] = fn.eq(6).val();
+                _arr.push(p);
+            }
+        );
+        return JSON.stringify($.extend(true,[],_arr));
+    };
+    $(function(){
+        $("#do_save").click(function(){
+            //check 参数
+            var valid = true;
+                $(".edit-zhekou").each(
+                    function(i){
+                        var fn = $("input", this);
+                        var displayDiscountPrice = fn.eq(0).val();
+                        var displayOriginalPrice = fn.eq(1).val();
+                        var limitNum = fn.eq(2).val();
+                        var buyNumPerPerson = fn.eq(3).val();
+                        var startTime = fn.eq(4).val();
+                        var endTime = fn.eq(5).val();
+                        if(validPositiveNumber(displayDiscountPrice,"折扣价")||
+                            validPositiveNumber(displayOriginalPrice,"展示原价")||
+                            validNumber(limitNum,"限量总数")||
+                            validNumber(buyNumPerPerson,"每人限购")||
+                            validNull(startTime,"开始时间")||
+                            validNull(endTime,"结束时间")){
+                                valid = false;
+                                return false;
+                        }
+                        if(new Date(startTime) > new Date(endTime)){
+                            top.artAlert('温馨提示', "开始时间不能大于结束时间",  'error');
+                            valid = false;
+                            return false;
+                        }
+                        if(parseInt(displayDiscountPrice) >= parseInt(displayOriginalPrice)){
+                            top.artAlert('温馨提示', "折扣价不能大于等于展示原价",  'error');
+                            valid = false;
+                            return false;
+                        }
+                    }
+                );
+                if(!valid)
+                    return;
+                submitData = collectionData();
+                $.ajax({
+                    type: 'POST',
+                    url: "/jdvop/admin/activity/limitExchange/checkRepeatProducts.php",
+                    contentType : "application/json",
+                    data: submitData,
+                    async:false,
+                    success: function(data){
+                        var temp = JSON.parse(data);
+                        if(temp.isOk){
+                            $.ajax({
+                                type: 'POST',
+                                url: "/jdvop/admin/activity/limitExchange/createProducts.php",
+                                contentType : "application/json",
+                                data: submitData,
+                                async:false,
+                                success: function(data){
+                                    var temp = JSON.parse(data);
+                                    if(temp.isOk){
+                                        top.artAlert('温馨提示',"数据保存成功！","/jdvop/admin/activity/limitExchange/list.php",'ok');
+                                    }
+                                },
+                                error: function(data, xhr, type){
+                                    top.artAlert('温馨提示',"系统异常","/jdvop/admin/activity/limitExchange/list.php",'error');
+                                }
+                            }, 'json');
+                        }else{
+                            //如果有重复的产品
+                            top.artConfirm('警告', "与现有列表中有重复产品，是否剔除并提交", function(v){
+                                if (v) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: "/jdvop/admin/activity/limitExchange/createProducts.php",
+                                        contentType : "application/json",
+                                        data: submitData,
+                                        async:false,
+                                        success: function(data){
+                                            var temp = JSON.parse(data);
+                                            if(temp.isOk){
+                                                top.artAlert('温馨提示',"数据保存成功！","/jdvop/admin/activity/limitExchange/list.php",'ok');
+                                            }
+                                        },
+                                        error: function(data, xhr, type){
+                                            top.artAlert('温馨提示',"系统异常","/jdvop/admin/activity/limitExchange/list.php",'error');
+                                        }
+                                    }, 'json');
+                                }
+                            });
+                        }
+                    },
+                    error: function(data, xhr, type){
+                        top.artAlert('温馨提示',"系统异常","/jdvop/admin/activity/limitExchange/list.php",'error');
+                        $(".btn-orange").attr("disabled", false);
+                    }
+                }, 'json');
+        });
+    });
+</script>
+<title></title>
+</head>
+<body>
+    <!--主导航-->
+    <div class="mainNav  borderRed clearfix">
+        <span class="text">修改折扣价格</span>
+        <p class="right fr"><a href="javascript:history.back(-1);" title="返回"><span class="btn-grey2">返回</span></a></p>
+    </div>
+    <div id="iframePage">
+        <div class="tab-column">
+            <div class="con">
+                <p class="text fwb"> 已选择的商品</p>
+            </div>
+        </div>
+        <div class="layout-grid highlight_e4e4e4 pb20 clearfix">
+            <form id="batch_form" method="POST">
+                <ul class="clearfix js-selectbox" id="candidate_box">
+                    #if($selectedProducts)
+                    #set($sysDate=$!dateTool.format('yyyy-MM-dd HH:mm:ss',$!dateTool.getSystemDate()))
+                    #foreach($product in $selectedProducts)
+                    <li>
+                        <p class="text"> <label>产品型号 $product.productCode</label></p>
+                        <p class="img">
+                            <img src="$product.thumbnailImage" width="160" height="160" alt=""/>
+                        </p>
+                        <p class="text orange"><i class="fr">折扣：</i><i>&yen;$!numberTool.format('#0.00', $product.retailPrice)</i> </p>
+                        <div class="edit-zhekou">
+                            <table>
+                                <colgroup>
+                                    <col style="width:70px;" />
+                                    <col />
+                                </colgroup>
+                                <tr>
+                                    <td class="tr">折扣价：</td>
+                                    <td class="tl"><input type="text" value ="" class="common h24 w100"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="tr">展示原价：</td>
+                                    <td class="tl"><input type="text" value="$!numberTool.format('#0.00',$product.retailPrice)" class="common h24 w100"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="tr">限量总数：</td>
+                                    <td class="tl"><input type="text" value="" placeholder="不填为不限购" class="common h24 w100"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="tr">每人限购：</td>
+                                    <td class="tl"><input type="text" value="" placeholder="不填为不限购" class="common h24 w100"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="tr">开始时间：</td>
+                                    <td class="tl">
+                                        <input type="text" value="" class="common h24 w100" onfocus="WdatePicker({readOnly:true, minDate:'$sysDate', skin:'blueFresh', dateFmt:'yyyy-MM-dd HH:mm:ss'});" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="tr">结束时间：</td>
+                                    <td class="tl">
+                                        <input type="text" value="" class="common h24 w100" onfocus="WdatePicker({readOnly:true, minDate:'$sysDate', skin:'blueFresh', dateFmt:'yyyy-MM-dd HH:mm:ss'});" />
+                                    </td>
+                                </tr>
+                            </table>
+                            <input type="hidden" value="$product.id"/>
+                        </div>
+                        <p class="tool">
+                            <span class="js-del-product ico-del mt6"><em>删除</em></span>
+                        </p>
+                        
+                    </li>
+                    #end
+                    #end
+                </ul>    
+            </form>    
+        </div>
+        <div class="layout-footer clearfix">
+            <div class="btn-wrap">
+<!--                <span class="js-del-all btn-red">取消</span>-->
+                <a href="javascript:;"><span class="btn-grey" id="do_save">保存</span></a>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(function(){
+        $(".js-del-product").click(function(){
+            var _this = this;
+            top.artConfirm("警告","您确定要删除该产品吗？",  function(v){ if (v) {$(_this).parents("li").remove();}});
+        });
+    });
+</script>
+</html>

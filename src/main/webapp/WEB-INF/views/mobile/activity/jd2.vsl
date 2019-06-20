@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>市民卡优惠活动</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no"/>
+	<meta name="full-screen" content="yes"/>
+	<meta name="x5-fullscreen" content="true"/>
+	<meta name="browsermode" content="application"/>
+	<meta name="x5-page-mode" content="app"/>
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+	<meta content="telephone=no" name="format-detection"/>
+	<style type="text/css">
+		*{ padding: 0; margin: 0;}
+		table{border-collapse:collapse;border-spacing:0;}
+		img{max-width: 100%; width: 100%; height: auto; vertical-align: middle;}
+	</style>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table id="001" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td>
+			<img src="/jdvop/images/mobile/activity/jd2/smkhd0721_01.jpg" width="640" height="307" alt=""></td>
+	</tr>
+	<tr>
+		<td><a href="https://mall.96225.com/jdvop/mobile/products.php?k=沙宣"><img src="/jdvop/images/mobile/activity/jd2/smkhd0721_02.jpg" width="640" height="451" alt=""></a></td>
+	</tr>
+	<tr>
+		<td><a href="https://mall.96225.com/jdvop/mobile/products.php?k=飞利浦"><img src="/jdvop/images/mobile/activity/jd2/smkhd0721_03.jpg" width="640" height="463" alt=""></a></td>
+	</tr>
+	<tr>
+		<td><a href="https://mall.96225.com/jdvop/mobile/products.php?wpt=32"><img src="/jdvop/images/mobile/activity/jd2/smkhd0721_04.jpg" width="640" height="469" alt=""></a></td>
+	</tr>
+	<tr>
+		<td><a href="https://mall.96225.com/jdvop/mobile/products.php?wpt=22"><img src="/jdvop/images/mobile/activity/jd2/smkhd0721_05.jpg" width="640" height="370" alt=""></a></td>
+	</tr>
+	<tr>
+		<td><a href="https://mall.96225.com/jdvop/mobile/products.php?wpt=20"><img src="/jdvop/images/mobile/activity/jd2/smkhd0721_06.jpg" width="640" height="326" alt=""></a></td>
+	</tr>
+	<tr>
+		<td><a href="https://mall.96225.com/jdvop/mobile/products.php?wpt=21"><img src="/jdvop/images/mobile/activity/jd2/smkhd0721_07.jpg" width="640" height="402" alt=""></a></td>
+	</tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script  type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script  type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<style type="text/css">
+    .btn-gr{ display: block; margin: 0 auto; background: #06bf04; width: 80%; height: 40px; border-radius:6px; text-align: center; color: #fff; font: normal 14px/40px simsun;}
+    .btn-gr:active{opacity: 0.8;}
+    .btn-bl{ display: block; margin: 0 auto; background: #0ae; width: 80%; height: 40px; border-radius:6px; text-align: center; color: #fff; font: normal 14px/40px simsun;}
+    .btn-bl:active{opacity: 0.8;}
+    .order-list .btn-wrap .btn{ height: 40px; line-height: 40px; padding: 0 26px; }
+    .mui-scroll{
+    	height:80px;
+    	overflow:hidden;
+    }
+</style> 
+</head>
+<body style=" background:#efeff4; ">
+<header class="bar-nav js-header">
+    <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+    <h1 class="title">订单支付</h1>
+</header>
+<div class="order-list pt44">
+    <ul>
+        <li>
+            
+                <a href="/jdvop/my/mobile/order/${order.getId()}.php">
+                <p class="top">订单号：<i>$order.getKey()</i>
+                    #if($order.status == 'completed')
+                    <img src="/jdvop/images/mobile/bg-order-ok.png" class="bg-ok" width="68" height="68"/>
+                    #else
+                    <span class="txt">$!order.getNormalStatus()</span>
+                    #end
+                </p>
+                #if($entries.size() == 1)
+                #set($product = $productMap.get($entries.get(0).getSourceObjectId().intValue()))
+                <div class="con clearfix">
+                    #if($!product.ownerType == "jingdong" || $!product.ownerType == "system")
+                        <p class="img fl"><span class="ico-jdm"></span> <img src="$!product.getThumbnailImage()" alt="$!esc.html($product.name)"></p>
+                    #else
+                        <p class="img fl"><img src="$configTool.getImageHost()/middle$!product.getThumbnailImage()" alt="$!esc.html($product.name)" ></p>
+                    #end
+                    <p class="name line-clamp2">$!esc.html($product.name)</p>
+                </div>
+                #if($order.shipmentFee)
+<!--                    <p class="total-txt tr color999">
+                        快递费：&yen;$!numberTool.format('#0.00', $order.shipmentFee)
+                    </p>-->
+                #end
+                <p class="total-txt tr color999">
+                    共 <i class="orange">$entries.get(0).amount</i>件商品 &nbsp;
+                    合计：<i class="orange">&yen;$!numberTool.format('#0.00', $order.getNeedPay())</i>
+                </p>
+                #{else}
+                <div class="con mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted" style=" font-size: 0; height: 99px;">
+                    <div class="mui-scroll">
+                        #set($entryAmount = 0)
+                        #foreach($entry in $entries)
+                        #set($entryAmount = $entryAmount + $entry.amount)
+                        #set($product = $productMap.get($entry.sourceObjectId.intValue()))
+                        <p class="img">
+                            #if($product.ownerType == "jingdong")
+                                <span class="ico-jdm"></span>
+                                <img src="$!product.thumbnailImage" alt="$!esc.html($product.name)"/>
+                            #elseif($product.ownerType == "system")
+                                <img src="$!product.thumbnailImage" alt="$!esc.html($product.name)"/>
+                            #else
+                                <img src="$configTool.getImageHost()/middle$!product.thumbnailImage" alt="$!esc.html($product.name)"/>
+                            #{end}
+                        </p>
+                        #end
+                    </div>
+                </div>
+                #if($order.shipmentFee)
+<!--                    <p class="total-txt tr color999">
+                        快递费：&yen;$!numberTool.format('#0.00', $order.shipmentFee)
+                    </p>-->
+                #end
+                <p class="total-txt tr color999">
+                    共 <i class="maincolor">$entryAmount </i>件商品 &nbsp;
+                    合计：<i class="maincolor">&yen;$!numberTool.format('#,##0.00', $order.getNeedPay())</i>
+                </p>
+                #{end}
+            </a>
+            <div class="btn-wrap clearfix">
+                <span class="btn js-shiminka-pay btn-green" data-href="/jdvop/my/order/shiminkaPay/topay.php?id=$!{order.id}">市民卡支付</span>
+				##if($order.needPay < 5001)
+                ##    <span class="hide btn js-tsm-wechat-pay btn-green" data-href="/jdvop/my/order/tsmPay/topay.php?orderKey=$!{order.key}&payType=wechat">微信支付</span>
+                ##end
+            </div>
+        </li>
+    </ul>
+</div>
+#parse('footer_nav.vsl')
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<script>
+    $(function() {
+        //判断是不是微信访问
+        var ua = window.navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i) == 'micromessenger'){
+            $('.js-tsm-wechat-pay').removeClass('hide');
+        } 
+        //市民卡支付
+        $(".js-shiminka-pay").click(function(e){
+            e.preventDefault();
+            $.post($(this).attr("data-href"), function(d){
+                var data = eval('(' + d + ')');
+                if (data.isOk) {
+                    location = data.message;
+                }  else {
+                    mui.alert(data.message, '温馨提示');
+                }
+            }, 'application/json');
+        });
+        
+        //市民卡支付
+        $(".js-tsm-wechat-pay").click(function(e){
+            e.preventDefault();
+            if(isWeiXin()){
+                $.post($(this).attr("data-href"), function(d){
+                    var data = eval('(' + d + ')');
+                    if (data.isOk) {
+                        location = data.message;
+                    }  else {
+                        mui.alert(data.message, '温馨提示');
+                    }
+                }, 'application/json');
+            } else {
+                mui.alert("请用微信浏览器打开!", '温馨提示');
+            }
+        });
+    });
+    function isWeiXin(){
+        var ua = window.navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i) == 'micromessenger'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+</script>
+</body>
+</html>

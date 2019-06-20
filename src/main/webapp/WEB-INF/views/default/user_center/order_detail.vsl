@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+</head>
+<body>
+ #parse('header.vsl')  
+<div class="user-personal">
+    #include('user_center/sider_bar.vsl')
+    <div class="user-content-wrap">
+        <h3 class="user-title">
+            <span>订单号：<i class="blue fwb">$order.getKey()</i></span>
+            <span class="ml15p">状态：<i class="green fwb">$order.getStatus().getDescription()</i></span>
+        </h3>
+        #set($progress = 'nav1')
+        #set($message = '')
+        #if($order.status == 'waiting_audit' || $order.status == 'waiting_finance_audit' || $order.status == 'refunding')
+            #set($progress = 'nav2')
+            #set($message = $dateTool.format('yyyy-MM-dd HH:mm:ss', $order.createTime) + '您已经成功下单,订单审核通过后我们会尽快为您发货，请耐心等待。')
+        #elseif($order.status == 'waiting_shipment')
+            #set($progress = 'nav3')
+            #set($message = '您的订单正在拣货出库中，请耐心等待。')
+        #elseif($order.status == 'waiting_confirmed')
+            #set($progress = 'nav4')
+            #set($message = '您的订单已经发货，请耐心等待并留意快递员的来电。')
+        #elseif($order.status == 'completed')
+            #set($progress = 'nav5')
+            #set($message = '订单已经完成,祝您购物愉快。')
+        #elseif($order.status == 'cancled_before_pay' || $order.status == 'canceld')
+            #set($progress = 'nav1')
+            #set($message = '该订单已经关闭,您可以去购买其他商品。')
+        #end
+        <div class="state mt10p">
+            <p class="$!progress"></p>
+            <span class="navsubmit">提交订单</span>
+            <span class="service">订单审核</span>
+            <span class="Return">商品出库</span>
+            <span class="Warehouse">等待收货</span>
+            <span class="last" style="left:742px;">完成</span>
+        </div>
+        <div class="user-wrap-tab">
+            <h3 class="process-title">订单跟踪</h3>
+            <div class="process-content">
+                #set($orderType=$order.getDeliveryObjectType().name())
+                #if($orderType=='system'||$orderType=='jingdong')
+                    #if($company)
+                        <table width="100%" class="process-tab">
+                            <tbody>
+                                <tr>
+                                    <td>时间</td>
+                                    <td>描述</td>
+                                </tr>
+                                #foreach($c in $contents)
+                                <tr>
+                                    <td>$c.get("time")</td>
+                                    <td>$c.get("description")</td>
+                                </tr>
+                                #end
+                            </tbody>
+                        </table>
+                    #else
+                        <table width="100%" class="process-tab">
+                            <tbody>
+                                <tr>
+                                    <td align="right" width="70"></td>
+                                    <td>$message</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    #end
+                #else
+                    <table width="100%" class="process-tab">
+                        <tbody>
+                            <tr>
+                                <td align="right" width="70"></td>
+                                <td>$message</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                #end
+                
+            </div>
+        </div>
+        <div class="user-wrap-tab">
+            <h3 class="process-title">订单信息</h3>
+            <div class="process-content">
+                <h4 class="process-content-t">收货人信息</h4>
+                <table width="100%" class="process-tab">
+                    <tbody><tr>
+                            <td align="right" width="70">收货人:</td>
+                            <td>$esc.html($order.getReceiverName())</td>
+                        </tr>
+                        <tr>
+                            <td align="right">收货地址:</td>
+                            <td>
+                                $!order.province.name $!order.city.name $!order.county.name $!order.town.name $esc.html($order.receiverAddr)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">联系电话:</td>
+                            <td>
+                                #if ($order.getReceiverMobile() != "")
+                                    $!order.getReceiverMobile()&nbsp;&nbsp;
+                                #end
+                                #if($order.getReceiverPhone() != "")
+                                    $!order.getReceiverPhone()
+                                #end
+                            </td>
+                        </tr>
+                        #if($order.deliveryObjectType == "provider" || $order.deliveryObjectType == "enterprise")
+                            #if($shipmentLog)
+                            <tr>
+                                <td colspan="2" class="process-content-t">快递信息</td>
+                            </tr>
+                            <tr>
+                                <td align="right">快递公司:</td>
+                                <td>$shipmentLog.shipmentCompany.name</td>
+                            </tr>
+                            <tr>
+                                <td align="right">快递单号:</td>
+                                <td>
+                                     $shipmentLog.shipmentOrder &nbsp;&nbsp;
+                                    <a href="http://www.kuaidi100.com/" class="blue" target="_blank">点击查询</a>
+                                </td>
+                            </tr>
+                            #end
+                        #else
+                            <tr>
+                                <td colspan="2" class="process-content-t">物流信息</td>
+                            </tr>
+                            #if($sod)
+                            <tr>
+                                <td align="right">物流公司：</td>
+                                <td class="fwb">$sod.shipmentName</td>
+                            </tr>
+                            <tr>
+                                <td align="right">快递单号：</td>
+                                <td class="fwb">$sod.shipmentOrder</td>
+                            </tr>
+                            <tr>
+                                <td align="right" class="vat">物流明细：</td>
+                                <td>
+                                    <table>
+                                        #if($order.deliveryObjectType == 'jingdong')
+                                        #set($idx = 0)
+                                        #foreach($foo in [$sod.contents.size()..1])
+                                            #set($idx = $idx + 1)
+                                            #set($foo = $math.sub($foo, 1))
+                                            #set($contents = $sod.contents.toArray())
+                                                <tr #if($idx == 1) class="green fwb" #end>
+                                                    <td>$!dateTool.format('yyyy-MM-dd HH:mm:ss', $contents[$foo].time) </td>
+                                                    <td class="pl20p">$!contents[$foo].description</td>
+                                                </div>
+                                        #end
+                                        #else
+                                            #set($idx = 0)
+                                            #foreach($entry in $sod.contents)
+                                            #set($idx = $idx + 1)
+                                            <tr #if($idx == 1) class="green fwb" #end>
+                                                <td>$!dateTool.format('yyyy-MM-dd HH:mm:ss', $entry.time)</td>
+                                                <td class="pl20p">$!entry.description</td>
+                                            </tr>
+                                            #end
+                                        #end
+                                    </table>
+                                </td>
+                                #else
+                                    <td class="pl20p" colspan="2">
+                                        暂无物流信息
+                                    </td>
+                                #end
+                            </tr>
+                        #end
+                        <tr>
+                            <td height="20" colspan="2"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h4 class="process-content-t">商品清单</h4>
+                <table class="user-tabs">
+                    <thead>
+                        <tr>
+                            <th>订单商品</th>
+                            <th>积分</th>
+                            <th>数量</th>
+                            <th>积分</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($entry in $entries)
+                            #set($storageUnit  = $storageUnitService.findOne($entry.getStorageUnitId()))
+                            #set($product  = $productTool.asProduct($storageUnit.getProductId()))
+                            <tr>
+                               <td width="300">
+                                 <p class="w300p overflow-h fl">
+                                   <!--<a href="/jdvop/product/${product.getId()}.php" target="_blank">-->
+                                        #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                            <img class="beaeaea fl" src="$!product.getThumbnailImage()" width="60" height="60"  style="border: none;"/>
+                                        #else 
+                                            <img class="beaeaea fl" src="$configTool.getImageHost()/thumbnail$!product.getThumbnailImage()" width="60" height="60"  style="border: none;"/>
+                                        #end
+                                   <!--</a>-->
+                                   <span class="fl ml10p overflow-h w230p tal" style="margin-top: 20px;">$!esc.html($product.getName())</span>
+                                   <!--<a href="/jdvop/product/${product.getId()}.php" class="fl ml10p overflow-h w230p tal" target="_blank" style="color: #0082f0;margin-top: 20px;">$!esc.html($product.getName())</a>-->
+                                 </p>
+                               </td>
+                               <td>
+                                    #set($ratio = $websiteTool.getWebsite().getRatio())
+                                    #set($price = 0)
+                                    #if($ratio > 0)
+                                         #set($price = $math.ceil($math.mul($entry.soldPrice, $ratio)))
+                                         $price
+                                    #else 
+                                         0
+                                    #end
+                               </td>
+                               <td>$entry.getAmount()</td>
+                               <td>
+                                    $math.ceil($math.mul($price, $entry.getAmount()))
+                               </td>
+                            </tr>
+                        #end
+                    </tbody>
+                </table>
+                <div class="integral">共支付<span class="orange ffa ml10p">$math.ceil($order.getNeedPay())</span> 分</div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--footer-->
+#parse('footer.vsl')   
+<!--footer  end-->
+</body>
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>  
+</html>

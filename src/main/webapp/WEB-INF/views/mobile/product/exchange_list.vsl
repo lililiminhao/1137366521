@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script  type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>兑换排行</title>
+</head>
+<body>
+    <header class="bar-nav">
+        <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+        <h1 class="title">兑换排行 </h1>
+    </header>
+    <div class="search-wrap" style="top: 44px; position: absolute;">
+        <form id="form1" action="/jdvop/mobile/products.php" method="GET">
+            <div class="search-frm">
+                <input type="text" class="search" name="k" id="search" autocomplete="off" value="$!request.getParameter('k')" placeholder="搜索全部商品"/>
+                <a class="clear hide js-clearSearch" href="javascript:;" >x</a>
+            </div>
+            <div class="btn-wrap">
+                <input type="hidden" name="sort" value="$!request.getParameter('sort')"/>
+                <input type="submit" value="搜索" class="hide"/>
+                <a href="javascript:;" id="searchBtn" class="hd_search_btn_blue">搜索</a>
+                <a href="javascript:;" id="cancelBtn" class="btn hide">取消</a>
+            </div>
+        </form>
+    </div>
+    <div class="wrap j-wrap mt45">
+        <div class="layout-list move-left js-layout  clearfix">
+            <ul id="product_list">
+                #if($pdList && $pdList.size() > 0)
+                    #foreach($product in $pdList)
+                    #set($soldPrice = $!productTool.getProductSoldPrice($product))
+                    #set($hrefProduct= '/jdvop/product/'+${product.id}+'.php')
+                        #if($fps)
+                            #foreach($fp in $fps)
+                                #if($fp.productId == $product.id)
+                                    #set($soldPrice = $fp.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                                    #break
+                                #end
+                            #end
+                        #end
+                    <li>
+                        <span class="ranking-num">$velocityCount</span> 
+                        <a href="$hrefProduct">
+                            <p class="img">
+                                #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                    #if($product.ownerType == "jingdong")
+                                    <span class="ico-jdsm"> <!--京东icon--> </span>
+                                    #end
+                                    <img src="$!product.thumbnailImage" /> 
+                                #else
+                                    #if($product.thumbnailImage)
+                                    <img src="$configTool.getImageHost()/middle$!product.thumbnailImage" /> 
+                                    #else
+                                    <img src="/jdvop/images/noimage.png" /> 
+                                    #end
+                                #end
+                            </p>
+                            <p class="text">
+                                <span class="name">$!product.name</span>
+                                <em class="price red">积分：$!numberTool.format('#0', $soldPrice)</em>
+                            </p>
+                        </a>
+                    </li>
+                    #end
+                #else
+                    <li>
+                        <p style=" margin-top:60px; text-align: center; ">  暂无兑换记录 </p>
+                    </li>
+                #end
+            </ul>
+            <div class="tc">
+                <a  href="/jdvop/mobile/products.php" style="  display: block; margin: 0 auto; margin-top:6%; width: 80%; height: 35px; border-radius: 4px; text-align: center; line-height: 35px; background: #dedede; color: #333;">
+                    查看更多产品》》
+                </a>
+            </div>
+        </div>
+    </div>
+    <!--搜索页面-->
+    <div class="search-dialog hide" id="searchLayout">
+        <ul class="mt45">
+            #set($rootCateList = $productCateTool.rootCates())
+            #foreach($c in $rootCateList)
+            <li><a href="/jdvop/mobile/products.php?c=$!c.id">$!c.name</a></li>
+            #end
+        </ul>
+    </div>
+    <div style="height: 52px;"></div>
+    <!--搜索页面-->
+    #parse('footer_nav.vsl')
+    <script>
+        $(function(){
+            $('#searchBtn').click(function(){
+                $('#form1').submit();
+            });
+        });
+    </script>
+</body>
+</html>

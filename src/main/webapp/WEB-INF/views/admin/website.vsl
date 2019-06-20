@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <!--<a href="/jdvop/admin/order/niffers.php" title="快递公司列表"><p class="right fr btn-green2">快递公司列表</p></a>-->
+    <span class="text">网站信息配置</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="js-tab curr"><a href="#" title="基本配置">基本信息配置</a></li>
+                <li class="js-tab"><a href="#" title="系统信息配置">系统信息配置</a></li>
+            </ul>
+        </div>
+    </div>
+    <form id="dataForm" action="/jdvop/admin/website.php" method="POST">
+        <div class="automatic-box clearfix highlight_e4e4e4 pt30 pb30 js-content" style="border-top: none; ">
+            <!--基本配置-->
+            <div class="item">
+                <table>
+                    <colgroup>
+                        <col style="width: 120px;" />
+                        <col style="width: 300px;"  />
+                        <col style="width: 120px;" />
+                        <col  />
+                    </colgroup>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>网站名称：</td>
+                        <td>
+                           <input type="text" name="name" value="$!website.name" class="common h30 w240" />
+                        </td>
+                        <td class="tr">ICP备案号：</td>
+                        <td>
+                            <input type="text" name="icpNo" value="$!website.icpNo" class="common h30 w240" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">客服QQ：</td>
+                        <td>
+                            <input type="text" name="customerServiceQQ" value="#if($website.customerServiceQQ)#foreach($q in $website.customerServiceQQ)$q#if(!$foreach.last)、#end#end#end" class="common h30 w240" />
+                        </td>
+                        <td class="tr">客服热线：</td>
+                        <td>
+                            <input type="text" name="customerServiceHotLine" value="$!website.customerServiceHotLine" class="common h30 w240" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">前台网站LOGO：</td>
+                        <td  colspan="3">
+                            <a class="tooltip" title="点击上传图片，请上传360*80的图片">
+                                <img id="logo_image" class="trigger_upload_image js-upload" src="$configTool.getImageHost()$!website.logo" width="360" height="80">
+                            </a>
+                            <input type="hidden" name="logo" value="$!website.logo"/>
+                            <div style="display: none">
+                                <input type="file" id='file_upload' name ="Filedata" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">后台网站LOGO：</td>
+                        <td  colspan="3">
+                            <a class="tooltip" title="点击上传图片，请上传160*60的图片">
+                                <img id="admin_logo_image" class="trigger_upload_image js-admin-logo-upload" src="$configTool.getImageHost()$!website.getExt().get('ADMIN_LOGO')" width="160" height="60">
+                            </a>
+                            <input type="hidden" name="adminLogo" value="$!website.getExt().get('ADMIN_LOGO')"/>
+                            <div style="display: none">
+                                <input type="file" id='admin_logo_upload' name ="Filedata" />
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>    
+            <!--系统配置-->
+            <div class="item hide">
+                <table>
+                    <colgroup>
+                        <col style="width: 120px;" />
+                        <col style="width: 300px;"  />
+                        <col style="width: 120px;" />
+                        <col  />
+                    </colgroup>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>默认快递：</td>
+                        <td>
+                            <select name="shipmentCompanyId" class="common h30 w240">
+                                <option value=" ">请选择</option>
+                                #foreach($company in $shimentCompanys)
+                                    <option value="$!company.id" #if($company.id == $website.shipmentCompanyId) selected #end>$!company.name</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>启用自定义分类：</td>
+                        <td>
+                            <label class="fl mr20 cup"><input type="radio" name="isDefinedCate" value="true" #if($website.getExt().get('ENABLE_WEBSITE_PRODUCTTAG') == "true") checked="" #end>是</label>
+                            <label class="fl mr20 cup"><input type="radio" name="isDefinedCate" value="false"  #if(!$website.getExt().get('ENABLE_WEBSITE_PRODUCTTAG') || $website.getExt().get('ENABLE_WEBSITE_PRODUCTTAG') == "false") checked="" #end>否</label>
+                        </td>
+                    </tr>
+                </table>
+            </div>  
+        </div>
+        <div class="layout-footer pb30">
+            <div class="btn-wrap">
+                <button type="submit" class="btn-orange">确定</button>
+                <span class="btn-grey" onclick="javascript:history.back(-1);">取消</span>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    var ratio = 1 / $('input[name="ratio"]').val(); 
+    $('.js-ratio').html(" ( 1积分 = " + ratio.toFixed(4) +" 元 )");
+    
+    $(document).on("click", "li.js-tab", function(e){
+        e.preventDefault();
+        $(this).addClass("curr");
+        $(this).siblings().removeClass("curr");
+        $("div.js-content .item").eq($(this).index()).show().siblings(".item").hide();
+    });
+    
+    $('input[name=isForceWechatAuthorize]').change(function(){
+        if($(this).val() == 'true') {
+            $('#hideWechatAppId').show();
+            $('#hideWechatAppSecret').show();
+        } else {
+            $('#hideWechatAppId').hide();
+            $('#hideWechatAppSecret').hide();
+        }
+    });
+    
+    $(document).on('click', 'img.js-upload', function(e) {
+        e.preventDefault();
+        $('#file_upload').click();
+    });
+        
+    $('#file_upload').fileupload({
+        url: '/jdvop/admin/website/uploadLogo.php',
+        dataType: 'json',
+        autoUpload: true,
+        done: function(e, data) {
+            if (!data.result.isOk) {
+                top.artAlert('温馨提示', data.result.message, 'error');
+            } else {
+                $('#logo_image').attr('src',data.result.message);
+                $('input[name="logo"]').val(data.result.message);
+            }
+        }
+    });
+    
+    $(document).on('click', 'img.js-admin-logo-upload', function(e) {
+        e.preventDefault();
+        $('#admin_logo_upload').click();
+    });
+        
+    $('#admin_logo_upload').fileupload({
+        url: '/jdvop/admin/website/uploadAdminLogo.php',
+        dataType: 'json',
+        autoUpload: true,
+        done: function(e, data) {
+            if (!data.result.isOk) {
+                top.artAlert('温馨提示', data.result.message, 'error');
+            } else {
+                $('#admin_logo_image').attr('src',data.result.message);
+                $('input[name="adminLogo"]').val(data.result.message);
+            }
+        }
+    });
+    
+    $(document).on("submit", "#dataForm", function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        $.post(thiz.attr("action"), thiz.serialize(), function(data){
+            if(data.isOk){
+                top.artAlert("操作成功", "数据保存成功", "/jdvop/admin/website.php", 'ok');
+            }else{
+                top.artAlert("数据错误", data.message);
+            }
+        }, "json");
+    });
+    
+});
+</script>
+
+</body>
+</html>

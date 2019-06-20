@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>产品管理</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav  borderGreen clearfix">
+##    <a href="/jdvop/admin/productCates.php" title="分类管理"><p class="right fr btn-green2">系统分类</p></a>
+##    #if($shiro.isPermitted('brand:view'))
+##    <a href="/jdvop/admin/brands.php" title="品牌管理"><p class="right fr btn-green2">品牌管理</p></a>
+##    #end
+<!--    <a href="" class="js-update-product" title="批量修改"><p class="right fr btn-green2">批量编辑产品</p></a>-->
+    #if($shiro.isPermitted('product:edit'))
+    <a href="/jdvop/admin/product/batchUpdate.php"><p class="right fr btn-green2">批量编辑产品</p></a>
+    #end
+    #if($shiro.isPermitted('product:import'))
+    <a href="" class="js-import-product" title="批量导入"><p class="right fr btn-green2">批量导入产品</p></a>
+    #end
+    <span class="text">产品管理</span>
+</div>
+<span style="display:none;"><input type="file" name="excelFile" class="excelFile" /></span>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                #if($self && $status != "basic_editing")
+                    <li><a href="/jdvop/admin/products.php" title="在售产品">在售产品</a></li>
+                    <li class="curr">供应商产品</li>
+                    <li><a href="/jdvop/admin/products.php?self=true&status=basic_editing" title="仓库中的产品">仓库中的产品</a></li>
+                #elseif($status == "basic_editing")
+                    <li><a href="/jdvop/admin/products.php" title="在售产品">在售产品</a></li>
+                    <li><a href="/jdvop/admin/products.php?self=true" title="供应商产品">供应商产品</a></li>
+                    <li class="curr">仓库中的产品</li>
+                #else
+                    <li class="curr">在售产品</li>
+                    <li><a href="/jdvop/admin/products.php?self=true" title="供应商产品">供应商产品</a></li>
+                    <li><a href="/jdvop/admin/products.php?status=basic_editing" title="仓库中的产品">仓库中的产品</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl">
+            <form action="/jdvop/admin/products.php">
+                <input type="hidden" name="status" value="#if($status == 'selling') selling #{else} basic_editing #{end}" />
+                <input type="hidden" name="self" value="$!self" />
+                <table>
+                    <tr>
+                        <td>
+                            #if($self && $status == 'selling')
+                                <select name="type" class="common ml10 h26">
+                                    <option value=" ">产品来源</option>
+                                    #foreach($type in $ownerTypes)
+                                        #if($type.name() == "provider")
+                                            <option value = "$type.name()" #if($ownerType == $type.name()) selected #end>$type.description</option>
+                                        #end
+                                    #end
+                                </select>
+                            #else
+                                <select name="type" class="common ml10 w100 h26">
+                                    <option value=" ">产品来源</option>
+                                    #foreach($type in $ownerTypes)
+                                        #if($type.name() == "system" || $type.name() == "jingdong" || $type.name() == "provider")
+                                        <option value = "$type.name()" #if($ownerType == $type.name()) selected #end>$type.description</option>
+                                        #end
+                                    #end
+                                </select>
+                            #end
+                        </td>
+                        <td>
+                        	<select name="p" class="common ml10 w100 h26">
+                        		<option value="0">所属供应商</option>
+                        		#foreach($p in $websiteAdministrator)
+                        			<option value = "$p.id" #if($request.getParameter('p') == $p.id) selected #end>$p.workerName</option>
+                        		#end
+                        	</select>
+                        </td>
+                        <td>
+                            <select name="b" class="common ml10 h26 w120">
+                                <option value="0">请选择品牌</option>
+                                #foreach($b in $brands)
+                                    <option value = "$b.id" #if($request.getParameter('b') == $b.id) selected #end>$b.name</option>
+                                #end
+                            </select>
+                        </td>
+                        
+                        <td>
+                            <select name="c" class="common ml10 h26">
+                                <option value="0">请选择分类</option>
+                                #foreach($cate in $productCateService.rootCates())
+                                    <option value = "$cate.id" #if($request.getParameter('c') == $cate.id) selected #end>$cate.name</option>
+                                #end
+                            </select>
+                        </td>
+                        <td>
+                            <select name="enableOverseas" class="common ml10 h26">
+                                #set($enableOverseas = $request.getParameter('enableOverseas'))
+                                <option value="">是否跨境</option>
+                                <option value="true" #if($enableOverseas == "true") selected #end>是</option>
+                                <option value="false" #if($enableOverseas == "false") selected #end>否</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="sp" filter-rule="isnumber" filter-except="." class="common ml10 w80 filter-input" placeholder="最低售价" value="$!esc.html($sp)"> - <input type="text" name="mp" filter-rule="isnumber" filter-except="." class="common w80 filter-input" placeholder="最高售价" value="$!esc.html($mp)">
+                        </td>
+                        <td>
+                            <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w160" placeholder="请出入关键字"/>
+                        </td>
+                        <td>
+                            <input class="btn-grey2 ml10" type="submit" value="搜索">
+                                #if($shiro.isPermitted('product:export'))
+                                    <span class="btn-grey2" id="js_do_export">导出</span>
+                                #end
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+            #if($shiro.isPermitted('product:create'))
+                <a href="/jdvop/admin/product/add.php"><span class="btn-grey2 ">添加产品</span></a>
+            #end
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="h34 bg_grey highlight_e4e4e4">
+        <div class="fl">
+            <label class="ml20 fl mr20"><input type="checkbox" id="select_all" class="mt10 mr4 fl">全选</label>
+            #if($status == "basic_editing")
+                #if($shiro.isPermitted('product:delete'))
+                    <span class="btn-grey2 h26 batch-action" batch-action="delete">删除</span>
+                #end
+                #if($shiro.isPermitted('product:online'))
+                    <span class="btn-grey2 h26 batch-action" batch-action="shelvesOn">上架</span>
+                #end
+            #else
+                #if($shiro.isPermitted('product:offline'))
+                    <span class="btn-grey2 batch-action" batch-action="shelvesOff">下架</span>
+                #end
+            #end
+        </div>
+        <div class="fr mr20">排序：
+            <button class="btn-grey2 js-sort-switch" rel="time" js-default="desc" js-sort-t="desc">时间</button>
+            <button class="btn-grey2 js-sort-switch" rel="price" js-default="desc" js-sort-t="desc">价格</button>
+            <button class="btn-grey2 js-sort-switch" rel="sales_amout" js-default="desc" js-sort-t="desc">销量</button>
+            <!--<button class="btn-grey2 js-sort-switch" rel="soldnum" js-sort-t="desc">销量</button>-->
+        </div>
+    </div>
+    <div class="layout-grid highlight_e4e4e4 pb20 clearfix">
+        <form id="batch_form" method="POST">
+        <ul class="clearfix">
+            #if($products.hasContent())
+                #foreach($product in $products)
+                #set($storage = $product.productStorage)
+                #set($sku = $skuMap.get($product.id))
+                <li>
+                    <p class="text"> <label><input type="checkbox" class="select-item" name="ids[]" value="$!product.id"/> 产品型号 $!product.productCode</label></p>
+                    <a href="/jdvop/admin/product.php?id=$!product.id" title="$!esc.html($product.name)">
+                        <p class="img">
+                            #if($product.ownerType == "jingdong")
+                                <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                                <img src="/jdvop/images/jd-ico.png" class="jd-ico"/>
+                            #elseif($product.ownerType == "system")
+                                <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                            #else
+                                #if($product.enableOverseas)
+                                    <img src="/jdvop/images/icon-kj-big.png" class="jd-ico"/>
+                                #end
+                                <img src="$configTool.getImageHost()/thumbnail$!product.thumbnailImage" width="160" height="160" alt="$!product.name"/>
+                            #end
+                        </p>
+                         <p class="text blue">$!esc.html($product.name)</p>
+                    </a>
+                    #if($product.ownerType == "enterprise" || $product.ownerType == "provider")
+                        <p class="text">
+                            <i class="fl">销量：$!product.salesVolume</i>
+                            <i class="fr">库存：$!storage.getUseableNum()</i>
+                        </p>
+                    #else
+                        <p class="text">所属品牌：$!product.brand.name</p>
+                    #end
+                    <p class="text ffa orange tc">经销价：&yen;$!numberTool.format('#0.00', $product.retailPrice)</p>
+                    <p class="tool">
+                            #if($product.status.name() == 'selling')
+                                #if($shiro.isPermitted('product:offline'))
+                                    <a href = "/jdvop/admin/product/shelvesOff.php?ids[]=$!product.id" class="ajax-request" ok-message="reload" cfm-message="您确定要下架该产品吗？"><span class="ico-offShelves mt6"><em>下架</em></span></a>
+                                #end
+                            #else
+                                #if($shiro.isPermitted('product:online'))
+                                    <a href = "/jdvop/admin/product/shelvesOn.php?ids[]=$!product.id" class="ajax-request" ok-message="reload"><span class="ico-shelves mt6"><em>上架</em></span></a>
+                                #end
+                            #end
+                            #if($shiro.isPermitted('product:edit'))
+                                #if($product.ownerType == "enterprise" || $product.ownerType == "provider")
+                                    <a href="/jdvop/admin/product/edit.php?id=$!product.id"><span class="ico-edit mt6"><em>编辑</em></span></a>
+                                #else
+                                    <a href="#" class="js-edit-one" pd-original-name="$!esc.html($product.systemName)" pd-name="$!esc.html($product.name)" pd-id="$!product.id" pd-original-price="$!product.systemPrice" pd-price="$!product.getRetailPrice()" pd-market-price="$!product.getMarketPrice()" pd-serviceChargeRatio="$!product.serviceChargeRatio" pd-salesVolume="$!product.salesVolume"><span class="ico-edit mt6"><em>编辑</em></span></a>
+                                #end
+                            #end
+                            #if($shiro.isPermitted('product:delete'))
+                            #if($product.status.name() != 'selling' && $productService.isDeleteable($!product))
+                                <a href = "/jdvop/admin/product/delete.php?ids[]=$!product.id" class="ajax-request" ok-message="reload" cfm-message="继续该操作将导致您选中的产品彻底删除，一旦删除，将无法恢复!"><span class="ico-del js-del mt6"><em>删除</em></span></a>
+                            #end
+                            #end
+                    </p>
+                    #if($product.ownerType == "enterprise")
+                        <label class="ico_own"></label>
+                    #elseif($product.ownerType == "provider")
+                        <label class="ico_gys"></label>
+                    #elseif($product.ownerType == "system")
+                        <label class="ico_xt"></label>
+                    #end
+                </li>
+                #end
+                #else
+                    <li class="tc fs16p" style="width:100%; height:50px; line-height:40px">
+                        暂无相关产品
+                    </li>
+                #end
+         </ul>
+        </form>
+    </div>
+    <div class="layout-footer clearfix">
+        <div class="btn-wrap fl">
+            #if($status == "basic_editing")
+                #if($shiro.isPermitted('product:delete'))
+                    <span class="btn-red batch-action" batch-action="delete">删除</span>
+                #end
+                #if($shiro.isPermitted('product:online'))
+                    <span class="btn-orange batch-action" batch-action="shelvesOn">上架</span>
+                #end
+            #else
+                #if($shiro.isPermitted('product:offline'))
+                    <span class="btn-red batch-action" batch-action="shelvesOff">下架</span>
+                #end
+            #end
+        </div>
+        $adminPg.pager($link, $products.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+
+function  doBatchAction(action) {
+    var data        = [];
+    $('input[name="ids[]"]:checked').each(function(){
+        var thiz    = $(this);
+        var id  = thiz.val();
+        if (id !== undefined) {
+            id  = parseInt(id);
+            if (id !== NaN && id > 0) {
+                data.push('ids[]=' + id);
+            }
+        }
+    });
+    if (data.length > 0) {
+        if (action === 'shelvesOn') {
+            shelvesOnBatch(data);
+        } else if (action === 'shelvesOff') {
+            shelvesOffBatch(data);
+        } else if (action === 'delete') {
+            deleteBatch(data);
+        }
+    } else {
+        top.artAlert('温馨提示', '您尚未选择您操作的产品', 'error');
+    }
+}
+
+function  shelvesOnBatch(data) {
+    top.artProgress('上架中，请稍后...');
+    $.post('/jdvop/admin/product/shelvesOn.php?' + data.join('&'), function(d){
+        top.artProgress('[close]');
+        if (d.isOk) {
+            location.reload();
+        } else {
+            top.artAlert('温馨提示', d.message, 'error');
+        }
+    }, 'json');
+}
+
+function  shelvesOffBatch(data) {
+    top.artConfirm('请注意', '您确定要下架' + data.length + '个产品吗？', function(v){
+        if (v) {
+            top.artProgress('下架中，请稍后...');
+            $.post('/jdvop/admin/product/shelvesOff.php?' + data.join('&'), function(d){
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    location.reload();
+                } else {
+                    top.artAlert('温馨提示', d.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+}
+
+function  deleteBatch(data) {
+    top.artConfirm('请注意', '您真的要删除这' + data.length + '个产品吗？一旦删除，将无法恢复！', function(v){
+        if (v) {
+            top.artProgress('删除中，请稍后...');
+            $.post('/jdvop/admin/product/delete.php?' + data.join('&'), function(d){
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    location.reload();
+                } else {
+                    top.artAlert('温馨提示', d.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+}
+
+$(function(){
+
+    $('button.js-sort-switch').each(function() {
+        var t = $(this);
+        var url = location.href;
+        var st = undefined;
+        var pos = url.indexOf('sort=');
+        if (pos !== -1)
+        {
+            url = url.substring(pos + 5);
+            if (url.indexOf(t.attr('rel') + '.asc') !== -1)
+            {
+                st = 'asc';
+                t.attr('js-sort-t', 'desc');
+            } else if (url.indexOf(t.attr('rel') + '.desc') !== -1) {
+                st = 'desc';
+                t.attr('js-sort-t', 'asc');
+            }
+        }
+        if (st === undefined)
+        {
+            st = t.attr('js-default');
+        }
+        var txt = '';
+        if (st === 'asc')
+        {
+            txt = '↑';
+        } else if (st === 'desc') {
+            txt = '↓';
+        }
+        t.html(t.html() + txt);
+    });
+    $('button.js-sort-switch').click(function(e) {
+        e.preventDefault();
+        var url = location.href;
+        var t = $(this);
+        var sps = url.indexOf('sort=');
+        if (sps === -1)
+        {
+            if (url.indexOf('?') === -1)
+            {
+                url = url + '?sort=' + t.attr('rel') + '.' + t.attr('js-sort-t');
+            } else {
+                url = url + '&sort=' + t.attr('rel') + '.' + t.attr('js-sort-t');
+            }
+        } else {
+            var seg = url.substring(sps);
+            var ed = seg.indexOf('&');
+            if (ed !== -1)
+            {
+                seg = seg.substring(0, ed);
+            }
+            var replaced = undefined;
+            if (seg.indexOf(t.attr('rel') + '.') !== -1)
+            {
+                var reg = new RegExp(t.attr('rel') + '\\.(asc|desc)');
+                replaced = seg.replace(reg, t.attr('rel') + '.' + t.attr('js-sort-t'));
+            } else {
+                replaced = seg + ',' + t.attr('rel') + '.' + t.attr('js-sort-t');
+            }
+            url = url.replace(seg, replaced);
+        }
+        location = url;
+    });
+
+    $('.batch-action').on('click', function(e){
+        e.preventDefault();
+        var action  = $(this).attr('batch-action');
+        if (action !== undefined) {
+            doBatchAction(action);
+        }
+    });
+
+    $('#js_do_export').click(function(e){
+        e.preventDefault();
+        var l   = location.href.replace('/jdvop/admin/products.php', '/jdvop/admin/product/export.php');
+        $('#export_ifrm').attr('src', l);
+    });
+
+    var isClick = true;
+    $('a.js-import-product').on('click', function(e){
+        e.preventDefault();
+        if(isClick) {
+            isClick = false;
+            window['SELECT_FILE_FORM'] = dialog({
+                width: 400,
+                height: 130,
+                title: '批量导入产品',
+                content:  '<div class="con pt20" style="padding-left: 50px;">'
+                        + '<p><span class="btn-green2 js-upload" title="选择文件" data-upload-url="/jdvop/admin/product/batch/import4Create.php">选择文件</span></p>'
+                        + '<p><a href="/jdvop/excel/BATCH_IMPORT_PRODUCT_TEMPLATE.xls">点击此处下载导入模板</a></p>'
+                        +'</div>',
+                onclose : function() {
+                    this.remove();
+                    isClick = true;
+                    window['SELECT_FILE_FORM']  = undefined;
+                }
+            });
+            window['SELECT_FILE_FORM'].showModal();
+        }
+    });
+
+    var isClick = true;
+    $('a.js-update-product').on('click', function(e){
+        e.preventDefault();
+        if(isClick) {
+            isClick = false;
+            window['SELECT_FILE_FORM'] = dialog({
+                width: 400,
+                height: 130,
+                title: '批量编辑产品',
+                content:  '<div class="con pt20" style="padding-left: 50px;">'
+                        + '<p><span class="btn-green2 js-upload" title="选择文件" data-upload-url="/jdvop/admin/product/batch/import4Update.php">选择文件</span></p>'
+                        + '<p><a href="#" id="js_batchUpdate_export">点击导出产品资料</span>'
+                        +'</div>',
+                onclose : function() {
+                    this.remove();
+                    isClick = true;
+                    window['SELECT_FILE_FORM']  = undefined;
+                }
+            });
+            window['SELECT_FILE_FORM'].showModal();
+        }
+    });
+
+    $(document).on('click', '#js_batchUpdate_export', function(e){
+        e.preventDefault();
+        var l   = location.href.replace('/jdvop/admin/products.php', '/jdvop/admin/product/exportUpdate.php');
+        $('#export_ifrm').attr('src', l);
+    });
+
+    $(document).on('click', 'span.js-upload', function(e){
+        e.preventDefault();
+        var url = $(this).attr('data-upload-url');
+        $('.excelFile').fileupload('option', 'url', url);
+        $('.excelFile').click();
+    });
+
+    $('.excelFile').fileupload({
+        dataType    : 'json',
+        autoUpload  : true,
+        sequentialUploads   : true,
+        start       : function(e) {
+            top.artProgress('产品导入中，请稍后...');
+        },
+        always      : function(e, data) {
+            top.artProgress('[close]');
+        },
+        done        : function(e, data) {
+            top.artProgress('[close]');
+            if (data.result.isOk) {
+                top.artAlert('温馨提示', "成功导入" + data.result.message + "个产品", 'ok');
+            } else {
+                top.artAlert('温馨提示', data.result.message, 'error');
+            }
+        },
+        fail    : function(e, data){
+            top.artProgress('[close]');
+            top.artAlert('温馨提示', '因为网络原因，上传失败!', 'error');
+        }
+    });
+
+    $(document).on('click', 'a.js-edit-one', function(e){
+        e.preventDefault();
+        var thiz    = $(this);
+        var data    = {};
+        data['type']    = '$type';
+        data['id']      = thiz.attr('pd-id');
+        data['name']    = thiz.attr('pd-name');
+        data['salesVolume']    = thiz.attr('pd-salesVolume');
+        top.dialog({
+            width   : 360,
+            title   : '编辑系统产品',
+            content : '<div class="con" style="padding-left:20px;">'
+                      + '<table>'
+                      + '<colgroup>'
+                      + '<col style="width: 60px;">'
+                      + '<col>'
+                      + '</colgroup>'
+                      + '<tr><td class="tr vt">产品原名:</td><td><div class="overflow-h" style="width:270px;"><span class="ml10">' + thiz.attr('pd-original-name') + '</span></div></td></tr>'
+                      + '<tr><td class="tr">产品名称:</td><td><input type="text" name="new_name" class="common ml10 w200" value="' + thiz.attr('pd-name') + '" /></td></tr>'
+                      + '<tr><td class="tr">市场价:</td><td><span class="ml10">' + thiz.attr('pd-market-price') + '</span></td></tr>'
+                      + '<tr><td class="tr">原售价:</td><td><span class="ml10">' + thiz.attr('pd-original-price') + '</span></td></tr>'
+                      + '<tr><td class="tr">销售价:</td><td><input type="text" name="new_price" class="common ml10 w200" value="' + thiz.attr('pd-price') + '" /></td></tr>'
+                      + '<tr><td class="tr">销量:</td><td><input type="text" name="salesVolume" class="common ml10 w200" value="' + thiz.attr('pd-salesVolume') + '" /></td></tr>'
+                      + '<tr><td class="tr">扣点:</td><td><input type="text" name="serviceChargeRatio" class="common ml10 w200" value="' + thiz.attr('pd-serviceChargeRatio') + '" />%</td></tr>'
+                      + '</table>'
+                      + '</div>',
+            okValue : '保存',
+            ok      : function() {
+                var name    = top.$('input[name="new_name"]').val();
+                if (name === '') {
+                    top.artAlert('温馨提示', '产品名称必须填写', 'error');
+                    return false;
+                }
+                var price   = top.$('input[name="new_price"]').val();
+                if (isNaN(price)) {
+                    top.artAlert('温馨提示', '请填写售价', 'error');
+                    return false;
+                }
+                var serviceChargeRatio = top.$('input[name="serviceChargeRatio"]').val();
+                if(isNaN(serviceChargeRatio) || serviceChargeRatio >= 100){
+                    top.artAlert('温馨提示', '扣点比例不能大于100!', 'error');
+                    return false;
+                }
+                var salesVolume = top.$('input[name="salesVolume"]').val();
+                if(isNaN(salesVolume) || salesVolume <0){
+                    top.artAlert('温馨提示', '请填写正确的销量!', 'error');
+                    return false;
+                }
+                top.artProgress('保存中,请稍后...');
+                data['name']    = name;
+                data['price']   = price;
+                data['serviceChargeRatio']   = top.$('input[name="serviceChargeRatio"]').val();
+                data['salesVolume']   = salesVolume;
+                $.post('/jdvop/admin/product/systemProductEdit.php', data, function(d){
+                    top.artProgress('[close]');
+                    if (d.isOk) {
+                        location.reload();
+                    } else {
+                        top.artAlert('温馨提示', d.message, 'error');
+                    }
+                }, 'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            },
+        }).showModal();
+    });
+
+});
+</script>
+
+</body>
+</html>

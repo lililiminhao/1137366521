@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>添加产品</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav  borderGreen clearfix">
+    <a href="/jdvop/admin/order/edit.php?id=$!orderId" ><p class="right fr btn-grey2">返回</p></a>
+    <a href="javascript:void();" class="js-submit"><p class="right fr btn-green2">确认添加</p></a>
+    <span class="text">添加产品</span>
+</div>
+<span style="display:none;"><input type="file" name="excelFile" class="excelFile" /></span>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr">全部产品</li>
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl">
+            <form action="/jdvop/admin/order/addEntry.php">
+                 <input type="hidden" name="id" value="$orderId"/>
+                <table>
+                    <tr>
+                        <td>
+                            <select name="b" class="common ml10 h26">
+                                <option value="0">请选择品牌</option>
+                                #foreach($b in $brands)
+                                    <option value = "$b.id" #if($brandId == $b.id) selected #end>$b.name</option>
+                                #end    
+                            </select>
+                        </td>
+                        <td>
+                            <select name="c" class="common ml10 h26">
+                                <option value="0">请选择分类</option>
+                                #foreach($cate in $productCateService.rootCates())
+                                    <option value = "$cate.id" #if($cateId == $cate.id) selected #end>$cate.name</option>
+                                #end    
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="minPrice" filter-rule="isnumber" filter-except="." class="common ml10 w80 filter-input" placeholder="最低售价" value="$!esc.html($minPrice)"> - <input type="text" name="maxPrice" filter-rule="isnumber" filter-except="." class="common w80 filter-input" placeholder="最高售价" value="$!esc.html($maxPrice)">
+                        </td>
+                        <td>
+                            <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w160" placeholder="请出入关键字"/>
+                        </td>
+                        <td>
+                            <input class="btn-grey2 ml10" type="submit" value="搜索">
+                        </td>
+                    </tr>
+                </table>
+            </form>    
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <form id="dataForm" action="/jdvop/admin/order/addEntry.php" method="POST">
+        <input type="hidden" name="id" value="$orderId"/>
+        <input type="hidden" name="pid"/>
+    </form>
+    <div class="layout-grid highlight_e4e4e4 pb20 clearfix">
+        <ul class="clearfix js-content">
+            #if($products.hasContent())
+                #foreach($product in $products)
+                #set($storage = $product.productStorage)
+                #set($sku = $skuMap.get($product.id))
+                <li>
+                    <p class="text"> <label>产品型号 $!product.productCode</label></p>
+                    <p class="img" rel="$product.id">
+                        #if($product.ownerType == "jingdong")
+                            <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                            <img src="/jdvop/images/jd-ico.png" class="jd-ico"/> 
+                        #elseif($product.ownerType == "system")
+                            <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                        #else
+                            <img src="/thumbnail$!product.thumbnailImage" width="160" height="160" alt="$!product.name"/>
+                        #end
+                    </p>
+                    <p class="text blue">$!esc.html($product.name)</p>
+                    #if($product.ownerType == "enterprise" || $product.ownerType == "provider")
+                        <p class="text"><i class="fl">销量：$!storage.soldedNum</i> <i class="fr">库存：$!storage.getUseableNum()</i> </p>
+                    #else
+                        <p class="text"><i class="fl"></i><i class="fr"></i></p>
+                    #end
+                    <p class="text ffa orange tc">
+                        销售价：&yen;$!numberTool.format('#0.00', $product.retailPrice)
+                    </p>
+                    #if($product.ownerType == "enterprise")
+                        <label class="ico_own"></label>
+                    #end
+                </li>
+                #end
+                #else
+                    <li class="tc fs16p" style="width:100%; height:50px; line-height:40px">
+                        暂无相关产品
+                    </li>
+                #end
+         </ul>    
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $products.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $("p.img").bind("click", function(e){
+        e.preventDefault();
+        var _liBox = $(this).parent("li");
+        if(_liBox.hasClass("highlight_orange")){
+             _liBox.removeClass("highlight_orange");
+             _liBox.find("span.ico_selected").hide();
+             $("input[name='pid']").val("");
+        }else{
+            _liBox.siblings("li").removeClass("highlight_orange");
+            _liBox.siblings("li").find("span.ico_selected").hide();
+            _liBox.addClass("highlight_orange");
+            _liBox.find("span.ico_selected").show();
+            $("input[name='pid']").val($(this).attr("rel"));
+        }
+    });
+    
+    $("a.js-submit").bind("click", function(e){
+        e.preventDefault();
+        var pid = $("input[name='pid']").val();
+        if(pid !== "" && pid !== undefined){
+            $.post($("#dataForm").attr("action"), $("#dataForm").serialize(), function(data){
+                if(data.isOk){
+                    top.artAlert('温馨提示', "添加成功", data.message, 'ok');
+                }
+            }, "json");
+        }else{
+            top.artAlert('温馨提示', "请选择要添加的商品", 'error');
+        }
+    });
+});
+</script>
+
+</body>
+</html>

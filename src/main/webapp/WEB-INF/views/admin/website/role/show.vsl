@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/public.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/addquan.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/jquery.datetimepicker.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+
+<title>优惠券</title>
+
+
+<style>
+    #add_quan .content .result {
+        display: none;
+        padding-left: 24px;
+        background: #f0f0f0;
+        height: 180px;
+        overflow-y: scroll;
+        width: 560px;
+        margin-left: 36px;
+    }
+
+    #add_quan .content .result li {
+        margin: 0;
+        line-height: 36px;
+        height: 36px;
+        overflow:hidden;
+        cursor:pointer;
+    }
+</style>
+</head>
+<body couponid="$!coupon.id" >
+    <div id="add_quan">
+        <h3>查看角色</h3>
+        <div class="content">
+            <ul class="list">
+                <li>
+                    <i>*</i>
+                    <span>角色类型：</span>
+                    <label><input type="radio" readonly name="role_type" value="2" #if($role.roleType == 2) checked #end >管理员</label>
+                    <label><input type="radio" readonly name="role_type" value="3" #if($role.roleType == 3) checked #end>供应商</label>
+                    <label><input type="radio" readonly name="role_type" value="4" #if($role.roleType == 4) checked #end>分销商</label>
+                </li>
+                <li class="item">
+                    <i>*</i>
+                    <span>角色名称：</span>
+                    <input type="text" readonly placeholder="长度限制10个汉字以内" required="required" class="role_name" maxlength="10" value="$!role.roleName">
+                </li>
+                 <li>
+                    <i>*</i>
+                    <span>角色状态：</span>
+                    <label><input type="radio" readonly  name="role_status" value="1" #if($role.roleStatus == 1) checked #end>启用</label>
+                    <label><input type="radio" readonly name="role_status" value="-1" #if($role.roleStatus == -1) checked #end>禁用</label>
+                </li>
+                
+                <li class="item">
+                    <i>*</i>
+                    <span>备注：</span>
+                    <input type="text" readonly placeholder="长度限制100个汉字以内" required="required" class="remark" maxlength="100" value="$!role.remark">
+                </li>
+                
+                
+                </div>
+                <div class="result"></div>
+            </ul>
+        </div>
+        
+        
+        <div class="layout-footer pb30">
+            <div class="btn-wrap" style="margin-left:30px;">
+                <span class="btn-grey" onclick="javascript:history.back(-1);">返回</span>
+            </div>
+        </div>
+	    
+        
+    </div>
+    <script src="/jdvop/script/jquery-1.8.3.min.js"></script>
+    <script src="/jdvop/script/admin/clipboard.min.js"></script>
+    <script src="/jdvop/script/admin/jquery.datetimepicker.full.min.js"></script>
+    <script>
+
+    
+        var clipboard = new Clipboard('.copy');
+		$.datetimepicker.setLocale('ch');
+        $('.quan_start_time').datetimepicker({
+            format:"Y-m-d H:i",
+            minDate:0,
+            minTime:0
+        });
+        
+        $('.quan_end_time').datetimepicker({
+            format:"Y-m-d H:i",
+            minDate:0,
+            minTime:0
+        });
+
+        clipboard.on('success', function (e) {
+            top.artAlert('温馨提示', '优惠券复制成功');
+        });
+        
+        initSelect1();
+        
+        function initSelect1(){
+            $.ajax({
+                url:'/jdvop/admin/coupon/findParentSort.php',
+                type:'get',
+                success:function(res){
+                    res = JSON.parse(res);
+                    if(res.code == 1){
+                        var arr = res.data;
+                        var targetType = $('input[name="quan-area"]:checked').val();
+                        var parentId;
+                        if(targetType == 2){
+                        	parentId = $('.classic').attr('fatherid');
+                        }
+                        var str = '';
+                        for(var i=0;i<arr.length;i++){
+                        	if(targetType == 2&&parentId&&arr[i].id == parentId){
+                        		 str+='<option selected value="'+arr[i].name+'" grade="'+arr[i].id+'">'+arr[i].name+'</option>'
+                        	}else{
+                        		 str+='<option value="'+arr[i].name+'" grade="'+arr[i].id+'">'+arr[i].name+'</option>'
+                        	}
+                        }
+                        $('select').eq(0).html(str);
+                        initSelect2($('select').eq(0).find('option:selected').attr('grade'));
+                    }
+                    $('select').eq(0).on('change',function(){
+                        var pid = $(this).find('option:selected').attr('grade');
+                        initSelect2(pid);
+                    })
+                }
+            })
+        }
+        function initSelect2(id){
+        	var childId = $('.classic').attr('childid');
+            $.ajax({
+                url:'/jdvop/admin/coupon/findChildSort.php',
+                type:'get',
+                data:{
+                    parentId:id
+                },
+                success:function(res){
+                    res = JSON.parse(res);
+                    if(res.code == 1){
+                        var arr = res.data;
+                        var str = '';
+                        for(var i=0;i<arr.length;i++){
+                        	if(childId&&arr[i].id == childId){
+                        		str+='<option selected value="'+arr[i].name+'" grade="'+arr[i].id+'">'+arr[i].name+'</option>'
+                        	}else{
+                        		str+='<option value="'+arr[i].name+'" grade="'+arr[i].id+'">'+arr[i].name+'</option>'
+                        	} 
+                        }
+                        $('select').eq(1).html(str);
+                    }
+                }
+            })
+        }
+        var form = {
+            name:'',
+            code:'',
+            startTime:'',
+            endTime:'',
+            type:'',
+            area:'',
+            targetType:'',
+            count:''
+        }
+        clipboard.on('error', function (e) {
+            console.log(e);
+        });
+
+        
+        (function () {
+            $('input[name="quan-type"]').each(function (index, ele) {
+                $(this).on('click', function () {
+                    var curType = $('.type_content>div').eq(index);
+                    curType.show();
+                    curType.siblings().hide();
+                })
+            });
+            var oldIndex = 0;
+            var quanAreaIndex; // 判断点击是否是自己的时候
+            $('input[name="quan-area"]').each(function (index, item) {
+                $(this).on('click', function () {
+                    
+                    var curArea = $('.area_content>div').eq(index);
+                    curArea.show();
+                    curArea.siblings().hide();
+                    if(quanAreaIndex==index){
+                        return;
+                    }else {
+                        $('.result').hide(); // 改变的时候隐藏显示框
+                        quanAreaIndex=index // 改变的时候隐藏显示框
+                    }
+                    if(index == 1){
+                        // $('.result').hide();
+                        form.targetId = '';
+                    }else{
+                        // $('.result').show();
+                    }
+                })
+            });
+            <!--搜索商家、商品或者活动 -->
+            $('.searchSaler').each(function(index){
+                var _self = $(this);
+                $(this).on('click',function(){
+                    var type = _self.attr('type');
+                    var text = $('input[name="searchCon"]:visible').val();
+                    var ziduan;
+                    if(type==1){
+                        ziduan = 'loginName'
+                    }
+                    if(type==3){
+                        ziduan = 'prodName'
+                    }
+                    if(type==4){
+                        ziduan = 'activityName'
+                    }
+                    $.ajax({
+                        url:'/jdvop/admin/coupon/findTarget.php',
+                        type:'get',
+                        data:{
+                            targetName:text,
+                            targetType:type
+                        },
+                        success:function(res){
+                            $('.result').show();
+                            res = JSON.parse(res);
+                            var str = '<ul>';
+                            if(res.code == 1){
+                                var arr = res.data;
+                                if(arr.length==0){
+                                    str+='<p class="empty">'+res.msg+'</p>'
+                                }
+                                for(var i = 0,l = arr.length; i < l; i++){
+                                    str+= '<li id="'+arr[i]['id']+'">'+arr[i][ziduan]+'</li>'
+                                }
+                            }else{
+                                str+='<p class="empty">'+res.msg+'</p>'
+                            }
+                            str+='</ul>';
+                            $('.result').html(str);
+                            $('.result').on('click','li',function(){
+                                var value = $(this).attr('id');
+                                form.targetId = value;
+                                form.targetName = $(this).html();
+                                $('input[name="searchCon"]:visible').val($(this).html());
+                            })
+                        }
+                    })
+                })
+            });
+            <!--保存-->
+            $('#save').on('click',function(){
+            	var tt = $('body').attr('couponid');
+
+                var face = '';
+                var amount = '';
+                var name = $('.quan_name').val();//优惠券名称
+                var startTime = $('.quan_start_time').val();//优惠券开始时间
+                var endTime = $('.quan_end_time').val();//优惠券结束时间
+                var code = $('.quan_code').val();//优惠券编码
+                var type = $('input[name="quan-type"]:checked').val();//优惠券类型
+                var area = $('input[name="quan-area"]:checked').val();//优惠券范围
+                var targetID = $('.area_content').attr('targetid');//
+                var targetNAME = $('.area_content').attr('targetname');//
+                var count = $('.quan_count').val();// 优惠券数量
+                if(name==''){
+                    top.artAlert('温馨提示', '优惠券名称不能为空', 'error');
+                    return;
+                }
+                if(startTime=='' || endTime ==''){
+                    top.artAlert('温馨提示', '请完善时间', 'error');
+                    return;
+                }
+                if(area == 2){
+                    form.targetId = '';
+                    var t1 = $('select').eq(0).find('option:selected').val();
+                    var t2 = $('select').eq(1).find('option:selected').val();
+                    if(t1 == '' || !t2 ){
+                        top.artAlert('温馨提示', '请完善所属分类', 'error');
+                        return;
+                    }
+                    form.targetId = $('select').eq(1).find('option:selected').attr('grade');
+                    form.targetName = t1 +'_'+ t2;
+                }else{
+                    if(area == 1 && form.targetId == ''){
+                        top.artAlert('温馨提示', '请选择所属商家', 'error');
+                        return;
+                    }
+                    if(area == 3 && form.targetId == ''){
+                        top.artAlert('温馨提示', '请选择所属商品', 'error');
+                        return;
+                    }
+                    if(area == 4 && form.targetId == ''){
+                        top.artAlert('温馨提示', '请选择所属专题', 'error');
+                        return;
+                    }
+                }
+                if(type==1){
+                    face = $('.quan_amount').val();
+                    amount = $('.quan_face').val();
+                    if(face=='' || amount == ''){
+                        top.artAlert('温馨提示', '请完善优惠券面额和条件', 'error');
+                        return;
+                    }
+                }
+                if(type==2){
+                    amount = $('.quan_zhijian').val();
+                    if(amount == ''){
+                        top.artAlert('温馨提示', '请完善优惠券使用条件', 'error');
+                        return;
+                    }
+                }
+                if(type==3){
+                    amount = $('.quan_zhekou').val();
+                    if(amount == ''){
+                        top.artAlert('温馨提示', '请完善优惠券使用条件', 'error');
+                        return;
+                    }
+                }
+                //
+                if(tt){
+                	 $.ajax({
+	                    url:'/jdvop/admin/coupon/edit.php',
+	                    type:'post',
+	                    data:{
+	                    	id:tt,
+	                        type:type,
+	                        targetId:form.targetId||targetID||'',
+	                        name:name,
+	                        startTime:startTime,
+	                        endTime:endTime,
+	                        amount:amount,
+	                        usable:face||'',
+	                        targetName:form.targetName||targetNAME||'',
+	                        targetType:area,
+	                        couponCode:code,
+	                        count:count
+	                    },
+	                    success:function(res){
+	                        res = JSON.parse(res);
+	                        if(res.code ==1 ){
+	                            location.href = '/jdvop/admin/statistics/couponList.php';
+	                        }else{
+	                            top.artAlert('温馨提示', res.msg, 'error');
+	                        }
+	                    }
+	                })
+                }else{
+                	$.ajax({
+	                    url:'/jdvop/admin/coupon/add.php',
+	                    type:'post',
+	                    data:{
+	                        type:type,
+	                        targetId:form.targetId||targetID||'',
+	                        name:name,
+	                        startTime:startTime,
+	                        endTime:endTime,
+	                        amount:amount,
+	                        usable:face||'',
+	                        targetName:form.targetName||targetNAME||'',
+	                        targetType:area,
+	                        couponCode:code,
+	                        count:count
+	                    },
+	                    success:function(res){
+	                        res = JSON.parse(res);
+	                        if(res.code ==1 ){
+	                            location.href = '/jdvop/admin/statistics/couponList.php';
+	                        }else{
+	                            top.artAlert('温馨提示', res.msg, 'error');
+	                        }
+	                    }
+	                })
+                }
+            })
+        })()
+    </script>
+</body>
+</html>

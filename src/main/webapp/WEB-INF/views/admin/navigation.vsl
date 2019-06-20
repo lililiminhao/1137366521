@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<link rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src='/jdvop/script/admin/dragsort-0.5.1.min.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>自定义导航栏</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">自定义导航栏</span>
+</div>
+<div id="iframePage">
+    <form id="dataForm" action="/jdvop/admin/navigation.php">
+        <div class="automatic-box highlight_e4e4e4 clearfix mb30">
+            <div class="tab-nav-dragsort">
+                <dl class="clearfix js-tabNav-dragsort">
+                    #if($navigations && $navigations.size() > 0)
+                        #foreach($navigation in $navigations)
+                            <dd class="#if($velocityCount == 1) curr #end js-attr-selected">
+                                #if($navigation.target == "")
+                                    <input type="hidden"  name="value[]" value = " ">
+                                #end
+                                <p class="title"><a href="javascript:;">$!navigation.name</a><span class="ico-del"></span></p>
+                                <div class="content js-item">
+                                    <table class="js-common" width="100%">
+                                        <colgroup>
+                                            <col style="width: 160px;">
+                                            <col>
+                                        </colgroup>
+                                        <tr>
+                                            <td class="tr"><i class="orange">*</i>栏目名称：</td>
+                                            <td>
+                                                <input type="text" name="name[]" value="$!navigation.name" class="common h30 w220" placeholder="请添加栏目名称">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="tr"><i class="orange">*</i>链接页面：</td>
+                                            <td>
+                                                <select name="linkPage[]" class="common h30 w220 js-linkPage-key">
+                                                    <option value=" ">--请选择--</option>    
+                                                    #foreach($type in $types)
+                                                        #if($type != "index" && $type != "allProducts" && $type != "category" && $type != "page"  && $type != "column")
+                                                            <option value="$type.name()" #if($navigation.type.name() == $type.name()) selected #end>$type.description</option> 
+                                                        #end
+                                                    #end
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr class="#if($navigation.target == "") hide #end js-linkPage-value">
+                                            #if($navigation.type.name() == "link")
+                                                <td class="tr"><i class="orange">*</i>填写链接：</td>
+                                                <td>
+                                                    <input type="text"  name="value[]" value="$!navigation.target" class="common w220 h30"  placeholder="请输入链接地址"/>
+                                                    <label class="red">&nbsp;&nbsp;&nbsp;例：http://www.yunzhonghe.com</label>
+                                                </td>
+                                            #elseif($navigation.type.name() == "page")
+                                                <td class="tr"><i class="orange">*</i>页面ID：</td>
+                                                <td>
+                                                    <input type="text"  name="value[]" value="$!navigation.target" class="common w220 h30"  placeholder="请输入页面ID"/>
+                                                </td>
+                                            #elseif($navigation.type.name() == "column")
+                                                <td class="tr"><i class="orange">*</i>页面栏目ID：</td>
+                                                <td>
+                                                    <input type="text"  name="value[]" value="$!navigation.target" class="common w220 h30"  placeholder="请输入页面栏目ID"/>
+                                                </td>    
+                                            #elseif($navigation.type.name() == "categoryProducts")
+                                                <td class="tr"><i class="orange">*</i>选择分类：</td>
+                                                <td>
+                                                    #set( $Integer = 0 )
+                                                    #set( $numberAsString = $!navigation.target.toString())
+                                                    #set( $cateId = $Integer.parseInt($numberAsString))
+                                                    #set($cate = $productCateService.findOne($cateId))
+                                                    #set($parentCates = "")
+                                                    #if($cate)
+                                                        #set($parentCates = $productCateService.parents($cate))
+                                                    #end
+                                                    <input type="hidden" name="value[]" value = "$!cateId">
+                                                    #if (!$parentCates)
+                                                        <select name="cate[]" class="common h30 w120">
+                                                            <option value="0">请选择</option>
+                                                            #foreach($c in $productCateService.rootCates())
+                                                            <option value="$c.id" #if($c == $cate) selected #end>$c.name</option>
+                                                            #end
+                                                        </select>
+                                                    #else
+                                                        #set($size = $parentCates.size() - 1)
+                                                        #set($nums = [$size .. 0])
+                                                        #foreach($i in $nums)
+                                                            #set($pc = $parentCates.get($i))
+                                                            <select name="cate[]" class="common h30 w120">
+                                                                <option value="0">请选择</option>
+                                                                #foreach($c in $productCateService.siblings($pc))
+                                                                    <option value="$c.id" #if($c == $pc) selected #end>$c.name</option>
+                                                                #end
+                                                            </select>
+                                                            #if($velocityCount == $parentCates.size())
+                                                                #set($childs = $productCateService.allChilds($pc))
+                                                                #if($childs)
+                                                                    <select name="cate[]" class="common h30 w120">
+                                                                        <option value="0">请选择</option>
+                                                                        #foreach($c in $childs)
+                                                                            <option value="$c.id" >$c.name</option>
+                                                                        #end
+                                                                    </select>
+                                                                #end
+                                                            #end
+                                                        #end
+                                                    #end
+                                                </td>
+                                            #elseif($navigation.type == "brandProducts")    
+                                            <td class="tr"><i class="orange">*</i>选择品牌：</td>
+                                            <td>
+                                                <select name="value[]" class="common h30 w220">
+                                                    <option value="0">请选择</option>
+                                                    #foreach($brand in $brands)
+                                                        <option value = "$brand.id" #if($brand.id == $!navigation.target) selected #end>$brand.name</option>
+                                                    #end
+                                                </select>
+                                            </td>
+                                            #elseif($navigation.type == "product")    
+                                                <td class="tr"><i class="orange">*</i>链接产品：</td>
+                                                <td>
+                                                    #set($product = $productService.findOne($!navigation.target))
+                                                    <input type="hidden" name="value[]" value="$!navigation.target">
+                                                    <input type="text" value="$!product.name"  class="common h30 w220 js-productName" readOnly ="true" />
+                                                    <span class="btn-grey2 ml10 js-select-product">选择产品</span>
+                                                </td>
+                                            #elseif($navigation.type == "lottery")
+                                            <td class="tr"><i class="orange">*</i>所属活动：</td>
+                                            <td>
+                                                #set($product = $productService.findOne($!navigation.target))
+                                                <select name="value[]" class="common h30 w220">
+                                                    <option value=" ">请选择</option>
+                                                    #foreach($lottery in $lotterys)
+                                                        <option value = "$lottery.id" #if($lottery.id == $!navigation.target) selected #end>$lottery.lotteryName</option>
+                                                    #end
+                                                </select>
+                                            </td>
+                                            #else
+                                                <input type="hidden" name="value[]" value=" "/>
+                                            #end
+                                        </tr>
+                                    </table>
+                                </div>
+                            </dd>
+                        #end
+                    #else    
+                        <dd class="curr js-attr-selected">
+                            <p class="title"><a href="javascript:;" title="正在编辑">正在编辑</a><span class="ico-del"></span></p>
+                            <div class="content js-item">
+                                <table class="js-common" width="100%">
+                                    <colgroup>
+                                        <col style="width: 160px;">
+                                        <col>
+                                    </colgroup>
+                                    <tr>
+                                        <td class="tr"><i class="orange">*</i>栏目名称：</td>
+                                        <td>
+                                            <input type="text" name="name[]" class="common h30 w220" placeholder="请添加栏目名称"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tr"><i class="orange">*</i>链接页面：</td>
+                                        <td>
+                                            <select name="linkPage[]" class="common h30 w220 js-linkPage-key">
+                                                <option value=" ">--请选择--</option>    
+                                                #foreach($type in $types)
+                                                    #if($type != "index" && $type != "allProducts" && $type != "category" && $type != "page"  && $type != "column")
+                                                        <option value="$type.name()" >$type.description</option>    
+                                                    #end
+                                                #end
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>    
+                            </div>
+                        </dd>
+                    #end
+                    <dd class="btn-add js-btnAdd">+添加栏目</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="layout-footer clearfix">
+            <div class="btn-wrap">
+                <input type="submit" value="保存" class="btn-orange" />
+            </div>
+        </div>
+    </form>
+    
+    <!--选择产品-->
+    <div class="automatic-box clearfix mt10  js-product-panel" id="productPanel" style="display: none;">
+        <div class="fl mt4">
+            <form id="search_form" action="/jdvop/admin/ajax/searchProduct.php" method="get">
+                <table>
+                    <tr>
+                        <td>
+                            <select name="b" class="common ml10 h36 w120">
+                                <option value="0">所有品牌</option>
+                                #foreach($b in $brands)
+                                <option value="$b.id">$esc.html($b.name)</option>
+                                #end
+                            </select>
+                        </td>
+                        <td>
+                            <select name="cate" class="common h36 w120">
+                                <option value="0">所有品类</option>
+                                #foreach($cate in $rootCates) 
+                                    <option value="$cate.id">$cate.name</option>
+                                #end
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="kw"  class="common ml10 h36 w160" placeholder="请出入关键字"/>
+                        </td>
+                        <td class="tl">
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />  
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div id="search_panel" class="table-list mt10" style=" width: 100%; height: 400px; overflow-y: auto;">
+            <table class="common" id="result_panel">
+                <colgroup>
+                   <col style="width:500px" />
+                   <col style="width:100px"/>
+                </colgroup>
+                <tr class="title">
+                    <th style="padding: 6px 0;">产品名称</th>
+                    <th style="padding: 6px 0;">操作</th>
+                </tr>
+           </table>
+        </div>
+        <script>
+            $(function(){
+                $(document).on("submit", "#search_form", function(e){
+                    e.preventDefault();
+                    var thiz = $(this);
+                    var data = '';
+
+                    var brand = thiz.find('select[name="b"]').val();
+                    if(brand != '' && brand != 0) {
+                        data += 'b=' + brand;
+                    }
+
+                    var cate  = thiz.find('select[name="cate"]').val();
+                    if (cate != "" && cate != 0)
+                    {
+                        if (data !== '') {
+                            data    += '&';
+                        }
+                        data += ('&cate=' + cate);
+                    }
+
+                    var keyword = thiz.find('input[name="kw"]').val();
+                    if (keyword !== '') {
+                        if (data !== '') {
+                            data    += '&';
+                        }
+                        data    += '&kw=' + encodeURIComponent(keyword);
+                    }
+                    top.artProgress('查询中，请稍后...');
+                    $.get($(this).attr("action"), data, function(d){
+                        top.artProgress('[close]');
+                        if (typeof(d) === 'object')
+                        {
+                            $('#result_panel tr:not(.title)').remove();
+                            var html = '';
+                            for (i = 0; i < d.length; ++ i)
+                            {
+                                html    += '<tr>';
+                                html    += '<td>' + d[i].name + '</td>';
+                                html    += '<td class="tc"><a href="javascript:;" rel="' + d[i].id + '#' + d[i].name + '" class="sel-current blue js-sel">选择</a></td>';
+                                html    += '</tr>';
+                            }
+                            $('#result_panel').append(html);
+                        }
+                    }, 'json');
+                });
+            });
+        </script>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    function autoCount(){ //计算宽高
+        var sWidth=$('.js-tabNav-dragsort').outerWidth();
+        $(".js-tabNav-dragsort dd").each(function(){
+            var sHeight=$(this).find(".js-item").outerHeight();
+            $(this).height(sHeight);
+        });
+        $('.js-tabNav-dragsort .js-item').width(sWidth);
+    };
+    autoCount();
+    $(window).resize(function(){autoCount();});
+     // 自定义导航拖动排序
+    $('.js-tabNav-dragsort').dragsort({
+        dragSelector: "dd",
+        dragEnd: function() { 
+            autoCount()
+        },
+        dragBetween: 'false',
+        dragSelectorExclude:'dd.btn-add , div.js-item, span.ico-del, .title a',
+        placeHolderTemplate: '<dd class="a-dashed"></dd>',
+        scrollSpeed: 5
+    });
+    //切换自定义编辑    
+     $('.js-tabNav-dragsort').on('click','.title a',function(){
+        $(this).parents("dd.js-attr-selected").addClass("curr").siblings().removeClass("curr");
+    });
+    //添加自定义导航
+    $(document).on('click','.js-btnAdd', function(){
+        $(this).siblings().removeClass("curr");
+        var topHtml = "<dd class='curr js-attr-selected'><p class='title'><a href='javascript:;'>正在编辑</a><span class='ico-del'></span></p></dd>";
+        $(this).before(topHtml);
+        
+        var downHtml = "";
+        
+        downHtml  += '<div class="content js-item">';
+        downHtml  += '<table class="js-common" width="100%">';
+        downHtml  += '<colgroup>';
+        downHtml  += '<col style="width: 160px;"/>';
+        downHtml  += '<col />';
+        downHtml  += '</colgroup>';
+        downHtml  += '<tr>';
+        downHtml  += '<td class="tr"><i class="orange">*</i>栏目名称：</td>';
+        downHtml  += '<td>';
+        downHtml  += '<input type="text" name="name[]" class="common h30 w220" placeholder="请添加栏目名称"/>';
+        downHtml  += '</td>';
+        downHtml  += '</tr>';
+        downHtml  += '<tr>';
+        downHtml  += '<td class="tr"><i class="orange">*</i>链接页面：</td>';
+        downHtml  += '<td>';
+        downHtml  += '<select name="linkPage[]" class="common h30 w220 js-linkPage-key">';
+        downHtml  += '<option value=" ">--请选择--</option>    ';
+        #foreach($type in $types)
+            #if($type != "index" && $type != "allProducts" && $type != "category" && $type != "page"  && $type != "column")
+                downHtml  += '<option value="$type.name()" >$type.description</option>';    
+            #end    
+        #end
+        downHtml  += '</select>';
+        downHtml  += '</td>';
+        downHtml  += '</tr>';
+        downHtml  += '</table>';
+        downHtml  += '</div>';
+        $('dd.js-attr-selected:last').append(downHtml);
+        autoCount();
+    });
+    
+    //删除单个自定义导航
+    $(".js-tabNav-dragsort").on('click', '.ico-del', function(){
+        autoCount();
+        $(this).parents("dd.js-attr-selected").remove();  
+        $("dd.js-attr-selected:last").addClass("curr");
+        if($('dd.js-attr-selected').length == 0) {
+            var topHtml = "<dd class='curr js-attr-selected'><p class='title'><a href='javascript:;'>正在编辑</a><span class='ico-del'></span></p></dd>";
+            $('.js-btnAdd').before(topHtml);
+
+            var downHtml = "";
+            downHtml  += '<div class="content js-item">';
+            downHtml  += '<table class="js-common" width="100%">';
+            downHtml  += '<colgroup>';
+            downHtml  += '<col style="width: 160px;"/>';
+            downHtml  += '<col />';
+            downHtml  += '</colgroup>';
+            downHtml  += '<tr>';
+            downHtml  += '<td class="tr"><i class="orange">*</i>栏目名称：</td>';
+            downHtml  += '<td>';
+            downHtml  += '<input type="text" name="name[]" class="common h30 w220" placeholder="请添加栏目名称"/>';
+            downHtml  += '</td>';
+            downHtml  += '</tr>';
+            downHtml  += '<tr>';
+            downHtml  += '<td class="tr"><i class="orange">*</i>链接页面：</td>';
+            downHtml  += '<td>';
+            downHtml  += '<select name="linkPage[]" class="common h30 w220 js-linkPage-key">';
+            downHtml  += '<option value=" ">--请选择--</option>    ';
+            #foreach($type in $types)
+                #if($type != "shop"  && $type != "page"  && $type != "column")
+                    downHtml  += '<option value="$type.name()" >$type.description</option>';    
+                #end    
+            #end
+            downHtml  += '</select>';
+            downHtml  += '</td>';
+            downHtml  += '</tr>';
+            downHtml  += '</table>';
+            downHtml  += '</div>';
+            $('dd.js-attr-selected:last').append(downHtml);
+            autoCount();
+        } 
+    });
+    
+    $(document).on('change', '.js-linkPage-key', function(e){
+        var thiz = $(this);
+        var html = '<tr class="js-linkPage-value">';
+        if(thiz.val() == "index" || thiz.val() == "category" || thiz.val() == "aboutUs"  || thiz.val() == "allProducts"  || thiz.val() == "limitExchange" || thiz.val() == "forwardIntegral") {
+            thiz.parents(".js-common").find('input[name="name[]"]').val(thiz.find("option:selected").text());
+            html  += '<input type="hidden" name="value[]" value=" " >';
+        }  else if(thiz.val() == "categoryProducts") {
+            html  += '<td class="tr"><i class="orange">*</i>选择分类：</td>';
+            html  += '<td>';
+            html  += '<input type="hidden" name="value[]" >';
+            html  += '<select name="cate[]" class="common h30 w120">';
+            html  += '<option value="0">请选择</option>';
+            #foreach($c in $productCateService.rootCates())
+                html  += '<option value="$c.id">$c.name</option>';
+            #end
+            html  += '</select>';
+            html  += '</td>';
+        } else if(thiz.val() == "brandProducts"){
+            html  += '<td class="tr"><i class="orange">*</i>选择品牌：</td>';
+            html  += '<td>';
+            html  += '<select name="value[]" class="common h22 w220">';
+            html  += '<option value="0">请选择</option>';
+            #foreach($brand in $brands)
+                var brandName = "$brand.name";
+                html  += ' <option value = "$brand.id" #if($brand.id == $!navigation.target) selected #end>'+ brandName +'</option>';
+            #end
+            html  += '</select>';
+            html  += '</td>';
+        } else if(thiz.val() == "product"){
+            html  += '<td class="tr"><i class="orange">*</i>链接产品：</td>';
+            html  += '<td>';
+            html  += '<input type = "hidden" name="value[]">';
+            html  += '<input type="text" name="aa" readOnly = "true" class="common h30 w220 js-productName"/>';
+            html  += '<span class="btn-grey2 ml10 js-select-product">选择产品</span>';
+            html  += '</td>';
+        }  else if(thiz.val() == "page") {
+            html  += '<td class="tr"><i class="orange">*</i>页面ID：</td>';
+            html  += '<td>';
+            html  += '<input type="text"  name="value[]" class="common w220 h30"  placeholder="请输入页面ID"/>'
+            html  += '</td>';
+        } else if(thiz.val() == "column") {
+            html  += '<td class="tr"><i class="orange">*</i>页面栏目ID：</td>';
+            html  += '<td>';
+            html  += '<input type="text"  name="value[]" class="common w220 h30"  placeholder="请输入页面栏目ID"/>'
+            html  += '</td>';
+        } else if(thiz.val() == "link") {
+            html  += '<td class="tr"><i class="orange">*</i>自由链接：</td>';
+            html  += '<td>';
+            html  += '<input type="text"  name="value[]" class="common w220 h30"  placeholder="请输入链接"/>'
+            html  += '<label class="red">&nbsp;&nbsp;&nbsp;例：http://www.yunzhonghe.com</label>'
+            html  += '</td>';
+        }  else if(thiz.val() == "lottery") {
+            html  += '<td class="tr"><i class="orange">*</i>所属活动：</td>';
+            html  += '<td>';
+            html  += '<select name="value[]" class="common h22 w220">';
+            html  += '<option value=" ">请选择</option>';
+            #foreach($lottery in $lotterys)
+                html += '<option value = "$lottery.id">$lottery.lotteryName</option>';
+            #end
+            html  += '</select>';
+            html  += '</td>';
+        } 
+        
+        html += '</tr>';
+        thiz.parents('table.js-common').find("tr.js-linkPage-value").remove();
+        thiz.parents('table.js-common').find("tr:last").after(html);
+        autoCount();
+    });
+    
+    $(document).on('change', 'select[name="cate[]"]', function(){
+        var selObj = $(this);
+        selObj.nextAll().remove();//删除后面所有的框
+        var cid = parseInt($(this).val());
+        if (cid > 0)
+        {
+            $.get('/jdvop/admin/cate/ajax.php', {parentID: cid}, function(d) {
+                var len = d.length;
+                if (len <= 0)
+                {
+                    return;
+                }
+                var html = '<select name="cate[]" class="common h30 w120">';
+                html += '<option value="0">请选择</option>';
+                var i = 0;
+                for (; i < len; ++i)
+                {
+                    html += '<option value="' + d[i].id + '">' + d[i].name + "</option>";
+                }
+                html += '</select>';
+                selObj.after(html);
+            }, 'json');
+            $(this).parent().find('input[name="value[]"]').val(cid);
+        }
+    });
+    var selectProduct;
+    var selectProductDialog;
+    $(document).on("click", ".js-select-product", function(e){
+        var pr=$("#productPanel");
+        selectProduct = $(this);
+        selectProductDialog = dialog({
+            width   : 800,
+            height  : 500,
+            title   : '查询产品',
+            id: 'pr',
+            content: pr,
+            padding: 0,
+            cancelValue: '取消',
+            cancel: function () {
+                this.close();
+                return false;
+            }
+        }).showModal();
+    });
+    //选择
+     $(document).on('click', '.js-sel', function(e){
+        e.preventDefault();
+        var productData = $(this).attr("rel").split("#");
+        var id   = productData[0];
+        var name = productData[1];
+        
+        selectProduct.parent().find('input[name="value[]"]').val(id);
+        selectProduct.parent().find('.js-productName').val(name);
+        selectProductDialog.close();  
+    });
+    
+    $('#dataForm').submit(function(e){
+        e.preventDefault();
+        var isOk =  false;
+        if($('dd.js-attr-selected').size() == 1){
+            if($('input[name="name[]"]').val() == '' && $('select[name="linkPage[]"]').val() == ' ') {
+                isOk = true;
+            } else {
+                if($('input[name="name[]"]').val() == '') {
+                    top.artAlert('温馨提示', '请填写栏目名称！', 'error');
+                    return false;
+                }
+                if($('select[name="linkPage[]"]').val() == '') {
+                    top.artAlert('温馨提示', '请选择链接页面！', 'error');
+                    return false;
+                }
+                if($('select[name="linkPage[]"]').val() == "freeLink"){
+                    if($('input[name="value[]"]').val() == ''){
+                        top.artAlert('温馨提示', '请填写链接！', 'error');
+                        return false;
+                    }
+                }
+                if($('select[name="linkPage[]"]').val() == "product") {
+                    if($('input[name="value[]"]').val() == ''){
+                        top.artAlert('温馨提示', '请选择产品！', 'error');
+                        return false;
+                    }
+                }
+                if($('select[name="linkPage[]"]').val() == "lottery") {
+                    if($('select[name="value[]"]').val() == ' ' || $('select[name="value[]"]').val() == '0'){
+                        top.artAlert('温馨提示', '请选择所属活动！', 'error');
+                        return false;
+                    }
+                }
+                isOk = true;
+            }
+        } else {
+            $('dd.js-attr-selected').each(function(){
+                if($('dd.js-attr-selected').size() > 3){
+                    top.artAlert('温馨提示', '最多允许添加三个栏目', 'error');
+                    return false;
+                }
+                if($('input[name="name[]"]').eq($(this).index()).val() == '') {
+                    top.artAlert('温馨提示', '请填写栏目名称', 'error');
+                    return false;
+                }
+                if($('select[name="linkPage[]"]').eq($(this).index()).val() == '') {
+                    top.artAlert('温馨提示', '请选择链接页面', 'error');
+                    return false;
+                }
+                if($('select[name="linkPage[]"]').eq($(this).index()).val() == "freeLink"){
+                    if($('input[name="value[]"]').val() == ''){
+                        top.artAlert('温馨提示', '请填写链接', 'error');
+                        return false;
+                    }
+                }
+                if($('select[name="linkPage[]"]').eq($(this).index()).val() == "product") {
+                    if($('input[name="value[]"]').val() == ' '){
+                        top.artAlert('温馨提示', '请选择产品', 'error');
+                        return false;
+                    }
+                }   
+                if($('dd.js-attr-selected').size() == $(this).index() + 1){
+                    isOk = true;
+                }
+            });
+        }
+        if(isOk) {
+            $.post($(this).action, $(this).serialize(), function(data){
+                if(data.isOk){
+                    top.artAlert('温馨提示', '数据保存成功', 'ok');
+                    location.reload();
+                }else{
+                    top.artAlert('温馨提示', data.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+});
+</script>
+
+</body>
+</html>

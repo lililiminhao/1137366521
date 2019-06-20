@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>账号管理</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+    </p>
+    <span class="text">供应商管理</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                #if($enabled == 'true')
+                    <li class="curr"><a href="#" title="已启用账号">已启用账号</a></li>
+                    <li><a href="/jdvop/admin/website/provider.php?enabled=false" title="已禁用账号">已禁用账号</a></li>
+                #elseif($enabled == 'false')
+                    <li><a href="/jdvop/admin/website/provider.php?enabled=true" title="已启用账号">已启用账号</a></li>
+                    <li class="curr"><a href="#" title="已禁用账号">已禁用账号</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/website/provider.php" method="get">
+                <input type="hidden" name="enabled" value="#if(!$enabled || $enabled == 'false') false #{else} true #{end}" />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w160" placeholder="供应商名称"/>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+            #if($shiro.isPermitted('provide:create'))
+            <a href="/jdvop/admin/website/provider/add.php"><span class="btn-green2">新增供应商</span></a>
+            #end
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:100px" />
+                <col style="width:100px" />
+                <col style="width:100px" />
+                <col style="width:120px" />
+                <col style="width:100px" />
+                <col style="width:120px" />
+                <col/>
+            </colgroup>
+            <tr>
+                <th>供应商账号</th>
+                <th>公司名称</th>
+                <th>姓名</th>
+                <th>角色名称</th>
+                <th>运费模板</th>
+                <th>操作</th>
+            </tr>
+            #if($adminstrators.hasContent())
+                #foreach($user in $adminstrators)
+                #set($shipmentFeeSettings = $shipmentFeeSettingsExtService.findOne($user.settingId))
+                <tr>
+                    <td class="tc">$!esc.html($user.loginName)</td>
+                    <td class="tc">$!esc.html($user.workerName)</td>
+                    <td class="tc">$!esc.html($user.staffName)</td>
+                    #if($!user.roleName)
+                        <td class="tc">$!esc.html($user.roleName)</td>
+                    #else
+                        <td class="tc">无角色</td>
+                    #end
+                    <td class="tc">
+                        #if($user.settingId > 0)
+                            $!esc.html($shipmentFeeSettings.getName())
+                        #else
+
+                        #end
+
+                    </td>
+                    <td class="tc js-option-parents">
+                        #if($shiro.isPermitted('provide:edit'))
+                        <div class="drop-down js-dropDown">
+                            <span class="ico"></span>
+                            <p class="s-inp">操作</p>
+                        </div>
+                            <dl class="s-option js-sOption">
+                            #if($shiro.isPermitted('provide:edit'))
+                                <dd><a href = "/jdvop/admin/website/provider/edit.php?adminId=$!user.id">编辑</a></dd>
+                                #end
+                                #if($user.loginName != "admin")
+                                    #if($user.enabled)
+                                        #if($shiro.isPermitted('provide:endUse'))
+                                            <dd><a class="ajax-request" onclick="operate($!user.id,0)">禁用</a></dd>
+                                        #end
+                                        #if($shiro.isPermitted('provide:delete'))
+                                            <dd><a class="ajax-request" onclick="operate($!user.id,-1)">删除</a></dd>
+                                        #end
+                                    #else
+                                        #if($shiro.isPermitted('provide:startUse'))
+                                            <dd><a class="ajax-request" onclick="operate($!user.id,1)">启用</a></dd>
+                                        #end
+                                    #end
+                                #end
+
+                            </dl>
+                        #end
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关账号
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $adminstrators.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+    function operate(userid,type){
+        if(type==0){
+            top.artConfirm('请注意', '您真的要禁用这位账号么?', function(v){
+                if (v) {
+                    top.artProgress('禁用中，请稍后...');
+                    $.get('/jdvop/admin/website/provider/setEnabled.php?',{enabled : false,'id':userid}, function(d){
+                        top.artProgress('[close]');
+                        if (d.isOk) {
+                            top.artAlert('温馨提示', '禁用成功',function(){
+                                location.reload();
+                            } );
+                        } else {
+                            top.artAlert('温馨提示', d.message, 'error');
+                        }
+                    }, 'json');
+                }
+            });
+        }else if(type==1){
+            top.artConfirm('请注意', '您真的要启用这位账号么?', function(v){
+                if (v) {
+                    top.artProgress('启用中，请稍后...');
+                    $.get('/jdvop/admin/website/provider/setEnabled.php?',{enabled : true,'id':userid}, function(d){
+                        top.artProgress('[close]');
+                        if (d.isOk) {
+                            top.artAlert('温馨提示', '启用成功',function(){
+                                location.reload();
+                            } );
+
+                        } else {
+                            top.artAlert('温馨提示', d.message, 'error');
+                        }
+                    }, 'json');
+                }
+            });
+        }else if(type==-1){
+            top.artConfirm('请注意', '您真的要删除这位账号么?一旦删除将无法恢复!', function(v){
+                if (v) {
+                    top.artProgress('删除中，请稍后...');
+                    $.get('/jdvop/admin/provider/delete.php?',{'id':userid}, function(d){
+                        top.artProgress('[close]');
+                        if (d.isOk) {
+                            top.artAlert('温馨提示', '删除成功',function(){
+                                location.reload();
+                            } );
+
+                        } else {
+                            top.artAlert('温馨提示', d.message, 'error');
+                        }
+                    }, 'json');
+                }
+            });
+        }
+
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>产品管理</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav  borderGreen clearfix">
+    <a href="/jdvop/admin/products.php"><p class="right fr btn-grey2">返回</p></a>
+    <span class="text">产品管理</span>
+</div>
+<span style="display:none;"><input type="file" name="excelFile" class="excelFile" /></span>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix js-tabList">
+                <li class="curr"><a href="javascript:;">批量编辑供应商产品</a></li>
+                #if(!$admin.isProvider())
+                <li><a href="javascript:;">批量编辑系统产品</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box  js-tabContent" style="border: 1px solid #dedede; margin-top: 0; border-top:none;">
+        <div class="item">
+            <div class="p20 mb10">
+                请点击<span class="btn-grey2 ml10 mr10 js_self_export">导出</span>  按钮，导出供应商产品资料
+            </div>
+            <div class="topTitle" style="border-top: 1px solid #eaeaea;">
+                 <em  class="fwb">操作说明</em>
+            </div>
+            <div class="p20">
+                在您下载的Excel模板中，依据表头，填写相应产品资料，填写完毕后，保存Excel，点击
+                <a href="" class="js-upload" data-upload-url="/jdvop/admin/product/batch/import4UpdateSelf.php" ><span class="btn-grey2 ml10 mr10">上传</span></a>  
+                按钮，将编辑好的表格上传回系统即可
+            </div>
+        </div>
+        <div class="item  hide">
+             <div class="p20 mb10">
+                请点击<span class="btn-grey2 ml10 mr10 js_system_export">导出</span>  按钮，导出系统产品资料
+            </div>
+            <div class="topTitle" style="border-top: 1px solid #eaeaea;">
+                 <em  class="fwb">操作说明</em>
+            </div>
+            <div class="p20">
+                在您下载的Excel模板中，依据表头，填写相应产品资料，填写完毕后，保存Excel，点击
+                <a href="" class="js-upload" data-upload-url="/jdvop/admin/product/batch/import4UpdateSystem.php"><span class="btn-grey2 ml10 mr10">上传</span> </a> 
+                按钮，将编辑好的表格上传回系统即可
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $(".js-tabList li").click(function(){
+        var oIndex=$(this).index();
+        $(this).addClass("curr").siblings().removeClass('curr');
+        $(".js-tabContent .item").eq(oIndex).show().siblings().hide();
+    });
+    $(document).on('click', '.js_self_export', function(e){
+        e.preventDefault();
+        $('#export_ifrm').attr('src', '/jdvop/admin/product/exportSelfProduct.php');
+    });
+    $(document).on('click', '.js_system_export', function(e){
+        e.preventDefault();
+        $('#export_ifrm').attr('src', '/jdvop/admin/product/exportSystemProduct.php');
+    });
+    $(document).on('click', 'a.js-upload', function(e){
+        e.preventDefault();
+        var url = $(this).attr('data-upload-url');
+        $('.excelFile').fileupload('option', 'url', url);
+        $('.excelFile').click();
+    });
+    
+    $('.excelFile').fileupload({
+        dataType    : 'json',
+        autoUpload  : true,
+        sequentialUploads   : true,
+        start       : function(e) {
+            top.artProgress('产品导入中，请稍后...');
+        },
+        always      : function(e, data) {
+            top.artProgress('[close]');
+        },
+        done        : function(e, data) {
+            top.artProgress('[close]');
+            if (data.result.isOk) {
+                location.reload();
+            } else {
+                top.artAlert('温馨提示', data.result.message, 'error');
+            }
+        },
+        fail    : function(e, data){
+            top.artProgress('[close]');
+            top.artAlert('温馨提示', '因为网络原因，上传失败!', 'error');
+        }
+    });
+});
+</script>
+
+</body>
+</html>

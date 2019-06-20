@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script  type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script  type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!enterprise.name</title>
+</head>
+<body class="pm56">
+    <header class="bar-nav">
+        <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+        <h1 class="title">退款详情</h1>
+    </header>
+    <div class="order-list">
+        <ul>
+            <li>
+                <h2 class="top"><em>订单信息</em></h2>
+                <p class="info">
+                    <span>订单编号：<i>$!order.key</i></span><br/>
+                    <span>申请时间：<i>$!dateTool.format('yyyy-MM-dd', $nifferOrder.applyTime) $dateTool.format('HH:mm:ss', $nifferOrder.applyTime)</i></span><br/>
+                    <span>退款原因：<i>#if($!nifferOrder.reason && $!nifferOrder.reason.length()>0)$esc.html($!nifferOrder.reason)#else无#end</i></span><br/>
+                    <span>问题描述：<i>#if($!nifferOrder.remark && $!nifferOrder.remark.length()>0)$esc.html($!nifferOrder.remark)#else无#end</i></span><br/>
+                    <span>订单状态：<i class="color999">
+                            
+                            #if($nifferOrder.isSystem)
+                               <!--如果市民卡后台已拒绝，则取拒绝状态-->
+                                #if($nifferOrder.status=="declined")
+                                     #set($status=$nifferOrder.status)
+                                #else
+                                     #set($status=$nifferOrder.openStatus)
+                                #end
+                            #else
+                                #set($status=$nifferOrder.status)
+                            #end
+                            $!status.description
+                        </i></span><br/>
+                    <span>退款金额：<i>
+                            &yen;$!numberTool.format('#0.00',$nifferOrder.refundAmount)+邮费：&yen;$!numberTool.format('#0.00',$nifferOrder.shipmentFee)
+                        </i></span><br/>
+                </p>
+            </li>
+            <li>
+                <form id="entry_form" action="/jdvop/shoppingCart/chooseEntry.php" method="get">
+                    <h2 class="top"><em>商品信息</em></h2>
+                    #set($totalIntegral = 0)
+                    #foreach($entry in $inEntry)
+                    #set($product = $productTool.asProduct($entry.productId))
+                    #set($skuId = $productTool.getStorageUnits($product.id).get(0).id)
+                    <input type="hidden" name="isSelected[]" value="true"/>
+                    <input type="hidden" name="entry[]"  value="$skuId"/>
+                    <input type="hidden" name="type[]"  value="sku"/>
+                    <input type="hidden" name="sentry[]"  value="$!product.id"/>
+                    <input type="hidden" name="stype[]"  value="product"/>
+                    <input type="hidden" name="amount[]"  value="$entry.amount"/>
+                    <input type="hidden" name="productOwnerType[]" value="$!product.ownerType"/>
+                    <div class="con clearfix">
+                        <p class="img">
+                            <a href="/jdvop/product/$!{product.id}.php">
+                                #if($!product.ownerType == "jingdong" || $!product.ownerType == "system")
+                                    <img src="$!product.getThumbnailImage()" />
+                                #else
+                                    <img src="$configTool.getImageHost()/middle$!product.getThumbnailImage()" />
+                                #end
+                            </a>
+                        </p>
+                        <p class="text">
+                            <span class="overflow-h"><i class="fwb">$!product.name</i></span>
+                            <span>
+                                <i></i>数量：<i class="fwb">$!entry.getAmount()</i> 
+                            </span>
+                        </p>
+                    </div>
+                    #end
+                </form>
+            </li>
+            
+            <li>
+                <h2 class="top"><em>退款进度反馈</em></h2>
+                <p class="info">
+                    <span>$!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.applyTime)</span><br/>
+                    <span>您的申请已提交，等待客服审核处理。</span><br/>
+                </p>
+                #if($status == 'declined')
+                    <p class="info">
+                        <span>客服拒绝了您的退款申请，备注信息：$!nifferOrder.remarkByWorker</span><br/>
+                    </p>
+                #elseif($status == 'canceld')
+                    <p class="info">
+                        <span>您的退款申请已撤销。</span><br/>
+                    </p>
+                #else
+                    #if($status!='waiting_audit') 
+                        <p class="info">
+                                <span>
+                                #if($nifferOrder.auditTime)
+                               	 	$!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.auditTime)
+                                #else
+                                	$!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.applyTime)
+                                #end
+                                </span><br/>
+                                #if($nifferOrder.remarkByWorker && $!nifferOrder.remarkByWorker!='')
+                                    <span>客服审核通过。备注信息：$!nifferOrder.remarkByWorker</span><br/>
+                                #else
+                                    <span>客服审核通过。</span><br/>
+                                #end
+                        </p>
+                    #end
+                    #if((!$nifferOrder.openStatus || $nifferOrder.openStatus == 'accepted') && ($nifferOrder.status == 'waiting_finance' || $nifferOrder.status == 'accepted' || $nifferOrder.status == 'processing_refund'))
+                        <p class="info">
+                            <span>系统处理退款中</span><br/>
+                        </p>
+                    #end
+                    #if($nifferOrder.status == 'accepted')
+                        <p class="info">
+                            #if($nifferOrder.acceptTime)
+                            <span>$!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.acceptTime)</span><br/>
+                            #end
+                            <span>金额已到账（售后完成）</span><br/>
+                        </p>
+                    #end
+                #end
+            </li>
+        </ul>
+    </div>
+
+</body>
+</html>

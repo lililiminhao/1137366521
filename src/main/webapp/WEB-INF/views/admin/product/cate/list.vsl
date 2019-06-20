@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link  rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/script/dtree/dtree.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src='/jdvop/script/dragsort-0.5.1.min.js'></script>
+<script type='text/javascript' src='/jdvop/script/dtree/dtree.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>产品分类管理</title>
+<script type="text/javascript">
+    var tree    = new dTree('tree');
+    function  renderTree()
+    {
+        //渲染这棵树
+        tree.add(0, -1, '系统分类', '/jdvop/admin/productCates.php');
+        #foreach($cate in $productCateService.findAll())
+            #if($cate.id > 0)
+                tree.add($cate.id, #if(!$cate.parentId) 0 #{else} $cate.parentId #{end}, '$cate.name', '/jdvop/admin/productCates.php?parentId=$cate.id');
+            #end
+        #end
+        document.getElementById('tree_view').innerHTML  = tree;
+    }
+    
+    $(function(){
+        //初始化树结构
+        renderTree();
+    });
+    
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.back(-1)" title="返回"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">系统分类</span>
+</div>
+<div id="iframePage">
+    <div class="mainNav borderGreen clearfix">
+        <p class="right fr">
+            <a href="/jdvop/admin/products.php" title="产品列表"><span class="btn-green2">产品列表</span></a>
+        </p>
+        <span class="text">系统分类</span>
+    </div>
+    <div class="automatic-box  clearfix">
+        <div class="web-layoutLeft fl">
+            <p class="title"> 分类结构图</p>
+            <div id="tree_view"></div>
+        </div>
+        <div class="fl ml20">
+            <div class="tab-column">
+                <div class="con">
+                    <!--<a href="/jdvop/admin/product/cate/add.php" class="btn-grey2 fr mt4 mr20">添加分类</a>-->
+                    <p class="text fwb">基本信息</p>
+                </div>
+            </div>
+            <div class="table-list">
+                <table class="common">
+                    <colgroup>
+                        <col style="width:180px;" />
+                        <col style="width: 260px;" />
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                    </colgroup>
+                    <tr>
+                        <th>ID</th>
+                        <th>名称</th>
+                        <th>父类</th>
+                        <th>操作</th>
+                    </tr>
+                    #if($cates && !$cates.isEmpty())
+                    #foreach($cate in $cates)
+                    <tr>
+                        <td class="tc">$!cate.id</td>
+                        <td class="tc">$!cate.name</td>
+                        <td class="tc">
+                            #if($productCateService.findOne($!cate.parentId))
+                                <a href="/jdvop/admin/cate/parents.php?parentId=$!cate.parentId">$!productCateService.findOne($!cate.parentId).name</a>
+                            #else   
+                                顶级分类
+                            #end
+                        </td>
+                        <td class="tc">
+                            <a href="/jdvop/admin/productCates.php?parentId=$!cate.id"><dd >查看子分类</dd></a>
+                        </td>
+<!--                        <td class="tc js-option-parents">
+                            <div class="drop-down js-dropDown">
+                                <span class="ico"></span>
+                                <p class="s-inp">操作</p>
+                            </div>
+                            <dl class="s-option js-sOption">
+                                <a href="/jdvop/admin/product/cate/add.php?parentId=$!cate.id"><dd >添加子分类</dd></a>
+                                
+                                <a href="/jdvop/admin/product/cate/edit.php?id=$!cate.id"><dd >编辑</dd></a>
+                                ###set($chileds = $productCateService.childs($cate.id))
+                                ###if($chileds.isEmpty())
+                                    <a href="/jdvop/admin/product/cate/delete.php?id=$!cate.id" class="ajax-request" ok-message="reload" cfm-message="继续该操作将导致该分类彻底删除，一旦删除，将无法恢复!" ><dd >删除 </dd></a>
+                                ###end
+                            </dl>
+                        </td>-->
+                    </tr>
+                    #end
+                    #else
+                    <tr>
+                        #if($parentId)
+                            <td colspan="5" class="tc">
+                                分类暂无子分类
+                                <!--暂无子分类，您可以点此 <a href="/jdvop/admin/product/cate/add.php?parentId=$parentId" class="blue">添加子分类</a>-->
+                            </td>
+                        #else
+                            <td colspan="6" class="tc">暂无任何分类数据</td>
+                        #end
+                    </tr>
+                    #end
+                </table>
+             </div>
+        </div>
+    </div> 
+</div>
+</body>
+</html>

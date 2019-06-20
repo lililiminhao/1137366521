@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link  rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="../jdvop/script/html5.js"></script><![endif]-->
+<title>产品库存管理</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    #if($shiro.isPermitted('stock:edit'))
+    <p class="right fr btn-green2 js-upload" data-upload-url="/jdvop/admin/product/storage/import.php">产品库存导入</p>
+    #end
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+    <span class="text">库存维护</span>  
+</div> 
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr">产品库存列表</li>
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix">
+        <div class="right  p10">
+            <iframe src="javascript:void(0);" style="display:none;" id="hidden_frm"></iframe>
+            <form id="searchForm" action="/jdvop/admin/product/storages.php" method="GET">
+                <table>
+                     <tr>
+                        <td>
+                             <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w150 h24" placeholder="请出入关键字"/>
+                        </td>
+                        <td>
+                            <select name="cate" class="common h26 w120">
+                                <option value="0">所有品类</option>
+                                #foreach($cate in $rootCates) 
+                                    <option value="$cate.id" #if($request.getParameter('cate') == $cate.id) selected #end>$cate.name</option>
+                                #end
+                            </select>
+                         </td>
+                        <td>
+                            <select name="brand" class="common h26 w120">
+                                <option value="0">所有品牌</option>
+                                #foreach($b in $brands)
+                                <option value="$b.id" #if($request.getParameter('brand') == $b.id) selected #end>$esc.html($b.name)</option>
+                                #end
+                            </select>
+                        </td>
+                         <td>
+                             <input type="submit" class="btn-grey2 ml10" value="搜索"/>
+                         </td>
+                         <td>
+                            #if($shiro.isPermitted('stock:export'))
+                                <input type="button" id="export-btn" class="btn-grey2 ml10" value="导出Excel"/>
+                            #end
+                         </td>
+                     </tr>
+                 </table>
+               
+            </form>
+            
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:140px;"/>
+                <col style="width:100px;"/>
+                <col style="width:100px;"/>
+                <col style="width:80px;"/>
+                <col style="width:80px;"/>
+                <col style="width:100px;"/>
+                <col style="width:80px;"/>
+                <col style="width:80px;"/>
+                <col style="width:80px;"/>
+                <col style="width:80px;"/>
+                <col style="width:120px;"/>
+            </colgroup>
+            <tr>
+                <th>名称</th>
+                <th>型号</th>
+                <th>品牌</th>
+                <th>产品ID</th>
+                <th>SKU ID</th>
+                <th>SKU条码</th>
+                <th>销售量</th>
+                <th>锁定数量</th>
+                <th>运输数量</th>
+                <th>库存余量</th>
+                <th>操作</th>
+            </tr>
+            #if($products && $products.hasContent())
+                #foreach($product in $products.getContent())
+                    #set($storage = $storageSummary.get($product.id))
+                    #set($sku = $skuMap.get($product.id))
+                    <tr>
+                        <td><a href="/jdvop/admin/product.php?id=$product.id" class="blue" title="$!product.name">$!product.name</a></td>
+                        <td>$!product.productCode</td>
+                        <td>$!product.brand.name</td>
+                        <td class="tc">$!product.id</td>
+                        <td class="tc">$!sku.id</td>
+                        <td class="tc">$!sku.barCode</td>
+                        <td class="tr">$storage.getSoldedNum()</td>
+                        <td class="tr">$storage.getLockedNum()</td>
+                        <td class="tr">$storage.getTransitNum()</td>
+                        <td class="tr">$storage.getUseableNum()</td>    
+                        <td class="tc js-option-parents">
+                            <div class="drop-down js-dropDown">
+                                <span class="ico"></span>
+                                <p class="s-inp">操作</p>
+                            </div>
+                                <dl class="s-option js-sOption">
+                                    #if($shiro.isPermitted('stock:replenishment'))
+                                        <dd><a href="#" class="js-edit-quantity" rel="$!sku.id#$!product.name#$!product.productCode#$storage.getUseableNum()">补货</a></dd>
+                                    #end
+                                    #if($shiro.isPermitted('stock:edit'))
+                                        <dd><a href="#" class="js-edit-storage" rel="$!sku.id#$!product.name#$!product.productCode#$storage.getUseableNum()">库存维护</a></dd>
+                                    #end
+                                </dl>
+                        </td>
+                    </tr>
+                #end
+            #else
+            <tr>
+                <td colspan="12"  class="tc">没有查询到任何数据</td> 
+            </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $products.getPagerSpec(), 4, '_self')
+    </div>
+    
+</div>
+
+<script>
+$(function(){
+    $('#excelFile').fileupload({
+        dataType    : 'json',
+        autoUpload  : true,
+        sequentialUploads   : true,
+        start       : function(e) {
+            top.artProgress('文件上传中，请稍后...');
+        },
+        always      : function(e, data) {
+            top.artProgress('[close]');
+        },
+        done        : function(e, data) {
+            top.artProgress('[close]');
+            if (data.result.isOk) {
+                location.reload();
+            } else {
+                top.artAlert('温馨提示', data.result.message, 'error');
+            }
+        },
+        fail    : function(e, data){
+            top.artProgress('[close]');
+            top.artAlert('温馨提示', '因为网络原因，上传失败!', 'error');
+        }
+    }, 'json');
+
+    $('p.js-upload').click(function(e){
+        e.preventDefault();
+        var url = $(this).attr('data-upload-url');
+        $('#excelFile').fileupload('option', 'url', url);
+        $('#excelFile').click();
+    });
+    
+    
+    $(document).on("click", ".js-edit-quantity", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var productData = $(this).attr("rel").split("#");
+        top.dialog({
+            width: 400,
+            title: '补货',
+            content:'<div class="con">'
+                    +   '<form id="quantity-data-form" action="/jdvop/admin/product/storage/replenish.php" method="POST">'
+                    +   '<input type = "hidden" name = "id" value = ' + productData[0] + '>'
+                    +   '<table class = "js-quantity_panel">'
+                    +   '<colgroup>'
+                    +   '<col style="width: 100px;">'
+                    +   '<col>'
+                    +   '</colgroup>'
+                    +   '<tr><td class="tr">产品名称：</td><td>' + productData[1] + '</td></tr>'
+                    +   '<tr><td class="tr">产品型号：</td><td>' + productData[2] + '</td></tr>'
+                    +   '<tr><td class="tr">库存余量：</td><td>' + productData[3] + '</td></tr>'
+                    +   '<tr><td class="tr"><i class="orange">*</i>补货数量：</td><td><input type="text" class="common h22 w200" name="quantityNum" placeholder="填写补货数量"></td></tr>'
+                    +   '</table></form></div>',
+            okValue: '确定',
+            ok: function (){
+                var num = top.$("input[name='quantityNum']").val();
+                if(num.length === 0 || isNaN(num)){
+                    top.dialog({
+                        width: 500,
+                        title: '温馨提示',
+                        content:  '请输入正确的补货数量',
+                        okValue: '确定',
+                        ok: function (){
+                        }
+                    }).showModal();
+                    return false;
+                }
+                $.post(top.$('#quantity-data-form').attr("action"), top.$('#quantity-data-form').serialize(), function(data){
+                    if(data.isOk){
+                        location.reload();
+                        return false;
+                    }else{
+                        top.dialog({
+                            width: 500,
+                            title: '温馨提示',
+                            content:  data.message,
+                            okValue: '确定',
+                            ok: function (){
+                                location.reload();
+                            }
+                        }).showModal();
+                    }
+                }, "json");
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            },
+            
+        }).showModal();
+    });
+    
+    $(document).on("click",".js-edit-storage",function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var productData = $(this).attr("rel").split("#");
+        top.dialog({
+            width: 400,
+            title: '库存维护',
+            content:'<div class="con">'
+                    +   '<form id="storageNum-data-form" action="/jdvop/admin/product/storage/resetStorage.php" method="POST">'
+                    +   '<input type = "hidden" name = "id" value = ' + productData[0] + '>'
+                    +   '<table class = "js-quantity_panel">'
+                    +   '<colgroup>'
+                    +   '<col style="width: 100px;">'
+                    +   '<col>'
+                    +   '</colgroup>'
+                    +   '<tr><td class = "tr red" colspan = "2">此操作会重置库存余量,请谨慎操作</td></tr>'
+                    +   '<tr><td class="tr">产品名称：</td><td>' + productData[1] + '</td></tr>'
+                    +   '<tr><td class="tr">产品型号：</td><td>' + productData[2] + '</td></tr>'
+                    +   '<tr><td class="tr">库存余量：</td><td>' + productData[3] + '</td></tr>'
+                    +   '<tr><td class="tr"><i class="orange">*</i>重置数量：</td><td><input type="text" class="common h22 w200" name="storageNum" placeholder="填写重置数量"></td></tr>'
+                    +   '</table></form></div>',
+            okValue: '确定',
+            ok: function (){
+                var num = top.$("input[name='storageNum']").val();
+                if(num.length === 0 || isNaN(num)){
+                    top.dialog({
+                        width: 500,
+                        title: '温馨提示',
+                        content:  '请输入正确的重置数量',
+                        okValue: '确定',
+                        ok: function (){
+                        }
+                    }).showModal();
+                    return false;
+                }
+                $.post(top.$('#storageNum-data-form').attr("action"), top.$('#storageNum-data-form').serialize(), function(data){
+                    if(data.isOk){
+                        location.reload();
+                        return false;
+                    }else{
+                        top.dialog({
+                            width: 500,
+                            title: '温馨提示',
+                            content:  data.message,
+                            okValue: '确定',
+                            ok: function (){
+                                location.reload();
+                            }
+                        }).showModal();
+                    }
+                }, "json");
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            },
+            
+        }).showModal();
+    });
+    
+    $("#export-btn").click(function(e){
+        e.preventDefault();
+        var url     = '/jdvop/admin/product/storage/export.php?kw=';
+        var keyword = $("input[name='kw']").val();
+        if(isNotEmpty(keyword)){
+            url += keyword;
+        }
+        var cate  = $('select[name="cate"]').val();
+        if (cate != "" && cate  != 0)
+        {
+            url += ('&cate=' + cate);
+        }
+        var brand  = $('select[name="brand"]').val();
+        if (brand != "" && brand != 0)
+        {
+            url += ('&brand=' + brand);
+        }
+        $('#hidden_frm').attr('src', url);
+    });
+    
+    function isNotEmpty(temp)
+    {
+        if(temp === '' || temp.length < 1)
+        {
+            return false;
+        }
+        return true;
+    }
+    
+});
+</script>
+
+</body>
+</html>

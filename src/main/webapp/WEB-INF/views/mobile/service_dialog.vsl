@@ -1,0 +1,34 @@
+
+<p class="mark js-btnCloseBox"></p>
+<div class="customer-service-dialog js-customerServiceDialog js-btnCloseBox">
+    <span class="img-tip"></span>
+    <p class="title">温馨提示</p>
+    <div class="cont">
+        <p class="txt">1.如果您购买京东商品但暂时未收到货，需退货或换货，请直接拒收京东快递，并在订单中心申请退货，或联系网站客服<br/><a href="tel:400-687-0001">400-687-0001</a>申请退货。</p>
+        <p class="txt">2.如果您购买京东商品并收到货之后，需退货或换货，请拨打京东专属电话<br/><a href="tel:400-606-5500">400-606-5500</a>，并提供京东快递单号给京东客服，京东客服会安排快递人员上门取件，然后您在订单中心申请退货，或联系网站客服<a href="tel:400-687-0001">400-687-0001</a>申请退货。</p>
+        <p class="txt">3.注意事项：购买京东商品为食品，如需退换货请直接拒收快递，食品签收后京东公司不接受退货，敬请谅解。 </p>
+    </div>
+    <div class="btn-con flexbox-h">
+        <p class="btn flex1 js-btnClose">取消</p>
+        <p class="btn flex1 curr js-btnOk">继续</p>
+    </div>
+</div>
+<script type="text/javascript">
+      $(document).ready(function(){
+            var serviceDialogBox = document.querySelector(".js-customerServiceDialog");
+            var btnClose = serviceDialogBox.querySelector(".js-btnClose");
+            var btnOk = serviceDialogBox.querySelector(".js-btnOk");
+            var closeBox = document.querySelectorAll(".js-btnCloseBox");
+            if (serviceDialogBox) {
+                btnClose.addEventListener("click", function () {
+                    window.history.back();
+                });
+
+                btnOk.addEventListener("click", function () {
+                    for (var i = 0; i < closeBox.length; ++i) {
+                        closeBox[i].remove()
+                    }
+                });
+            }
+       })
+</script>

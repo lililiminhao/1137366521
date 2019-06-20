@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<theme description="风格一" key="block1" type="block" default="true">
+    <blocks>
+        <block id="block_1" type="slider">
+            <layout>
+                <width value="400" />
+                <height value="350" />
+            </layout>
+            <property max-size="2" min-size="2"/>
+            <preview><![CDATA[/jdvop/images/theme/theme1/1.png]]></preview>
+        </block>
+        <block id="block_2" type="slider">
+            <layout>
+                <width value="400" />
+                <height value="175" />
+            </layout>
+            <property max-size="2" min-size="2"/>
+            <preview><![CDATA[/jdvop/images/theme/theme1/1.png]]></preview>
+        </block>
+    </blocks>
+    <template>
+    <![CDATA[
+        <div class="a-mod1 w1200">
+            <ul class="clearfix">
+                <li class="templet-js-slide" max="2" min="2" width="400" height="350" key = "block_1">
+                    <a href="#"><img src="" width="400" height="350" alt="描述1..."/> </a> 
+                </li>
+                <li class="templet-js-slide" max="2" min="2" width="400" height="350" key = "block_1">
+                    <a href="#"><img src="" width="400" height="350" alt="描述2..."/> </a> 
+                </li>
+                <li class="list templet-js-slide" max="2" min="2" width="400" height="175" key = "block_2">
+                    <a href="#"><img src="" width="400" height="175" alt="描述3..."/> </a> 
+                </li>
+                <li class="list templet-js-slide" max="2" min="2" width="400" height="175" key = "block_2">
+                    <a href="#"><img src="" width="400" height="175" alt="描述4..."/> </a> 
+                </li>
+            </ul> 
+        </div>
+    ]]>
+    </template>
+    <velocity>
+    <![CDATA[
+        <div class="a-mod1 w1200">
+            <ul class="clearfix">
+                #foreach($img in $block_1.getEntries())
+                    <li class="templet-js-slide" max="2" min="2" width="400" height="350" key = "block_1">
+                        <a href="$!img.linkTo"><img src="$!configTool.getImageHost()$!img.image" width="400" height="350" alt="描述1..."/> </a> 
+                    </li>
+                #end
+                #foreach($img in $block_2.getEntries())
+                    <li class="list templet-js-slide" max="2" min="2" width="400" height="175" key = "block_2">
+                        <a href="$!img.linkTo"><img src="$!configTool.getImageHost()$!img.image" width="400" height="175" alt="描述3..."/> </a> 
+                    </li>
+                #end
+            </ul> 
+        </div>
+    ]]>
+    </velocity>
+    <preview><![CDATA[/jdvop/images/admin/img1_02.jpg]]></preview>
+</theme>

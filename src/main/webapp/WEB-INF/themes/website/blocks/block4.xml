@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<theme description="风格四" key="block4" type="block" default="true">
+    <blocks>
+        <block id="block_1" type="text">
+            <property no-link="true"/>   
+        </block>
+        <block id="block_2" type="image">
+            <layout>
+                <width value="224" />
+                <height value="160" />
+            </layout>  
+        </block>
+        <block id="block_3" type="product">
+            <property max-size="6" min-size="6"/>
+            <preview><![CDATA[/jdvop/images/img1_03.jpg]]></preview>
+        </block>
+        <block id="block_4" type="product">
+            <property max-size="5" min-size="5"/>
+            <preview><![CDATA[/jdvop/images/img1_03.jpg]]></preview>
+        </block>
+    </blocks>
+    <template>
+    <![CDATA[
+    <div class="a-mod3 w1200 clearfix">
+        <div class="layout-left">
+            <p class="title templet-js-text" key="block_1" noLink="true" key = "block_1">标题栏xxx</p>
+            <div class="list">
+                <ul class="clearfix">
+                    <li class="ad-img1 templet-js-image" width="234" height="416" key="block_2"> 
+                        <a href="#" title="图片广告3">
+                            <img src=""  width="234" height="416" alt="图片广告3"/>
+                        </a>
+                    </li>
+                    <li class="templet-js-product" pid="0" minSize="6" maxSize="6" key = "block_3">
+                        <a href="#" title="产品名称">
+                            <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                            <p class="num"><i>2000</i>积分</p>
+                            <p class="img"><img src="" width="160" height="160" alt="产品名称..."/></p>
+                        </a>
+                    </li>
+                    <li class="templet-js-product" pid="0" minSize="6" maxSize="6" key = "block_3">
+                        <a href="#" title="产品名称">
+                            <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                            <p class="num"><i>2000</i>积分</p>
+                            <p class="img"><img src="" width="160" height="160" alt="产品名称..."/></p>
+                        </a>
+                    </li>
+                    <li class="templet-js-product" pid="0" minSize="6" maxSize="6" key = "block_3">
+                        <a href="#" title="产品名称">
+                            <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                            <p class="num"><i>2000</i>积分</p>
+                            <p class="img"><img src="" width="160" height="160" alt="产品名称..."/></p>
+                        </a>
+                    </li>
+                    <li class="small templet-js-product" pid="0" minSize="6" maxSize="6" key = "block_3">
+                        <a href="#" title="产品名称">
+                            <p class="img"><img src="" width="100" height="100" alt="产品名称..."/></p>
+                            <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                            <p class="num"><i>2000</i>积分</p>
+                        </a>
+                    </li>
+                    <li class="small templet-js-product" pid="0" minSize="6" maxSize="6" key = "block_3">
+                        <a href="#" title="产品名称">
+                            <p class="img"><img src="" width="100" height="100" alt="产品名称..."/></p>
+                            <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                            <p class="num"><i>2000</i>积分</p>
+                        </a>
+                    </li>
+                    <li class="small templet-js-product" pid="0" minSize="6" maxSize="6" key = "block_3">
+                        <a href="#" title="产品名称">
+                            <p class="img"><img src="" width="100" height="100" alt="产品名称..."/></p>
+                            <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                            <p class="num"><i>2000</i>积分</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="layout-right Ranking">
+            <p class="title"></p>
+            <ul class="clearfix js-ranking">
+               <li class="title1">一周销量排行</li>
+               <li class="clearfix templet-js-product" pid="0" minSize="5" maxSize="5" key = "block_4">
+                   <a href="#" title="根据您当前的积分额度推荐">
+                       <p class="img">
+                           <span>1</span>
+                           <img src=""  width="60" height="60" alt="产品名称"/>
+                       </p>
+                       <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                       <p class="num"><i>2000</i>积分</p>
+                   </a>
+               </li>
+               <li class="clearfix templet-js-product" pid="0" minSize="5" maxSize="5" key = "block_4">
+                   <a href="#" title="根据您当前的积分额度推荐">
+                       <p class="img">
+                           <span>2</span>
+                           <img src=""  width="60" height="60" alt="产品名称"/>
+                       </p>
+                       <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                       <p class="num"><i>2000</i>积分</p>
+                   </a>
+               </li>
+               <li class="clearfix templet-js-product" pid="0" minSize="5" maxSize="5" key = "block_4">
+                   <a href="#" title="根据您当前的积分额度推荐">
+                       <p class="img">
+                           <span>3</span>
+                           <img src=""  width="60" height="60" alt="产品名称"/>
+                       </p>
+                       <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                       <p class="num"><i>2000</i>积分</p>
+                   </a>
+               </li>
+               <li class="clearfix templet-js-product" pid="0" minSize="5" maxSize="5" key = "block_4">
+                   <a href="#" title="根据您当前的积分额度推荐">
+                       <p class="img">
+                           <span>4</span>
+                           <img src=""  width="60" height="60" alt="产品名称"/>
+                       </p>
+                       <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                       <p class="num"><i>2000</i>积分</p>
+                   </a>
+               </li>
+               <li class="clearfix templet-js-product" pid="0" minSize="5" maxSize="5" key = "block_4">
+                   <a href="#" title="根据您当前的积分额度推荐">
+                       <p class="img">
+                           <span>5</span>
+                           <img src=""  width="60" height="60" alt="产品名称"/>
+                       </p>
+                       <p class="name overflow-h">根据您当前的积分额度推荐</p>
+                       <p class="num"><i>2000</i>积分</p>
+                   </a>
+               </li>
+            </ul>
+        </div>
+    </div>
+    ]]>
+    </template>
+    <velocity>
+    <![CDATA[
+    <div class="a-mod3 w1200 clearfix">
+        <div class="layout-left">
+            #if($block_1)
+                <p class="title templet-js-text" key="block_1" noLink="true">$!block_1.text</p>
+            #else
+                <p class="title templet-js-text" key="block_1" noLink="true">定制专区</p>
+            #end
+            <div class="list">
+                <ul class="clearfix">
+                    <li class="ad-img1 templet-js-image" width="234" height="416" key="block_2"> 
+                        <a href="$!block_2.linkTo">
+                            <img src="$!configTool.getImageHost()$!block_2.url"  width="234" height="416"/>
+                        </a>
+                    </li>
+                    #set($productMap = $productTool.findAsMap($block_3.value))
+                    #foreach($pid in $block_3.value)
+                        #set($p = $productMap.get($pid))
+                        #if($velocityCount <= 3)
+                            <li class="templet-js-product" pid="$p.id" minSize="6" maxSize="6" key = "block_3">
+                                <a href="/jdvop/product/${p.id}.php" target="_blank" title="$!p.name">
+                                    <p class="name overflow-h">$p.name</p>
+                                    <p class="num"><i>$productTool.getProductSoldPrice2($!p)</i>积分</p>
+                                    <p class="img">
+                                        #if($p.ownerType == "jingdong" || $p.ownerType == "system")
+                                            <img src="$!p.thumbnailImage" width="160" height="160" alt="$!p.name"/>
+                                        #else
+                                            <img src="$configTool.getImageHost()/thumbnail$!p.thumbnailImage" width="160" height="160" alt="$!p.name"/>
+                                        #end
+                                    </p>
+                                </a>
+                            </li>
+                        #else
+                            <li class="small templet-js-product" pid="$p.id" minSize="6" maxSize="6" key = "block_3">
+                                 <a href="/jdvop/product/${p.id}.php" target="_blank" title="$!p.name">
+                                    <p class="img">
+                                        #if($p.ownerType == "jingdong" || $p.ownerType == "system")
+                                            <img src="$!p.thumbnailImage" width="100" height="100" alt="$p.name"/>
+                                        #else
+                                            <img src="$configTool.getImageHost()/thumbnail$!p.thumbnailImage" width="100" height="100" alt="$p.name"/>
+                                        #end
+                                    </p>
+                                    <p class="name overflow-h">$!p.name</p>
+                                    <p class="num"><i>$productTool.getProductSoldPrice2($!p)</i>积分</p>
+                                </a>
+                            </li>
+                        #end
+                    #end
+                </ul>
+            </div>
+        </div>
+        <div class="layout-right Ranking">
+            <p class="title"></p>
+            <ul class="clearfix js-ranking">
+                <li class="title1">一周销量排行</li>
+                #set($productMap = $productTool.findAsMap($block_4.value))
+                #foreach($pid in $block_4.value)
+                    #set($p = $productMap.get($pid))
+                    <li class="clearfix templet-js-product" pid="$p.id" minSize="5" maxSize="5" key = "block_4">
+                        <a href="/jdvop/product/${p.id}.php" target="_blank" title="$!p.name">
+                            <p class="img">
+                                <span>$velocityCount</span>
+                                #if($p.ownerType == "jingdong" || $p.ownerType == "system")
+                                    <img src="$!p.thumbnailImage"  width="60" height="60" alt="产品名称"/>
+                                #else
+                                    <img src="$configTool.getImageHost()/thumbnail$!p.thumbnailImage"  width="60" height="60" alt="产品名称"/>
+                                #end
+                            </p>
+                            <p class="name overflow-h">$!p.name</p>
+                            <p class="num"><i>$productTool.getProductSoldPrice2($!p)</i>元</p>
+                        </a>
+                    </li>
+                #end
+            </ul>
+        </div>
+    </div>
+    ]]>
+    </velocity>
+    <preview><![CDATA[/jdvop/images/admin/img1_05.jpg]]></preview>
+</theme>

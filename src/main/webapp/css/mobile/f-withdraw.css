@@ -1,0 +1,56 @@
+#app {
+  padding: 0 30px; }
+  #app li {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    padding: 12px 0;
+    height: 40px;
+    line-height: 40px;
+    font-size: 14px;
+    color: #666; }
+    #app li span {
+      width: 48px; }
+    #app li input[name="btn"] {
+    height: 38px;
+    line-height: 38px;
+      width: 81px;
+      color: #999;
+      border-radius:3px;
+      outline:none;
+      text-align:center;
+      border:1px solid #d7d7d7;
+      margin-left: 6px;
+      background: #fff; }
+    #app li input[type="number"] {
+      -webkit-box-flex: 1;
+          -ms-flex: 1;
+              flex: 1;
+      text-indent: 3px; }
+    #app li input {
+      outline: none;
+      border: 1px solid #d7d7d7;
+      border-radius: 3px; }
+  #app input::-webkit-input-placeholder {
+    color: #999; }
+  #app button {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    margin-top: 36px;
+    height: 40px;
+    border-radius: 3px;
+    background: #add1f5;
+    color: #fff;
+    border: 0;
+    outline: none;
+    padding: 0; }
+    #app button.active {
+      background: #59a2e7; }
+  #app p {
+    text-align: center;
+    line-height: 36px;
+    color: #999; }

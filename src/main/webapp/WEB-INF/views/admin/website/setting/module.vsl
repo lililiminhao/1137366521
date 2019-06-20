@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link  rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src='/jdvop/script/dragsort-0.5.1.min.js'></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>模板配置</title>
+<script type="text/javascript">
+$(function(){
+    // 中间模块拖动排序
+    $('#dragsort').dragsort({
+        dragSelector: "div.js-dragsort",
+        dragEnd: function() { },
+        dragBetween: 'false',
+        dragSelectorExclude:'div.btn',
+        placeHolderTemplate: '<div class="a-dashed"></div>',
+        scrollSpeed: 5
+        
+    });
+    
+    $("#data-form").submit(function(e){
+        e.preventDefault();
+        $.post($(this).attr("action"), $(this).serialize(), function(data){
+            if(data.isOk){
+                top.artAlert("温馨提示", data.message, "/jdvop/admin/website/module.php?init=true", 'ok');
+            }else{
+                top.artAlert("温馨提示", data.message, 'error');
+            }
+        }, "json");
+        
+    });
+    
+    $(".js-block-delete").click(function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        top.artConfirm("操作提示", "删除模块需要保存后生效, 是否确认删除?", function(result){
+            if(result){
+                $.post(thiz.attr("href"), function(data){
+                    if(data.isOk){
+                        thiz.parents("div.js-dragsort").remove();
+                    }else{
+                        top.artAlert("温馨提示", data.message, 'error');
+                    }
+                }, "json");
+            }
+        });
+    });
+});
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">页面设计</span>
+</div>
+<div id="iframePage" style="min-width: 1366px;">
+    <form id="data-form" action="/jdvop/admin/website/module/save.php" method="post">
+        <div class="automatic-box clearfix">
+             <!--style="overflow: hidden;overflow-y: auto;"-->
+            <div class="web-layoutLeft fl">
+                <p class="title">网站模板配置</p>
+<!--                <dl>
+                    <dt class="mt10">网站色系</dt>
+                    <dd style="border: none;">
+                        <select name="colorTheme" class="common w200 h30">
+                            <option value="red" #if($colorTheme == 'red') selected #end>红色</option>
+                            <option value="green" #if($colorTheme == 'green') selected #end>绿色</option>
+                            <option value="orange" #if($colorTheme == 'orange') selected #end>橙色</option>
+                            <option value="blue" #if($colorTheme == 'blue') selected #end>蓝色</option>
+                            <option value="violet" #if($colorTheme == 'violet') selected #end>紫色</option>
+                        </select>
+                    </dd>
+                </dl>-->
+                <dl>
+                    <dt class="mt10">顶部</dt>
+                    #if($header)
+                        <dd>
+                            <div class="item">
+                                <input type="hidden" name="blockKeys[]" value="$!header.key"/>
+                                <p class="text">$!header.description</p>
+                                <div class="btn">
+                                   <a href="/jdvop/admin/website/module/header.php" class="ico edit">
+                                       <em>编辑</em>
+                                   </a>
+                                </div>
+                           </div> 
+                        </dd>
+                    #else
+                        <dd class="btn-add"><a href="/jdvop/admin/website/module/header.php">+添加模块</a></dd>
+                    #end
+                </dl>
+                <dl>
+                    <dt class="mt10">
+                        <div class="topTip-wrap fr">
+                              <em class="help-title js-topTip-title">模板列表可直接鼠标拖动排序</em>
+                              <i class="topTip js-topTip"></i>
+                        </div>
+                        中部
+                    </dt>
+                    #if($blockList)
+                    <dd  id="dragsort">
+                        #foreach($block in $blockList)
+                        <div class="item js-dragsort">
+                            <input type="hidden" name="blockKeys[]" value="$!block.key"/>
+                            <p class="text">$block.description</p>
+                             <div class="btn">
+                                <a href="/jdvop/admin/website/module/delete.php?type=block&key=$!block.key&index=$velocityCount" class="ico del js-block-delete">
+                                    <em>删除</em>
+                                </a>
+                             </div>
+                        </div> 
+                        #end
+                    </dd>
+                    #end
+                    <dd class="btn-add"><a href="/jdvop/admin/website/module/choose.php">+添加模块</a></dd>
+                </dl>
+                <dl>
+                    <dt class="mt10">
+                    底部
+                    </dt>
+                     #if($footer)
+                    <dd>
+                        <div class="item">
+                            <input type="hidden" name="blockKeys[]" value="$!footer.key"/>
+                            <p class="text">$!footer.description</p>
+                            <div class="btn">
+                               <a href="/jdvop/admin/website/module/footer.php" class="ico edit">
+                                   <em>编辑</em>
+                               </a>
+                            </div>
+                        </div> 
+                    </dd>
+                    #else
+                    <dd class="btn-add"><a href="/jdvop/admin/website/module/footer.php">+添加模块</a></dd>
+                    #end
+                </dl>
+            </div>
+            <div class="web-layoutRight fl">
+                #if($header)
+                <img src="$header.preview" />
+                #end
+                #if($blockList)
+                    #foreach($block in $blockList)
+                    <img src="$block.preview" />
+                    #end
+                #end
+                #if($footer)
+                <img src="$footer.preview" />
+                #end
+            </div>
+        </div>
+        <div class="layout-footer clearfix">
+            <div class="btn-wrap">
+                <button type="submit" class="btn-orange">确定</button>
+                <span class="btn-grey" onclick="javascript:window.history.go(-1);">取消</span>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

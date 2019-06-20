@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/date.js"></script>
+<script type="text/javascript">
+        function lotteryDel(beginTime,expireTime,url){
+            beginTime = beginTime.replace(/-/g,"/");
+            expireTime = expireTime.replace(/-/g,"/");
+            var beginD =new Date(beginTime.substring(0,19));
+            var expireD =new Date(expireTime.substring(0,19));
+            var sysD = new Date().getTime();
+             if(sysD < beginD || sysD>expireD){
+                top.artConfirm('警告', "删除后不可恢复，请保留相关数据。是否确认删除？", function(v){
+                    if (v) {
+                        $.post(url,"",function(data){
+                            if(data.isOk){
+                                location.reload();
+                                top.artAlert('温馨提示', "删除成功");
+                            }else{
+                                top.artAlert('温馨提示', data.message,'error');
+                            }
+                        },'json');
+                    }
+                });
+            }
+            if(beginD<sysD && sysD<expireD){
+                top.artAlert('温馨提示', "活动进行中无法删除。请先停止活动",  'error');
+                return;
+            }
+        };
+</script>   
+<title>抽奖列表</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.back(-1)" title="品牌管理"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">抽奖列表</span>
+</div>
+<div id="iframePage">
+    <div class="automatic-box clearfix">
+       <ul class="layout-activityGrid clearfix">
+            <li class="btn">
+                <a href="/jdvop/admin/lottery/addView.php" title="新增活动">
+                    <i class="add"></i>
+                    <span class="btn-greenMian">新增活动</span>
+                </a>
+            </li>
+                #if($lotterys.hasContent())
+                #foreach($lottery in $lotterys.getContent())
+                <li class="
+                        #if($lottery.beginTime.getTime() <= $dateTool.getSystemTime() && $lottery.expireTime.getTime() >= $dateTool.getSystemTime())
+                            curr
+                        #end">
+                    <P class="title overflow-h">
+                         $lottery.lotteryName
+                        <i class="tip">
+                            #if($lottery.beginTime.getTime() > $dateTool.getSystemTime())
+                                未开始
+                            #elseif($lottery.beginTime.getTime() <= $dateTool.getSystemTime() && $lottery.expireTime.getTime() >= $dateTool.getSystemTime())
+                                进行中
+                            #else
+                                已结束
+                            #end
+                        </i>
+                    </P>
+                    <p class="img #if($lottery.beginTime.getTime() > $dateTool.getSystemTime())end #elseif($lottery.beginTime.getTime() <= $dateTool.getSystemTime() && $lottery.expireTime.getTime() >= $dateTool.getSystemTime())start #else end #end">
+                        $lottery.lotteryName
+                    </p>
+                    <p class="time">
+                        <span><i>开始时间：</i>$!dateTool.format('yyyy-MM-dd HH:mm', $lottery.beginTime)</span>
+                        <span><i>结束时间：</i>$!dateTool.format('yyyy-MM-dd HH:mm', $lottery.expireTime)</span>
+                    </p>
+                    <div class="btn clearfix">
+                        <a href="/jdvop/admin/lottery/editView/${lottery.id}.php" title="编辑信息"><i class="ico-edit"></i>编辑信息</a>
+                        <!--<a href="javascript:;" title="活动统计"><i class="ico-act"></i>活动统计 </a>-->
+                        <a href="/jdvop/admin/lottery/winningList/${lottery.id}.php" title="中奖名单"><i class="ico-mingdan"></i>中奖名单 </a>
+                        <a href="javascript:;" class="j-delBox" title="删除"  
+                           onclick="lotteryDel('$lottery.beginTime','$lottery.expireTime','/jdvop/admin/lottery/delete/${lottery.id}.php')"
+                           ><i class="ico-del"></i>删除</a>
+                    </div>
+                </li>
+                 #end
+                 #end
+       </ul>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $lotterys.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+</body>
+</html>

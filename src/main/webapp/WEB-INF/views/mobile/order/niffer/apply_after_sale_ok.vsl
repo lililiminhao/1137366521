@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta content="telephone=no" name="format-detection"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+        <script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+        <title>申请售后</title>
+    </head>
+    <body class="pm56">
+        <header class="bar-nav">
+            <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+            <h1 class="title">申请售后成功</h1>
+            <!--<a class="btn btn-home fr"></a>-->
+        </header>
+        <div class="after-sale-state ok">
+            <i class="icon-ok mui-icon"></i>您的申请已提交,等待客服审核处理
+        </div>
+        <ul class="customer-service-list view">
+            <li class="webkitbox-h">
+                <p class="txt">申请服务：</p>
+                <div class="flex1">#if($nifferOrder.type=='niffer') 换货单 #elseif($nifferOrder.type=='returned') 退款单 #else $nifferOrder.type.name() #end</div>
+            </li>
+             <li class="webkitbox-h return-policy">
+                <p class="txt">申请原因：</p>
+                <p class="flex1" style="font-size: 13px;">$!esc.html($!nifferOrder.reason)</p>
+            </li>
+            <li class="webkitbox-h return-policy">
+                <p class="txt">问题描述：</p>
+                <p  class="flex1" style="font-size: 13px; ">#if($nifferOrder.remark && $nifferOrder.remark.length()>0)$esc.html($!nifferOrder.remark)#else无#end</p>
+            </li>
+            <li class="webkitbox-h">
+                <p class="txt">申请时间：</p>
+                <div class="flex1">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.applyTime)</div>
+            </li>
+            <li class=" last">
+                <div class="webkitbox-h submit-ok-btn">
+                    <p class="flex1"><a href="/jdvop/index.php"><span class="btn btn-orange">返回首页</span></a></p>
+                    <p class="flex1"><a href="/jdvop/my/mobile/orders.php"><span class="btn btn-orange">订单列表</span></a></p>
+                </div>
+            </li>
+        </ul>
+    </body>
+</html>

@@ -1,0 +1,26 @@
+<div class="user-sidebar">
+    <dl>
+        <dt>账户中心</dt>
+        <dd>
+            <ul>
+                <li><a href="/jdvop/my/profile.php">个人信息</a></li>
+                <li><a href="/jdvop/my/address.php">收货地址</a></li>
+                <li><a href="/jdvop/my/edit_password.php">修改密码</a></li>
+                <li><a href="/my/lottery/myAwards.php">我的奖品</a></li>
+            </ul>
+        </dd>
+        <dt>订单中心</dt>
+        <dd>
+            <ul>
+               <li><a href="/jdvop/my/orders.php">我的订单</a></li>
+               <li><a href="/jdvop/my/nifferOrders.php">换货订单</a></li>
+            </ul>
+        </dd>
+        <dt>积分中心</dt>
+        <dd>
+            <ul>
+                <li><a href="/jdvop/my/generate/integrals.php">我的积分</a></li>
+            </ul>
+        </dd>
+    </dl>
+</div>

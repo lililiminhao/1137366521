@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+</head>
+<body>
+ #parse('header.vsl')  
+<div class="user-personal">
+#include('user_center/sider_bar.vsl')
+<div class="user-content-wrap">
+    <h3 class="user-title">我的奖品</h3>
+    <div class="user-wrap-tab">
+        <table class="user-tab">
+            <colgroup>
+                <col style="width: 200px;">
+                <col style="width: 250px;">
+                <col style="width: 150px;">
+                <col style="width: 120px;">
+                <col style="width: 120px;">
+                <col style="width: 120px;">
+            </colgroup>
+            <tr>
+                <th>中奖时间</th>
+                <th>奖品名称</th>
+                <th>来源活动</th>
+                <th>领奖状态</th>
+                <th>发奖状态</th>
+                <th>操作</th>
+            </tr>
+                #if($myAwards.hasContent())
+                #foreach($award in $myAwards.content)
+                <tr>
+                    <td>$!dateTool.format('yyyy-MM-dd HH:mm:ss', $!award.createTime)</td>
+                    <td class="tl">
+                        <div class="w300p overflow-h">
+                        <img src='$!award.awardImage' width='45' height='45'/>$!award.awardName
+                        </div>
+                    </td>
+                    <td>$!award.lotteryName</td>
+                    <td>#if($!award.awardStatus =='no_receive')未领取#else已领取#end</td>
+                    <td>
+                        #if($!award.awardStatus =='no_receive')
+                        #elseif($!award.awardStatus =='no_sent')未发货
+                        #elseif($!award.awardStatus =='has_sent' || $!award.awardStatus =='enter_account')已发货
+                        #elseif($!award.awardStatus =='enter_order_process')
+                            #if($!orderStatus.get($!award.ext.get('orderId')) == 'waiting_confirmed' || 
+                                $!orderStatus.get($!award.ext.get('orderId')) == 'waiting_shipment' ||
+                                $!orderStatus.get($!award.ext.get('orderId')) == 'completed')已发货
+                            #else
+                                未发货
+                            #end
+                        #else
+                        #end
+                    </td>
+                    <td>
+                        #if($!award.awardStatus =='no_receive')
+                            <a href="/jdvop/activity/lottery/order.php?id=$!award.logId" class="blue js_delete_order">立即领奖</a>
+                        #end
+                    </td>
+                </tr>
+                #end
+                #else
+                <tr>
+                    <td colspan="7">暂无奖品信息!</td>
+                </tr>
+                #end
+            </table>
+            <div class="pages">$pg.pager($link, $myAwards.pagerSpec, 6, '_self')</div>
+        </div>
+    </div>
+</div>
+<!--内容框 end -->
+<!--footer-->
+#parse('footer.vsl')
+<!--footer  end-->
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>  
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>商品池关联产品</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav  borderGreen clearfix">
+    <a href="/marketingCenter/productPool/product/list.php?productPoolId=$productPoolId" ><p class="right fr btn-grey2">返回</p></a>
+    <span class="text">商品池关联产品</span>
+</div>
+<span style="display:none;"><input type="file" name="excelFile" class="excelFile" /></span>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr">全部产品</li>
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl">
+            <form id="dataForm" action="/jdvop/admin/enterprise/pool/productEntry/batchAdd.php">
+                <input type="hidden" name="poolId" value="$!productPool.id" />
+                <table>
+                    <tr>
+                        <!-- 产品类型 -->
+                        <td>
+                            <select name="type" class="common ml10 h26">
+                                <option value="">产品来源</option>
+                                #foreach($type in $ownerTypes)
+                                    #if("enterprise" != $type.name())
+                                        <option value = "$type.name()" #if($ownerType == $type.name()) selected #end>$type.description</option>
+                                    #end
+                                #end    
+                            </select>
+                        </td>
+                        <td>
+                            <select name="cate" class="common ml10 h26">
+                                <option value="0">请选择分类</option>
+                                #foreach($cate in $cates)
+                                    <option value = "$cate.id" #if($request.getParameter('cate') == $cate.id) selected #end>$cate.name</option>
+                                #end    
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="minPrice" filter-rule="isnumber" filter-except="." class="common ml10 w80 filter-input" placeholder="最低售价" value="$!request.getParameter('minPrice')"> - <input type="text" name="maxPrice" filter-rule="isnumber" filter-except="." class="common w80 filter-input" placeholder="最高售价" value="$!request.getParameter('maxPrice')">
+                        </td>
+                        <td>
+                            <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w160" placeholder="请出入关键字"/>
+                        </td>
+                        <td>
+                            <input class="btn-grey2 ml10" type="submit" value="搜索">
+                        </td>
+                    </tr>
+                </table>
+            </form>    
+        </div>
+    </div>
+    <div class="h34 bg_grey highlight_e4e4e4">
+        <div class="fl">
+            <label class="ml20 fl mr20"><input type="checkbox" id="check_all" class="mt10 mr4 fl">全选</label>
+            <!--<label class="ml20 fl mr20"><input type="checkbox" id="check_query_all" url="/marketingCenter/productPool/product/batchAndSelectAll/create.php" class="mt10 mr4 fl">选择全部</label>-->
+            <span class="btn-red h26 js-choose-clear" batch-action="delete">清空已选产品</span>
+            <span class="btn-orange h26 js-choose-post"  url="/marketingCenter/productPool/product/batch/create.php">确认关联</span>
+            <label class="ml20 fr mr20"><input type="checkbox" id="only_show_selected" url="/marketingCenter/productPool/product/choose.php" class="mt10 mr4 fl">仅显示已关联产品</label>
+        </div>
+    </div>
+    <div class="layout-grid highlight_e4e4e4 pb20 clearfix">
+        <ul class="clearfix js-content">
+            #if($products.hasContent())
+                #foreach($product in $products)
+                #set($storage = $product.productStorage)
+                #set($sku = $skuMap.get($product.id))
+                <li class="js-choose-entry" rel="$product.id">
+                    <p class="text"> <label>产品型号 $!product.productCode</label></p>
+                    <p class="img">
+                        #if($product.ownerType == "jingdong")
+                            <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                            <img src="/jdvop/images/jd-ico.png" class="jd-ico"/> 
+                        #elseif($product.ownerType == "system")
+                            <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>   
+                        #else
+                            <img src="$!configTool.getImageHost()$!product.thumbnailImage" width="160" height="160" alt="$!product.name"/>
+                        #end
+                    </p>
+                    <p class="text blue">$!esc.html($product.name)</p>
+                    #if($product.ownerType == "enterprise" || $product.ownerType == "provider")
+                        <p class="text"><i class="fl">销量：$!storage.soldedNum</i> <i class="fr">库存：$!storage.getUseableNum()</i> </p>
+                    #else
+                        <p class="text">所属品牌：$!product.brand.name</p>
+                    #end
+                    <p class="text ffa orange tc">销售价：$!numberTool.currency($product.retailPrice)</p>
+                    #if($product.ownerType == "jindong")
+                        <label class="jd-ico"></label>
+                    #elseif($product.ownerType == "system")
+                        <label class="ico_xt"></label>
+                    #elseif($product.ownerType == "provider")
+                        <label class="ico_gys"></label>
+                    #end
+                </li>
+                #end
+                #else
+                    <li class="tc fs16p" style="width:100%; height:50px; line-height:40px">
+                        暂无相关产品
+                    </li>
+                #end
+         </ul>    
+    </div>
+    <div class="layout-footer clearfix" id="pageCnt">
+        $adminPg.pager($link, $products.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    var PID_ARRAY = new Array();
+    //初始化PID_ARRAY
+    #if($productIds)
+    #foreach($pid in $productIds)
+    PID_ARRAY.push('$pid');
+    #end
+    #end
+    reflushSelected();
+    
+    $('#check_all').click(function(e){
+        if ($(this).is(':checked'))
+        {
+            $('ul.js-content input[type="checkbox"]').attr('checked', 'checked');
+        } else {
+            $('ul.js-content input[type="checkbox"]').removeAttr('checked');
+        }
+    });
+    
+    $("li.js-choose-entry").live("click", function(e){
+        e.preventDefault();
+        var pid = $(this).attr("rel");
+        if($(this).hasClass("highlight_orange")){
+            $(this).removeClass("highlight_orange");
+            $(this).children(".ico_selected").hide();
+            removeArrayData(pid);
+        }else{
+            $(this).addClass("highlight_orange");
+            $(this).children(".ico_selected").show();
+            addArrayData(pid);
+        }
+    });
+    
+    $("#check_all").click(function(e){
+        var thiz = $(this);
+        $("li.js-choose-entry").each(function(index, element){
+            var pid = $(element).attr("rel");
+            if(thiz.is(":checked")){
+                $(element).addClass("highlight_orange");
+                $(element).children(".ico_selected").show();
+                addArrayData(pid);
+            }else{
+                $(element).removeClass("highlight_orange");
+                $(element).children(".ico_selected").hide();
+                removeArrayData(pid);
+            }
+        });
+    });
+    
+    $("#only_show_selected").bind("click", function(e){
+        e.preventDefault();
+        if ($(this).is(':checked'))
+        {
+            $.post($("#dataForm").attr("action")+"?selected=true", $("#dataForm").serialize(), function(data){
+                    $("#only_show_selected").attr("checked", true);
+                   $("#check_all").attr("checked", true);
+                   $(".js-content").html(data['contentHtml']);
+                   $("#pageCnt").html(data['pageHtml']);
+                   reflushSelected();
+               
+           }, "json");
+        }else{
+            //$("#only_show_selected").removeAttr("checked");
+            $("#search-form").click();
+        }
+    });
+    
+    $("span.js-choose-post").bind("click", function(e){
+        e.preventDefault();
+        var message = "";
+        if($("#check_query_all").is(':checked')){
+            message = "您共选择了" + PID_ARRAY.length + "个和当前搜索的所有产品, 是否确认将所选产品关联到<font color='red'>$!productPool.poolName</font>";
+            var url = $("#check_query_all").attr("url");
+            top.artConfirm("温馨提示", message, function(result){
+                if(result){
+                    $.each(PID_ARRAY, function(index, item){
+                        if(index==0){
+                            url += "?pid[]=" + item;
+                        }else{
+                            url += "&pid[]=" + item;
+                        }
+                        
+                    });
+                    $.post(url, $("#dataForm").serialize(), function(data){
+                        if(data.isOk){
+                            top.artAlert("操作成功", "数据保存成功", "/marketingCenter/productPool/product/list.php?productPoolId=$productPoolId", 'ok');   
+                        }else{
+                            top.artAlert("温馨提示", data.message, 'error');  
+                        }
+                    }, "json");
+                }
+            });
+        }else{
+            debugger;
+            if(PID_ARRAY.length <= 0){
+                top.artAlert("温馨提示", "请选择需要关联的产品数据！", "error");
+                return false;
+            }
+            message = "您共选择了" + PID_ARRAY.length + "个产品, 是否确认将所选产品关联到<font color='red'>$!productPool.poolName</font>";
+            var url = $(this).attr("url");
+            top.artConfirm("温馨提示", message, function(result){
+                if(result){
+                    url +="?id="+$productPool.id
+//                    $.each(PID_ARRAY, function(index, item){
+//                        url += "&pid[]=" + item;
+//                    });
+                    $.post(url, {"pid[]":PID_ARRAY}, function(data){
+                        if(data.isOk){
+                            top.artAlert("操作成功", "数据保存成功", "/marketingCenter/productPool/product/list.php?productPoolId=$productPoolId", 'ok');   
+                        }else{
+                            top.artAlert("温馨提示", data.message, 'error');  
+                        }
+                    }, "json");
+                }
+            });
+        }
+    });
+    
+    $("span.js-choose-clear").bind("click", function(e){
+        e.preventDefault();
+        PID_ARRAY = new Array(); 
+        reflushSelected();
+    });
+    
+    function reflushSelected(){
+        $("li.js-choose-entry").each(function(index, element){
+            var productId = $(element).attr("rel");
+            if($.inArray(productId, PID_ARRAY) >= 0){
+                $(element).addClass("highlight_orange");
+                $(element).children(".ico_selected").show();
+            }else{
+                $(element).removeClass("highlight_orange");
+                $(element).children(".ico_selected").hide();
+            }
+        });
+    }
+    
+    function addArrayData(productId){
+        if(!isNaN(productId)){
+            if($.inArray(productId, PID_ARRAY) < 0){
+                PID_ARRAY.push(productId);
+            }
+        }
+    }
+    
+    function removeArrayData(productId){
+        if(!isNaN(productId)){
+            var index = $.inArray(productId, PID_ARRAY);
+            if(index >= 0){
+                PID_ARRAY.splice(index, 1);
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>

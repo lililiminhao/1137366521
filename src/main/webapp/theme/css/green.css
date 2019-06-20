@@ -1,0 +1,10 @@
+.bg-red60{background:#ff175e;}
+.nav { background:#2a9b7d;}
+.nav .item.curr{background: #258d72;}
+.nav .item:hover a{background: #258d72;}
+.nav-categorys .nav-category-title{background:#217d66;}
+.nav-categorys .product-categories{border:2px solid #2a9b7d;  border-right: none;  border-top: none; }
+.product-categories .cls-bot { background: #2a9b7d; }
+.main-banner .flex-control-nav .flex-active{background:#2a9b7d;}
+.product-categories li.curr .category-popup{border:2px solid #2a9b7d;}
+.product-categories ul li {border-right: 2px solid #2a9b7d;}

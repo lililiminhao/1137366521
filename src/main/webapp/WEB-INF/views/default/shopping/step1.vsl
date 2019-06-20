@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title></title>
+<!-- <title>$!esc.html($websiteTool.getWebsite().getName())</title> -->
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+</head>
+<body>
+ #parse('header.vsl')  
+    <!--内容框 str -->
+<div class="content-wrap-bd" style="margin-top: 10px;">
+    <div class="shopping-process-pic1"></div>
+    <form id="submitOrder" action="/jdvop/shoppingCart/chooseEntry.php" method="get">
+        <input type="hidden" name="returnUrl" value="/jdvop/shoppingCart/myCart.php"/>
+        <table class="table-list">
+            <colgroup>
+                <col style="width:60px;"/>
+                <col style="width:400px;"/>
+                <col style="width:100px;"/>
+                <col style="width:120px;"/>
+                <col style="width:100px;"/>
+                <col style="width:100px;"/>
+            </colgroup>
+            <tr id="cart_title">
+                <th><label class=""><input type="checkbox" id="select_all" checked="checked" class="mr10p">全选</label></th>
+                <th>商品名称</th>
+                <th>所需积分</th>
+                <th>数量</th>
+                <th>总积分</th>
+                <th>操作</th>
+            </tr>
+            <tr >
+                #if($cartEntrys && !$cartEntrys.isEmpty())
+                    ##购物车明细
+                    #initShoppingCart($cartEntrys)
+                #else
+                    <tr>
+                        <td colspan="6" style="text-align: center;" height="80px;">
+                            <i class="orange fwb">购物车中空空如也,赶紧去挑选吧!</i>
+                        </td>
+                    </tr>
+                #end
+        </table>
+        <p class="go-exchange tar" style="height: 80px; margin-top:20px; font-size: 0px;">
+            #if($spcart.totalAmount() <= 0)
+                <a class="but_clearing_grey" >立即购买</a>
+            #else
+                #if($currentUser)
+                    #if($currentUser.integral < $resultMap.get("TOTALPRICE"))
+                        <a class="but_clearing_grey js-exchange">立即购买</i>
+                    #else
+                        <a class="but_clearing js-exchange">立即购买</a>
+                    #end
+                #else
+                    <a class="but_clearing " title="立即购买">立即购买</a>
+                #end
+            #end
+            <a href="/jdvop/products.php" class="ico_Bgreen">继续购物</a>
+        </p>
+    </form>
+<!--    <div class="gift-title">推荐礼品</div>
+    <div class="gift-list1">
+        <ul class="clearfix">
+            #set($ids = $websiteTool.getAdvertisements('RECOMMEND_PRODUCTS'))
+            #set($recGifts = $productTool.findAsMap($ids))
+            #if($recGifts && !$recGifts.isEmpty())
+                #foreach($product in $recGifts)
+                #set($soldPrice = $!productTool.getProductSoldPrice($product))
+                <li class="w198">
+                    <p  class="por">
+                        <a href="/jdvop/product/${product.id}.php" target="_blank">
+                            #if($product.ownerType == "jingdong")
+                                <img src="http://img13.360buyimg.com/n2/$!product.thumbnailImage" width="160" height="160" alt="$!product.name"/>
+                                <img src="/jdvop/images/jd-ico.png" class="jd-ico"/>
+                            #else
+                                <img src="$configTool.getImageHost()/thumbnail$!product.thumbnailImage" width="160" height="160" alt="$!product.name"/>
+                            #end
+                        </a>
+                    </p>
+                    <p class="name overflow-h"><a href="/jdvop/product/${product.id}.php" target="_blank">$!product.name</a></p>
+                    <p class="integral">积 分：<i class="orange ffa">$!numberTool.format('#0',$soldPrice)</i></p>
+                </li>
+                #end
+            #else
+            <li class="tac fwb" style="width: 100%;">暂时还没有推荐礼品哦......</li>
+            #end
+        </ul>
+    </div>-->
+</div>
+<!--内容框 end -->
+##初始化购物车明细
+#macro(initShoppingCart $entryList)
+   #foreach($entry in $entryList)
+        ##该entry为产品
+        #set($product = $productTool.asProduct($entry.sourceEntryId))
+        #set($skuId = $productTool.getStorageUnits($!product.id).get(0).id)
+        #set($hasUseab = $productTool.hasUseableNum($product.id))
+        #set($isSelling = $product.getStatus() == "selling")
+        #set($soldPrice = $!productTool.getProductSoldPrice($product))
+        <tr #if($product.ownerType.name() != "jingdong" && $product.ownerType.name() != "system") #if(!$hasUseab || !$isSelling) class="no-click" #end #end>
+            <td>
+                #if($product.ownerType.name() == "jingdong" || $product.ownerType.name() == "system")
+                    <input type="checkbox" name="isSelected" checked="checked" class="select-item"/>
+                    <input type="hidden" name="isSelected[]"  value="true"/>
+                #else
+                    #if($hasUseab && $isSelling)
+                        <input type="checkbox" name="isSelected" checked="checked" class="select-item"/>
+                        <input type="hidden" name="isSelected[]"  value="true"/>
+                    #else
+                        <input type="hidden" name="isSelected[]"  value="false"/>
+                        #if(!$isSelling)
+                            已下架
+                        #else
+                            无货
+                        #end
+                    #end
+                #end
+                <input type="hidden" name="entry[]"  value="$skuId"/>
+                <input type="hidden" name="type[]"  value="sku"/>
+                <input type="hidden" name="sentry[]"  value="$product.id"/>
+                <input type="hidden" name="stype[]"  value="product"/>
+                <input type="hidden" name="amount[]"  value="$entry.amount"/>
+                <input type="hidden" name="productOwnerType[]"  value="$product.ownerType"/>
+                <input type="hidden" name="price"  value="$!soldPrice"/>
+            </td>
+            <td style="text-align: left; padding-left: 10PX;">
+               <a href="/jdvop/product/${product.id}.php"  title="$!product.name" target="_blank">
+                    #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                        <img src="$!product.thumbnailImage"  width="60" height="60" class="fl mr10p"/>
+                    #else
+                        <img src="$configTool.getImageHost()/thumbnail$!product.thumbnailImage"  width="60" height="60" class="fl mr10p"/>
+                    #end
+                   <p class="fl mt20p overflow-h" style="width: 350px">$!product.name</p>  
+               </a>
+            </td>
+            <td class="js-price">
+                #if($isSelling)
+                    $!numberTool.format("#0", $soldPrice)
+                #else
+                    已下架
+                #end
+            </td>
+            <td class="data_box">
+                <input type="hidden" name="entryParam" entry="$skuId" etype="sku" sentry="$!product.id" stype="product" price="$!soldPrice"/>
+                #if($product.ownerType.name() == "jingdong" || $product.ownerType.name() == "system")
+                    <span class="sub" style='margin-left:34px;'>-</span>
+                    <input type="text" value="$entry.amount" class="show" readonly="readonly"/>
+                    <span class="add" >+</span>
+                #else 
+                    <span #if($hasUseab) class="sub" #end style='margin-left:34px;'>-</span>
+                    <input type="text" value="$entry.amount" class="show" readonly="readonly"/>
+                    <span #if($hasUseab) class="add" #end >+</span>
+                #end
+            </td>
+            #set($allPrice = $entry.amount * $soldPrice)
+            <td class="entryPrice">
+                #if($isSelling)
+                    $!numberTool.format("#0",$math.ceil($allPrice))
+                #else
+                    已下架
+                #end
+            </td>
+            <td><div class="del-row cp">删除</div></td>
+        </tr>
+    #end    
+    <tr>
+       <td colspan="6" style="text-align: left;">
+           &nbsp;&nbsp;您一共购买了&nbsp;<i class="orange fwb" id="totalAmount">$resultMap.get("TOTALAMOUNT")</i>&nbsp;件商品,共需积分&nbsp;<i class="orange fwb" id="totalPrice">$!numberTool.format('#0',$resultMap.get("TOTALPRICE"))</i>&nbsp;分
+       </td>
+    </tr>
+#end
+<script type="text/javascript">
+    $(function(){
+        
+        $(document).on('click', '#select_all', function(e) {
+            var thiz = $(this);
+            if (thiz.is(':checked')) {  
+                $('input[name="isSelected"]').each(function(){
+                    $(this).attr('checked', 'checked');
+                    $(this).children("input[name='isSelected[]']").val('true');
+                    statistics();
+                });
+                thiz.attr('checked', 'checked');
+            } else {
+                $('input[name="isSelected"]').each(function(){
+                    $('input[name="isSelected"]').removeAttr('checked');
+                    $(this).children("input[name='isSelected[]']").val('false');
+                    statistics();
+                });
+                thiz.removeAttr('checked');
+            }
+        });
+        
+        //移除商品
+        $(document).on('click','.table-list .del-row',function(e){
+            e.preventDefault();
+            var thiz = $(this);
+            messageBox("question", "提示信息", "您确定要移除该商品吗", true, function(){
+                var _delProductBox = thiz.parent().parent();    //需要移除的商品
+                var dataBox     = _delProductBox.children('.data_box');
+                var opeAmount = dataBox.children('input.show').val();
+                var hiddenInput = dataBox.children('input[name="entryParam"]');
+                var param = {entry:hiddenInput.attr("entry"), sentry:hiddenInput.attr("sentry"), stype:hiddenInput.attr("stype"), opeAmount:-opeAmount};
+                $.post("/jdvop/shoppingCart/changeAmount.php", param, function(data){
+                    if(data.isOk){
+                        _delProductBox.remove();
+                        $('.mark').hide();
+                        $('.dialog-box').hide();
+                        $("#totalAmount").text(data.message['TOTALAMOUNT']);
+                        $("#totalPrice").text(data.message['TOTALPRICE']);
+                        if(parseInt(data.message['TOTALAMOUNT']) === 0){
+                            var _emptyBox   = '<tr>';
+                            _emptyBox  += '<td colspan="6" style="text-align: center;" height="80px;">';
+                            _emptyBox  += '<i class="orange fwb">购物车中空空如也,赶紧去挑选吧!</i>';
+                            _emptyBox  += '</td></tr>';
+                            $("#cart_title").after(_emptyBox);
+                            $(".js-exchange").removeClass().addClass("but_clearing_grey");
+                        }else{
+                            statistics();
+                        }
+                    }
+                }, "json");
+            });
+        }); 
+        
+        
+        //减少商品数量
+        $(document).on('click','.table-list .sub',function(e){
+            e.preventDefault();
+            
+            var thizAmount = $(this).siblings('input.show');    //当前前购买数量
+            var hiddenAmounts = $(this).parent("td").parent("tr").find("input[name='amount[]']");
+            
+            if (parseInt(thizAmount.val()) === 1 || hiddenAmounts === 1){
+                return false;
+            };
+            
+            var entryPrice = $(this).parent("td").siblings(".entryPrice");
+            var hiddenInput = $(this).siblings('input[name="entryParam"]');
+            
+            var param = {entry:hiddenInput.attr("entry"), sentry:hiddenInput.attr("sentry"), stype:hiddenInput.attr("stype"), opeAmount:-1};
+            $.post("/jdvop/shoppingCart/changeAmount.php", param, function(data){
+                if(data.isOk){
+                    thizAmount.val(parseInt(thizAmount.val()) - 1);
+                    hiddenAmounts.val(parseInt(hiddenAmounts.val()) - 1);
+                    entryPrice.text(Math.round((parseFloat(entryPrice.text()) - parseFloat(hiddenInput.attr("price"))).toFixed(2)));
+                    $("#totalAmount").text(data.message['TOTALAMOUNT']);
+                    $("#totalPrice").text(data.message['TOTALPRICE']);
+                    $("#shoppcart_amount_num").text(data.message['TOTALAMOUNT']);
+                    statistics();
+                }
+            }, "json");
+        });
+        
+        
+        //增加商品数量
+        $(document).on('click','.table-list .add',function(e){
+            e.preventDefault();
+            
+            var thizAmount = $(this).siblings('input.show');
+            var entryPrice = $(this).parent("td").siblings(".entryPrice");
+            var hiddenInput = $(this).siblings('input[name="entryParam"]');
+            var hiddenAmounts = $(this).parent("td").parent("tr").find("input[name='amount[]']");
+            
+            if (parseInt(thizAmount.val()) === 99 || hiddenAmounts === 99){
+                return false;
+            };
+            
+            var param = {entry:hiddenInput.attr("entry"), sentry:hiddenInput.attr("sentry"), stype:hiddenInput.attr("stype"), opeAmount:1};
+            $.post("/jdvop/shoppingCart/changeAmount.php", param, function(data){
+                if(data.isOk){
+                    thizAmount.val(parseInt(thizAmount.val()) + 1);
+                    hiddenAmounts.val(parseInt(hiddenAmounts.val()) + 1);
+                    entryPrice.text(Math.round((parseFloat(entryPrice.text()) + parseFloat(hiddenInput.attr("price"))).toFixed(2)));
+                    $("#totalAmount").text(data.message['TOTALAMOUNT']);
+                    $("#totalPrice").text(data.message['TOTALPRICE']);
+                    $("#shoppcart_amount_num").text(data.message['TOTALAMOUNT']);
+                    statistics();
+                }
+            }, "json");
+        });
+        
+        $(document).on('click', 'input[name="isSelected"]', function(){
+            if($(this).attr("checked") == "checked"){
+                $(this).siblings("input[name='isSelected[]']").val('true');
+            }else{
+                $(this).siblings("input[name='isSelected[]']").val('false');
+            }
+            statistics();
+        });
+        
+        $(document).on('click','.but_clearing', function(e){
+            e.preventDefault();
+            var selectedCount = $("input[type='checkbox'][name='isSelected']:checked").length;
+            if(selectedCount <= 0){
+                messageBox("warning", "提示信息", "请至少选择一件商品");
+                return false;
+            }
+            $("#submitOrder").submit();
+        });
+        
+        function statistics(){
+            var totalAmount = 0;
+            var totalPrice = 0;
+            $('input[name="isSelected"]:checked').each(function(){
+                var amount = parseInt($(this).parent("td").siblings().find("input.show").val());
+                var price = $(this).parent().siblings().eq(1).text();
+                totalAmount += amount;
+                totalPrice += parseInt(amount *  price);
+            });
+            $("#totalAmount").text(totalAmount);
+            $("#totalPrice").text(totalPrice);
+            
+            #if ($currentUser)
+                var integral =  parseInt($currentUser.integral);
+                var totalPrice = $("#totalPrice").html();
+                if(totalPrice > integral){
+                    $('.js-exchange').removeClass("but_clearing");
+                    $('.js-exchange').addClass("but_clearing_grey");
+                }else{
+                    $('.js-exchange').removeClass("but_clearing_grey");
+                    $('.js-exchange').addClass("but_clearing");
+                }
+            #end
+        }
+    });
+</script>
+<!--footer-->
+#parse('footer.vsl')   
+<!--footer  end-->
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>  
+</body>
+</html>

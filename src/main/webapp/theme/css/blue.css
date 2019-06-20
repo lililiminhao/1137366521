@@ -1,0 +1,10 @@
+.bg-red60{background:#ff175e;}
+.nav { background:#0171c5;}
+.nav .item.curr{background: #006ab8;}
+.nav .item:hover a{background: #006ab8;}
+.nav-categorys .nav-category-title{background:#005da3;}
+.nav-categorys .product-categories{border:2px solid #0171c5;  border-right: none;  border-top: none; }
+.product-categories .cls-bot { background: #0171c5; }
+.main-banner .flex-control-nav .flex-active{background:#0171c5;}
+.product-categories li.curr .category-popup{border:2px solid #0171c5;}
+.product-categories ul li {border-right: 2px solid #0171c5;}

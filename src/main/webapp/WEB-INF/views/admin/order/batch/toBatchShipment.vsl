@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/main.js'></script>
+<link rel="stylesheet" href="/jdvop/css/admin/ui-dialog.css"/>
+<script src="/jdvop/script/admin/dialog-min.js"></script>
+<script src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>批量发货</title>
+<script>
+    $(function(){
+        
+        $(document).on('click', 'a.js-upload', function(e){
+            e.preventDefault();
+            var url = $(this).attr('data-upload-url');
+            $('.excelFile').fileupload('option', 'url', url);
+            $('.excelFile').click();
+        });
+
+        $('.excelFile').fileupload({
+            dataType    : 'json',
+            autoUpload  : true,
+            sequentialUploads   : true,
+            start       : function(e) {
+                top.artProgress('数据加载中，请稍后...');
+            },
+            always      : function(e, data) {
+                top.artProgress('[close]');
+            },
+            done        : function(e, data) {
+                top.artProgress('[close]');
+                if (data.result.isOk) {
+                    top.artAlert('温馨提示', "成功发货" + data.result.message + "个订单", 'ok');
+                } else {
+                    top.artAlert('温馨提示', data.result.message, 'error');
+                }
+            },
+            fail    : function(e, data){
+                top.artProgress('[close]');
+                top.artAlert('温馨提示', '因为网络原因，上传失败!', 'error');
+            }
+        });
+    });
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav  borderGreen clearfix">
+    <span class="text">批量发货</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr">批量发货</li>
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix highlight_e4e4e4 pt30 pb30" style="border-top: none; ">
+        <p class="pl10 fs16p fwb">操作步骤</p>
+        <p class="pl10 fs16p pt16">
+           1.下载批量发货Excel模板
+           <a class="btn-blue2" title="下载文件" href="/jdvop/excel/ORDER_BATH_SHIPMENT_TEMPLATE.xls" target="_blank">下载Excel模板</a> 
+        </p>
+        <p class="pl10 fs16p pt16">
+            2.编辑好的表格上传回系统即可
+            <a class="btn-blue2 js-upload" data-upload-url="/jdvop/admin/order/toBatchShipment.php" title="选择文件">
+                上传Excel文件
+            </a>
+        </p>
+        <p class="pl10 fs16p pt16">
+            3.Excel文件上传成功后, 点击 <a href="/jdvop/admin/orders/deliveriedOrders.php" class="blue">已发货订单</a>
+            即可查看相应记录
+        </p>
+    </div>
+    <span style="display:none;"><input type="file" name="excelFile" class="excelFile" /></span>
+</div>
+</body>
+</html>

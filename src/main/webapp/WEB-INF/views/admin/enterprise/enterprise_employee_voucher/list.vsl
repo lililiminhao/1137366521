@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>提货券列表</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+    </p>
+    <span class="text">提货券列表</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr"><a href="#" title="提货券列表">提货券列表</a></li>
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/enterpriseEmployeeVoucher.php" method="get">
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="key" value="$!esc.html($request.getParameter('key'))" class="common ml10 w200" placeholder="提货券名称/员工姓名/员工手机号"/>
+                        </td>
+                        <td>
+                            <select name="enterpriseId"class="common ml10 w160" style="height:28px; width:160px">
+                                <option value="0">所属企业</option>
+                                #foreach($enterprise in $enterpriseList)
+                                    <option value="$enterprise.id" #if($enterprise.id == $enterpriseId) selected #end >$enterprise.name</option>
+                                #end
+                            </select>
+                        </td>
+                        <td>
+                            <select name="status"class="common ml10 w160" style="height:28px; width:160px">
+                                <option value="-100">提货券状态</option>
+                                <option value="0" #if($request.getParameter('status') == 0) selected #end >未使用</option>
+                                <option value="2" #if($request.getParameter('status') == 2) selected #end >已使用</option>
+                                <option value="-1" #if($request.getParameter('status') == -1) selected #end >未开始</option>
+                                <option value="1" #if($request.getParameter('status') == 1) selected #end >已过期</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="beginTime" value="$!esc.html($request.getParameter('beginTime'))" onfocus="WdatePicker({readOnly:true, skin:'blueFresh', dateFmt:'yyyy-MM-dd 00:00:00'});" class="common ml10 w160" placeholder="开始时间"/>
+                        </td>
+                        <td>
+                            -
+                        </td>
+                        <td>
+                            <input type="text" name="endTime" value="$!esc.html($request.getParameter('endTime'))" onfocus="WdatePicker({readOnly:true, skin:'blueFresh', dateFmt:'yyyy-MM-dd 00:00:00'});" class="common ml10 w160" placeholder="结束时间"/>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+            #if($shiro.isPermitted('voucher:import'))
+                <a href="/jdvop/admin/enterpriseEmployeeVoucher/batchInsert.php"><span class="btn-green2">导入提货券</span></a>
+            #end
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+            	<col  />
+                <col  />
+            	<col  />
+                <col  />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col  />
+                <col style="width:120px" />
+                <col/>
+            </colgroup>
+            <tr>
+                <th>提货券名称</th>
+                <th>所属企业</th>
+                <th>员工姓名</th>
+                <th>员工手机号</th>
+                <th>使用范围</th>
+                <th>提货券状态</th>
+                <th>有效时间</th>
+                <th>操作</th>
+            </tr>
+            #if($enterprisePackageVouchers.hasContent())
+                #foreach($enterprisePackageVoucher in $enterprisePackageVouchers)
+                <tr>
+                	<!-- 提货券名称  -->
+                    <td class="tc">$!esc.html($enterprisePackageVoucher.ticketName)</td>
+                    <!-- 所属企业  -->
+                    #set($enterpriseInfo = '')
+                    #set($enterpriseInfo = $enterpriseService.getOneById($!enterprisePackageVoucher.enterpriseId))
+                    <td class="tc">$!esc.html($!enterpriseInfo.name)</td>
+                    <!-- 员工姓名  -->
+                    <td class="tc">$!esc.html($enterprisePackageVoucher.employeeName)</td>
+                    <!-- 员工手机号  -->
+                    <td class="tc">$!esc.html($enterprisePackageVoucher.employeePhone)</td>
+                    <!-- 使用范围  -->
+                    <td class="tc">$!esc.html($enterprisePackageVoucher.packageName)</td>
+                    <!-- 提货券状态  -->
+                    <td class="tc">
+                    #if($enterprisePackageVoucher.status == -1)未开始 #end
+	                #if($enterprisePackageVoucher.status == 0)未使用 #end
+	                #if($enterprisePackageVoucher.status == 1)已过期 #end
+	                #if($enterprisePackageVoucher.status == 2)已使用 #end
+                    </td>
+                    <!-- 有效时间  -->
+                    <td class="tc">$simpleDateFormat2.format($enterprisePackageVoucher.beginTime) ~ $simpleDateFormat2.format($enterprisePackageVoucher.endTime)</td>
+                    
+                    <!-- 操作 -->
+                    <td class="tc js-option-parents">
+                    #if($enterprisePackageVoucher.status == -1||$enterprisePackageVoucher.status == 0)
+                            <div class="drop-down js-dropDown">
+                                <span class="ico"></span>
+                                <p class="s-inp">操作</p>
+                            </div>
+                    #else
+                          ## 无法操作      	
+                    #end
+                        #if($enterprisePackageVoucher.status == -1||$enterprisePackageVoucher.status == 0)
+	                        <dl class="s-option js-sOption">
+                                #if($shiro.isPermitted('voucher:delete'))
+                                    <dd><a href = "/jdvop/admin/enterpriseEmployeeVoucher/delete.php?id=$!enterprisePackageVoucher.id"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要删除该提货券吗?一旦删除将无法恢复!">删除</a></dd>
+                                #end
+                            </dl>
+                        #end
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关内容
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $enterprisePackageVouchers.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+
+</script>
+
+</body>
+</html>

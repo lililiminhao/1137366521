@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/common.js"></script>	
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>购物车</title>
+</head>
+<body class="pm56" style="background: #fff;">
+    <div class="shopcart-list">
+        #if($cartEntrys && $cartEntrys.size() > 0)
+        <form id="entry_form" action="/jdvop/shoppingCart/chooseEntry.php" method="get">
+        	<!-- input type="hidden" name="fstr" /-->
+            <ul class="js-list">
+                #foreach($entry in $cartEntrys)
+                #if($entry.sourceEntryType == 'product')
+                #set($product = $productTool.asProduct($entry.sourceEntryId))
+                #set($skuId = $productTool.getStorageUnits($product.id).get(0).id)
+                #set($soldPrice = $!productTool.asProductByExclusiveProductPool($product.id, $!userTool.getUserId()).retailPrice)
+                #set($hasUseable = $productTool.hasUseableNum($product.id))
+                <li class="clearfix" id="li_$foreach.count">
+                    #if($product.status == "selling")
+                    #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                    <input type="hidden" name="isSelected[]" value="true"/>
+                    #else
+                    #if($hasUseable)
+                    <input type="hidden" name="isSelected[]" value="true"/> 
+                    #else
+                    <input type="hidden" name="isSelected[]" value="false"/>
+                    #end
+                    #end
+                    #else
+                    <input type="hidden" name="isSelected[]" value="false"/>
+                    #end
+                    <input type="hidden" name="entry[]"  value="$skuId"/>
+                    <input type="hidden" name="type[]"  value="sku"/>
+                    <input type="hidden" name="sentry[]"  value="$!product.id"/>
+                    <input type="hidden" name="stype[]"  value="product"/>
+                    <input type="hidden" name="stype[]"  value="product"/>
+                    <input type="hidden" name="fenxiaoUserId[]"  value="$!entry.fenxiaoUserId"/>
+
+                    <input type="hidden" name="productOwnerType[]" value="$product.ownerType"/>
+                    #if($product.status == "selling")
+                        #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                            <p class="checked js-checked curr"></p>
+                        #else
+                            #if($hasUseable)
+                                <p class="checked js-checked curr"></p>
+                            #else
+                                <p class="checked js-checked"></p>
+                            #end
+                        #end
+                    #end
+                    <p class="img">
+                        #if($product.status == "selling")
+                        <a href="/jdvop/product/${product.id}.php">
+                            #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                            <img src="$!product.thumbnailImage" width="80" height="80"/>
+                            #else
+                            <img src="$configTool.getImageHost()/middle$!product.thumbnailImage" width="80" height="80"/>
+                            #end
+                        </a>
+                        #else
+                        #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                        <img src="$!product.thumbnailImage" width="80" height="80"/>
+                        #else
+                        <img src="$configTool.getImageHost()/middle$!product.thumbnailImage" width="80" height="80"/>
+                        #end
+                        #end
+                    </p>
+                    <div class="text">
+                        <span class="name">$!product.name</span>
+                        <em class="price"><i class="red">&yen;$!numberTool.format('#0.00', $soldPrice)</i> </em> <br>
+                        <input type="hidden" name="entryParam" entry="$!skuId" etype="sku" sentry="$!product.id" stype="product" price="$soldPrice" />
+                        #if($product.status == "selling")
+                        #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                        <div class="sku-num">
+                            <span class="minus js-reduce #if($entry.amount == 1) disabled #end" rev="li_$foreach.count"></span>
+                            <input class="num js-fm-txt" name="amount[]" type="number" disabled="disabled" value="$!entry.amount"/> 
+                            <span class="plus js-add" rev="li_$foreach.count" max="99"></span>
+                        </div>
+                        #else
+                        #if($hasUseable)
+                            <div class="sku-num">
+                                <span class="minus js-reduce #if($entry.amount == 1) disabled #end" rev="li_$foreach.count"></span>
+                                <input class="num js-fm-txt" name="amount[]" type="number" disabled="disabled" value="$!entry.amount"/> 
+                                <span class="plus js-add" rev="li_$foreach.count" max="99"></span>
+                            </div>
+                        #{else}
+							<input class="js-fm-txt" name="amount[]" type="hidden" value="$!entry.amount"/>
+                            <i class="red">无货</i>
+                        #{end}
+                        #end
+                        #else
+                            <input class="js-fm-txt" name="amount[]" type="hidden" value="$!entry.amount"/> 
+                            <i class="red">已下架</i>
+                        #end
+                    </div>
+                    <p class="btn-del2 mui-icon js-del"></p>
+                </li>
+                #end
+                #end
+            </ul>
+        </form>
+        #else
+        <div class="shopcart-none"> 
+            <i class="icon"></i>
+            <p class="title" style="padding-bottom: 6%;">您的购物车内还没有商品！</p>
+            <div class="mod-btns webkitbox-h">
+                <p class="flex1"><a href="/jdvop/mobile/products.php" class="mod-btn">立即逛逛</a></p>
+                #if($currentUser)
+                <p class="flex1"><a href="/jdvop/my/mobile/userCenter.php" class="mod-btn">个人中心</a></p>
+                #else
+                <p class="flex1"><a href="/jdvop/login.php?retUrl=/shoppingCart/myCart.php" class="mod-btn red">登录</a></p>
+                #end
+            </div>
+        </div>
+        #end
+    </div>
+    <section class="fixed-column webkitbox-h" #if(!$cartEntrys || $cartEntrys.size() == 0) style="display: none;" #{end}>
+        <p class="flex2 but-collection tl js-show-total">
+            <input id="hiddenTotalPrice" value="$!numberTool.format('#0.00', $resultMap.get('TOTALPRICE'))" type="hidden"/>
+            <i class="checked-all js-checked-all curr"></i>
+            <span class="all-jf">合计：¥<i class="js-total-price">$!numberTool.format('#0.00', $resultMap.get("TOTALPRICE"))</i> </span>
+        </p>
+        #if($resultMap.get("TOTALAMOUNT") > 0)
+        <p class="but-orange flex1">
+            <input id="hiddenTotalAmount" value="$!resultMap.get('TOTALAMOUNT')" type="hidden"/>
+            <a href="" class="ico-shopping cart-buy-now">去结算（<i class="js-total-amount">$!resultMap.get("TOTALAMOUNT")</i>）</a>
+        </p>
+        #{else}
+        <p class="flex1 but-grey">
+            <a href="#" class="ico-shopping">去结算（<i class="js-total-amount">$!resultMap.get("TOTALAMOUNT")</i>）</a>
+        </p>
+        #{end}
+    </section>
+    <script type="text/javascript">
+        $(function () {
+            $('li p.js-checked.curr').each(function () {
+                $(this).parent('li').find("input[name='isSelected[]']").val('true');
+                calculateAmount();
+            });
+            //全选
+            $(".js-show-total").on('click', '.js-checked-all', function (e) {
+                e.preventDefault();
+                var thiz = $(this);
+                if (thiz.hasClass('curr')) {
+                    thiz.removeClass('curr');
+                    $('.js-checked').each(function () {
+                        $(this).removeClass('curr');
+                    });
+                    $('input[name="isSelected[]"]').val("false");
+                    $(".js-total-amount").text('0');
+                    $(".js-total-price").text('0.00');
+                } else {
+                    thiz.addClass('curr');
+                    $('.js-checked').each(function () {
+                        $(this).addClass('curr');
+                    });
+                    $('input[name="isSelected[]"]').val("true");
+                    $(".js-total-amount").text($('#hiddenTotalAmount').val());
+                    $(".js-total-price").text($('#hiddenTotalPrice').val());
+                }
+            });
+            //产品单选
+            var product_count;
+            var calculationType;
+            $(document).on('touchstart', '.js-checked', function (e) {
+                e.preventDefault();
+                var thiz = $(this);
+                product_count = $(this).parents('li');
+                if (thiz.hasClass('curr')) {
+                    thiz.removeClass('curr');
+                    $('.js-checked-all').removeClass('curr');
+                    thiz.parents('li').find('input[name="isSelected[]"]').attr('value', 'false');
+                    calculationType = "reduce";
+                    calculation();
+                } else {
+                    thiz.addClass('curr');
+                    thiz.parents('li').find('input[name="isSelected[]"]').attr('value', 'true');
+                    if ($('.js-checked.curr').length === $('.js-checked').length) {
+                        $('.js-checked-all').addClass('curr');
+                    }
+                    calculationType = "add";
+                    calculation();
+                }
+            });
+            function calculation() {
+                var amount = product_count.find('input[name="amount[]"]').val();
+                var price = product_count.find('input[name="entryParam"]').attr('price');
+                var entryPrice = Number(price * amount);
+                var totalAmount = $(".js-total-amount").text();
+                var totalPrice = Number($(".js-total-price").text());
+                if (calculationType === 'add') {
+                    totalPrice = Number(totalPrice + entryPrice);
+                    totalAmount = parseInt(totalAmount) + parseInt(amount);
+                } else {
+                    totalPrice = Number(totalPrice - entryPrice);
+                    totalAmount = parseInt(totalAmount - amount);
+                }
+                $(".js-total-amount").text(totalAmount);
+                $(".js-total-price").text(totalPrice);
+                $(".js-total-price").text(number_format(totalPrice,2,'.',''));
+            }
+            function calculateAmount() {
+                var totalAmount = 0;
+                var totalPrice = 0;
+                $('ul.js-list li input[name="isSelected[]"]').each(function () {
+                    if ($(this).attr('value') == 'true') {
+                        var price = $(this).parents('li').find('input[name="entryParam"]').attr('price');
+                        var amount = $(this).parents('li').find('input[name="amount[]"]').val();
+                        amount = amount == '' ? 0 : amount;
+                        totalAmount += Number(amount);
+                        totalPrice += Number(price) * Number(amount);
+                    }
+                });
+                $(".js-total-amount").text(totalAmount);
+                $(".js-total-price").text(number_format(totalPrice,2,'.',''));
+            }
+
+
+            //增加数量
+            $('.js-add').on('touchstart', function () {
+                var obj = $(this);
+                if (!obj.hasClass("disabled") && !obj.hasClass("curr")) {
+                    obj.addClass("curr");
+                    var txtVal = $(this).siblings('.js-fm-txt');
+                    var amount = parseInt(txtVal.val()) + 1;
+                    txtVal.val(amount);
+                    //判断输入的值 跟最大可输入的值 做比较  如果等于最大值的时候 不允许在增加
+                    var maxNum = parseInt($(this).attr('max'));
+                    var thizAmount = $(this).siblings('input[name="amount[]"]');
+                    if(parseInt(thizAmount.val()) === maxNum) {
+                        $(this).addClass('disabled');
+                        return false;
+                    }
+
+                    if (amount >= 1) {
+                        $(this).parent().find(".js-reduce").removeClass('disabled');
+                    }
+                    product_count = $(this).attr('rev');
+                    var hiddenInput = $('#' + product_count).find('input[name="entryParam"]');
+                    var param = {entry: hiddenInput.attr("entry"), etype: hiddenInput.attr("etype"), sentry: hiddenInput.attr("sentry"), stype: hiddenInput.attr("stype"), opeAmount: 1};
+                    $.post("/jdvop/shoppingCart/changeAmount.php", param, function (result) {
+                        var data = eval('(' + result + ')');
+                        if (data.isOk) {
+                            var hasCurr = $('#' + product_count).find('.js-checked').hasClass('curr');
+                            if (hasCurr && $('.js-checked-all').hasClass('curr')) {
+                                $(".js-total-amount").text(data.message['TOTALAMOUNT']);
+                                $(".js-total-price").text(data.message['TOTALPRICE']);
+                            } else if (hasCurr) {
+                                var totalAmount = $(".js-total-amount").text();
+                                var totalPrice = $(".js-total-price").text();
+                                $(".js-total-amount").text(parseInt(totalAmount) + 1);
+                                $(".js-total-price").text((parseFloat(totalPrice) + parseFloat(hiddenInput.attr("price"))).toFixed(2));
+                            }
+                            $("#hiddenTotalAmount").val(data.message['TOTALAMOUNT']);
+                            $("#hiddenTotalPrice").val(data.message['TOTALPRICE']);
+                            obj.removeClass("curr");
+                        }
+                    }, 'application/json');
+                }
+            });
+            //减少数量
+            $('.js-reduce').on('touchstart', function () {
+                var obj = $(this);
+                if (!obj.hasClass("disabled") && !obj.hasClass("curr")) {
+                    obj.addClass("curr");
+                    var txtVal = $(this).siblings('.js-fm-txt');
+                    var amount = parseInt(txtVal.val());
+                    //减少的时候  如果数量小于 最大可输入的数量 就移除样式
+                    var $add = $(this).parent().find("span.js-add");
+                    $add.removeClass("disabled");
+                    $add.removeClass("curr");
+
+                    if (parseInt(txtVal.val()) === 1) {
+                        return false;
+                    }
+                    txtVal.val(amount - 1);
+                    if (parseInt(txtVal.val()) === 1) {
+                        $(this).addClass('disabled');
+                    }
+                    product_count = $(this).attr('rev');
+                    var hiddenInput = $('#' + product_count).find('input[name="entryParam"]');
+                    var param = {entry: hiddenInput.attr("entry"), etype: hiddenInput.attr("etype"), sentry: hiddenInput.attr("sentry"), stype: hiddenInput.attr("stype"), opeAmount: -1};
+                    $.post("/jdvop/shoppingCart/changeAmount.php", param, function (result) {
+                        var data = eval('(' + result + ')');
+                        if (data.isOk) {
+                            var hasCurr = $('#' + product_count).find('.js-checked').hasClass('curr');
+                            if (hasCurr && $('.js-checked-all').hasClass('curr')) {
+                                $(".js-total-amount").text(data.message['TOTALAMOUNT']);
+                                $(".js-total-price").text(data.message['TOTALPRICE']);
+                            } else if (hasCurr) {
+                                var totalAmount = $(".js-total-amount").text();
+                                var totalPrice = $(".js-total-price").text();
+                                $(".js-total-amount").text(parseInt(totalAmount) - 1);
+                                $(".js-total-price").text(parseInt(totalPrice) - parseInt(hiddenInput.attr('price')));
+                            }
+                            $("#hiddenTotalAmount").val(data.message['TOTALAMOUNT']);
+                            $("#hiddenTotalPrice").val(data.message['TOTALPRICE']);
+                            obj.removeClass("curr");
+                        }
+                    }, 'application/json');
+                }
+            });
+
+            $(document).on('click', '.cart-buy-now', function (e) {
+                e.preventDefault();
+                var checked = $(".js-checked").hasClass('curr');
+                if (!checked) {
+                    mui.alert('请选择您想要购买的产品！', '温馨提示');
+                    return false;
+                }
+                $('input[name="amount[]"]').removeAttr('disabled');
+                //var fstr = [];
+                //$('.js-list li').each(function(index,ele){
+                //	var select = $(this).find('input[name="isSelected[]"]').val();
+                //	if(select == 'true'){
+                //		var pid = $(this).find('input[name="sentry[]"]').val();
+                //		var fid = $(this).attr('fid');
+                //		var amount = $(this).find('input[name="amount[]"]').val();
+                //		fstr.push(pid+'_'+fid+'_'+amount);
+                //	}
+                //});
+                //$('input[name="fstr"]').val(fstr.join(','));
+                $("#entry_form").submit();
+            });
+
+            //删除产品
+            $(document).on('click', '.js-del', function (e) {
+                e.preventDefault();
+                var del_data_box = $(this).parents();
+                mui.confirm('确定要删除该产品吗？', '温馨提示', function (v) {
+                    if (v.index === 1) {
+                        var opeAmount = del_data_box.find('input.js-fm-txt').val();
+                        var hiddenInput = del_data_box.find('input[name="entryParam"]');
+                        var param = {entry: hiddenInput.attr("entry"), etype: hiddenInput.attr("etype"), sentry: hiddenInput.attr("sentry"), stype: hiddenInput.attr("stype"), opeAmount: -opeAmount};
+                        $.post("/jdvop/shoppingCart/changeAmount.php", param, function (result) {
+                            var data = eval('(' + result + ')');
+                            if (data.isOk) {
+                                location = decodeURIComponent("/jdvop/shoppingCart/myCart.php");
+                            }
+                        }, 'application/json');
+                    }
+                    ;
+                });
+            });
+        });
+        function modifyWare(count) {
+            var amount = $('#li_' + count).find('.js-fm-txt');
+            var hiddenInput = $('#li_' + count).find('input[name="entryParam"]');
+            var hiddenAmounts = parseInt($('#li_' + count).find("input[name='amount[]']").val());
+            var opeAmount = parseInt(amount.val()) - hiddenAmounts;
+            var param = {entry: hiddenInput.attr("entry"), etype: hiddenInput.attr("etype"), sentry: hiddenInput.attr("sentry"), stype: hiddenInput.attr("stype"), opeAmount: opeAmount};
+            $.post("/jdvop/shoppingCart/changeAmount.php", param, function (result) {
+                var data = eval('(' + result + ')');
+                if (data.isOk) {
+                    var hasCurr = $('#li_' + count).find('.js-checked').hasClass('curr');
+                    if (hasCurr && $('.js-checked-all').hasClass('curr')) {
+                        $(".js-total-amount").text(data.message['TOTALAMOUNT']);
+                        $(".js-total-price").text(data.message['TOTALPRICE']);
+                    } else if (hasCurr) {
+                        var totalAmount = parseInt($(".js-total-amount").text());
+                        var totalPrice = $(".js-total-price").text();
+                        $(".js-total-amount").text((totalAmount - hiddenAmounts) + amount);
+                        $(".js-total-price").text(parseInt(totalPrice) - parseInt(hiddenInput.attr('price')) * parseInt(hiddenAmounts) + parseInt(hiddenInput.attr('price') * parseInt(amount)));
+                    }
+                    $('#li_' + count).find('.js-fm-txt').attr("value", amount);
+                    $("#hiddenTotalAmount").val(data.message['TOTALAMOUNT']);
+                    $("#hiddenTotalPrice").val(data.message['TOTALPRICE']);
+                }
+            }, 'application/json');
+        }
+    </script>
+</body>
+</html>

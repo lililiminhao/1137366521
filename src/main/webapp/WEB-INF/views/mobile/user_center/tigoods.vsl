@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>我的提货券</title>
+    <link rel="stylesheet" href="/jdvop/css/admin/public.css">
+    <link rel="stylesheet" href="/jdvop/css/mobile/vant/index.css">
+    <link rel="stylesheet" href="/jdvop/css/mobile/tihuo.css">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?a4bdf75b6de63051044e71201e9ab697";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <h3>我的提货券<span @click="showDetail=!showDetail">说明</span></h3>
+        <ul v-if="list">
+            <li :class="{active:item.status==0,used:item.status==2,'over_time':item.status==1}" v-for="item in list" :key="item.id" v-if="item.status!=-1">
+                <div class="img_wrapper">
+                	
+                </div>
+                <div class="info">
+                    <p class="name">{{item.ticketName}}</p>
+                    <p class="time">{{item.beginTime}}~{{item.endTime}}</p>
+                    <a :href="'/jdvop/mobile/products.php?wpt='+(item.wpt||'')+'&eppId='+(item.productPoolId||'')" v-show="item.status==0">去使用</a>
+                </div>
+            </li>
+        </ul>
+        <div class="empty">
+            <img src="/jdvop/images/mobile/icon_wushuju@3x.png" alt="">
+            <p>暂无相关数据</p>
+        </div>
+        <transition name="slide">
+            <div class="description" v-show="showDetail">
+                <h3><i class="van-icon van-icon-arrow-left" @click="showDetail=false"></i>提货券说明</h3>
+                <div class="van-hairline--top-bottom van-collapse">
+                    <div class="van-collapse-item" v-for="item in tiplist" :class="{expand:item.expand}">
+                        <div class="van-cell van-cell--clickable van-hairline van-collapse-item__title" @click="toggle(item)">
+                            <div class="van-cell__title"><span>{{item.name}}</span></div>
+                            <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                        </div>
+
+                        <div class="van-collapse-item__wrapper" v-show="item.expand">
+                            <div class="van-collapse-item__content" v-html="item.content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </div>
+    <script src="/jdvop/script/jquery-1.8.3.min.js"></script>
+    <script src="/jdvop/script/mobile/vue.js"></script>
+    <script src="/jdvop/script/mobile/vant.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: function () {
+                return {
+                    showDetail: false,
+                    activeNames: ['1'],
+                    list:null,
+                    tiplist: [
+                        {
+                            name: '获取方式',
+                            content: '通过购买预付卡获取，企业团购请联系0571-87837950。',
+                            expand: false
+                        },
+                        {
+                            name: '兑换方式',
+                            expand: false,
+                            content: '1、如何查询：进入‘个人中心-我的提货券’；<br />2、如何使用：进入‘首页-企业专区’，选择具体礼包即可直接使用。'
+                        },
+                        {
+                            name: '使用规则',
+                            expand: false,
+                            content: '1、后买预付卡后，提货券自动发送至账户，无需手动绑定；<br />2、提货券不能转让、不能体现，只能在当前绑定账户使用；<br />3、提货券只能在有效期内使用，逾期自动失效'
+                        }
+                    ]
+                }
+            },
+            methods: {
+                toggle(item) {
+                    item.expand = !item.expand;
+                },
+                getList:function(){
+                	var _self = this;
+                	$.ajax({
+                		url:'/jdvop/my/mobile/listVouchers.php',
+                		dataType:'json',
+                		success:function(res){
+                			if(res.code == 1){
+                				_self.list = res.data;
+                			}
+                		}
+                	})
+                }
+            },
+            mounted:function(){
+            	this.getList();
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolbox>
+    <tool>
+        <key>esc</key>
+        <scope>application</scope>
+        <class>org.apache.velocity.tools.generic.EscapeTool</class>
+    </tool>
+    <tool>
+        <key>math</key>
+        <scope>application</scope>
+        <class>org.apache.velocity.tools.generic.MathTool</class>
+    </tool>
+    <tool>
+        <key>date</key>
+        <scope>application</scope>
+        <class>org.apache.velocity.tools.generic.DateTool</class>
+    </tool>
+    <tool>
+        <key>shiro</key>
+        <scope>application</scope>
+        <class>com.lmf.integral.admin.velocity.ShiroTool</class>
+    </tool>
+
+    <tool>
+        <key>websiteTool</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.WebsiteTool</class>
+    </tool>
+
+    <tool>
+        <key>productTool</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.ProductTool</class>
+    </tool>
+    <tool>
+        <key>productCateTool</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.ProductCateTool</class>
+    </tool>
+    <tool>
+        <key>configTool</key>
+        <scope>application</scope>
+        <class>com.lmf.integral.velocity.ConfigTool</class>
+    </tool>
+    <tool>
+        <key>logTool</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.VisitLogTool</class>
+    </tool>
+    <tool>
+        <key>pg</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.PagerTool</class>
+    </tool>
+    
+    <tool>
+        <key>adminPg</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.admin.velocity.PagerTool</class>
+    </tool>
+    
+     <tool>
+        <key>stringFormat</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.admin.velocity.StringFormatTool</class>
+    </tool>
+    
+    <tool>
+        <key>spcart</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.ShoppingCartTool</class>
+    </tool>
+    
+    <tool>
+        <key>userTool</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.UserDetailTool</class>
+    </tool>
+    <tool>
+        <key>frontRenderTool</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.VelocityThemeWXRenderTool</class>
+    </tool>
+    <tool>
+        <key>backRenderTool</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.admin.velocity.VelocityThemeWXRenderTool</class>
+    </tool>
+    
+    <tool>
+        <key>v2RenderTool</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.VelocityThemeV2RenderTool</class>
+    </tool>
+    
+    <tool>
+        <key>websiteProductTagTool</key>
+        <scope>request</scope>
+        <class>com.lmf.integral.velocity.WebsiteProductTagTool</class>
+    </tool>
+    
+</toolbox>

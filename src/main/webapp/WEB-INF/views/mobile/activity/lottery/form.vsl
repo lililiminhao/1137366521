@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>
+<title>幸运抽奖</title>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+</head>
+<body class="pm56 activityBg">
+<header class="bar-nav">
+    <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+    <h1 class="title">幸运抽奖</h1>
+</header>
+<div class="activity-top">
+    <img src="/jdvop/images/mobile/act-bg1.jpg" class="bg"/>
+    <!--<img src="/jdvop/images/mobile/img-top.png" class="img2" alt="这个广告位配置图片大小485*200，没配置就默认这个图片">-->
+    <img src="#if($lottery.mobilePublicityImage=='')/jdvop/images/mobile/img-top.png#else$lottery.mobilePublicityImage#end" class="img2" alt="配置图片大小为485*200" width="485" height="200"/>
+</div>
+<div class="marquee-box" id="gameContent">
+    <div id="shade_box"></div>
+    <table id="gameTable">
+         ##遍历第一行的盒子
+        <tr>
+            #foreach($i in [1..3])
+                #set($has = false)
+                #foreach($award in $lottery.getAwards())
+                    #if($award.boxIndex == $i)
+                        #set($has = true)
+                        <td rel='$i'>
+                            <div class="img_bg">
+                            <img src="$award.image" alt='积分图片'  width="48" height="48"/><p class="name">$award.name</p>
+                            </div>
+                        </td>
+                    #end
+                #end
+                #if($has == false)
+                    <td rel='$i'>
+                        <p class="default-text">谢谢参与</p>
+                    </td>
+                #end
+            #end
+        </tr>
+        <tr>
+            ##遍历第二行的第一个盒子
+            #set($has = false)
+            #foreach($award in $lottery.getAwards())
+                #if($award.boxIndex == 8)
+                    #set($has = true)
+                    <td rel='8'>
+                        <div class="img_bg">
+                        <img src="$award.image" alt='' width="48" height="48"/><p class="name">$award.name</p>                 
+                        </div>
+                    </td>
+                    #break
+                #end
+            #end
+            #if($has == false)
+                <td rel='8'>
+                    <p class="default-text">谢谢参与</p>
+                </td>
+            #end
+            <td></td>
+            ##遍历第二行的第三个盒子
+            #set($has = false)
+            #foreach($award in $lottery.getAwards())
+                #if($award.boxIndex == 4)
+                    #set($has = true)
+                    <td rel='4'>
+                        <div class="img_bg">
+                        <img src="$award.image" alt='' class="jifen"   width="48" height="48"/><p class="name">$award.name</p>
+                        </div>
+                    </td>
+                    #break
+                #end
+            #end
+            #if($has == false)
+                <td rel='4'>
+                    <p class="default-text">谢谢参与</p>
+                </td>
+            #end
+        </tr>
+        <tr>
+            ##遍历第三行的盒子
+            #foreach($i in [7..5])
+                #set($has = false)
+                #foreach($award in $lottery.getAwards())
+                    #if($award.boxIndex == $i)
+                        #set($has = true)
+                        <td rel='$i'>
+                            <div class="img_bg">
+                                <img src="$award.image" alt='' width="48" height="48"/><p class="name">$award.name</p>
+                            </div>
+                        </td>
+                    #end
+                #end
+                #if($has == false)
+                    <td rel='$i'>
+                        <p class="default-text">谢谢参与</p>
+                    </td>
+                #end
+            #end
+        </tr>
+    </table>
+    <div id="btn_center_box">
+        <!--这个就是中间的表情按钮-->
+        <img src="/jdvop/images/mobile/btn-draw.png" id="start_lottery_draw" alt="点击抽奖" class="cup" title="点击抽奖" width="53" height="53"/>
+    </div>
+    <p class="text-rules">活动规则：<br/>每次抽奖花费<i>$!lottery.needIntegral</i>积分；
+    #if($lottery.limitPeople != 0) 每人限制参与<i>$!lottery.limitPeople</i> 次；#end</p>  
+</div>
+<!---->
+<div class="winning">
+    <p class="title">中奖名单</p>
+    <div class="th clearfix">
+        <p class="tl">获奖用户</p>
+        <p class="tr">获奖名称</p>
+    </div>
+    <div class="list" id="boxMove">
+        <ul>
+            #if($winlist)
+                 #foreach($win in $winlist)
+                  #set($winloginName = $win.websiteUser.loginName)
+                    <li>
+                        <p class="tl">$winloginName.substring(0, 3)****</p>
+                                    <p class="tr">$win.awardName</p>
+                    </li>
+                 #end
+            #end
+        </ul>
+    </div>
+</div>
+<div class="explain">
+    <p class="title">活动说明</p>
+    <div class="text">
+        $!lottery.remark
+    </div>
+</div>
+<!--抽奖中奖显示的弹框提示-->
+<div class="dialog-act js-dialogOk">
+    <span class="btn-del js-btnDel" id="entityBtn">删除按钮</span>
+    <p class="title1">恭喜您中奖了!</p>
+    <div class="contentOk">
+        <p class="text1">您获得了<i></i></p>
+        <p class="img"><img src="/jdvop/images/img6.png" width="60" height="60" alt="中奖奖品的图片"/></p>
+        <p class="text2">积分已入账，请查收</p>
+    </div>
+</div>
+<!--抽奖未中奖显示的弹框提示-->
+<div class="dialog-act js-dialogError">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img img1"></p>
+        <div class="text">
+            <p class="title">很遗憾未抽中</p>
+            <p class="text">就差一点点，再试试吧</p>
+        </div>
+    </div>
+</div>
+<!--抽奖扣除积分 显示的弹框提示-->
+<div class="dialog-act js-deductIntegral">
+    <div class="contentError2 clearfix">
+        <p class="img"></p>
+        <div class="text">
+            <p class="title">-$!lottery.needIntegral 积分</p>
+        </div>
+    </div>
+</div>
+<!--活动未开始-->
+<div class="dialog-act w488 js-notStarted">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img img2"></p>
+        <div class="text">
+            <p class="title title2">活动未开始</p>
+            <p class="text">请在耐心等等吧</p>
+        </div>
+    </div>
+</div>
+<!--活动已结束-->
+<div class="dialog-act w488 js-actEnd">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img img3"></p>
+        <div class="text">
+            <p class="title title2">活动已结束</p>
+            <p class="text">下次请早点来哦</p>
+        </div>
+    </div>
+</div>
+<!--活动参与次数已用完-->
+<div class="dialog-act w488 js-actOver">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img img4"></p>
+        <div class="text">
+            <p class="title title2">活动参与次数已用完</p>
+            <p class="text">可以看看其他活动哦</p>
+        </div>
+    </div>
+</div>
+<!--积分不够  -->
+<div class="dialog-act w488 js-noIntegral">
+    <span class="btn-del js-btnDel">删除按钮</span>
+    <div class="contentError1 clearfix">
+        <p class="img img5"></p>
+        <div class="text">
+            <p class="title title2">积分不够参与抽奖</p>
+            <p class="text">可以看看其他活动哦</p>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="id" value="$!lottery.id"/>
+<input type="hidden" id="beginTime" value="$!dateTool.format('yyyy-MM-dd HH:mm:ss', $lottery.beginTime)"/>
+<input type="hidden" id="expireTime" value="$!dateTool.format('yyyy-MM-dd HH:mm:ss', $lottery.expireTime)"/>
+<script type="text/javascript" src="/jdvop/script/date.js"></script>
+<script type="text/javascript" src="/jdvop/script/marquee.js"></script>
+<script>
+    marquee_obj.page_textMove();
+    marquee_obj.page_marquee();
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>惠分享</title>
+    <link rel="stylesheet" href="/jdvop/css/admin/public.css">
+    <link rel="stylesheet" href="/jdvop/css/mobile/vant/index.css">
+    <link rel="stylesheet" href="/jdvop/css/mobile/f-center.css">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak userid="$!{currentUser.userId}">
+    	<template v-if="user">
+        <div class="header" >
+            <div class="header-wrapper">
+                <div class="avatar" @click="toPerson"></div>
+                <div class="text" @click="toPerson">
+                    <p>{{user.rankName}}</p>
+                    <p>{{user.mobile}}</p>
+                </div>
+                <div class="code" @click="openCode"></div>
+            </div>
+            <div class="panel">
+                <div class="panel-l" >
+                    <p class="tip">我的佣金</p>
+                    <p class="count">￥{{user.money.toFixed(2)}}</p>
+                    <span class="btn" style="opacity:0">提现</span>
+                </div>
+                <div class="panel-2" @click="toDetail">
+                    <p class="tip">冻结佣金</p>
+                    <p class="count_fixed">￥{{user.freezeMoney.toFixed(2)}}</p>
+                    <span class="btn2" >查看</span>
+                </div>
+            </div>
+        </div>
+        <ul class="f-body" >
+            <li ><a href="http://admin.colorfulflorist.com/test/wechat/festival/fatherd.html?userid=$!{currentUser.userId}&domain=$!{domain}&init=/jdvop/mobile/fenxiao/myProducts.php&open=0"><img src="/jdvop/images/mobile/my-products.png" />我的商品</a></li>
+            <li><a href="/jdvop/mobile/fenxiao/orders.php?userId=$!{currentUser.userId}&pageNum=1"><img src="/jdvop/images/mobile/my-order.png" />我的订单</a></li>
+            <li><a :href="'/jdvop/my/mobile/share_money_detail.php?allm='+this.user.money"><img src="/jdvop/images/mobile/my-details.png" />佣金明细</a></li>
+        </ul>
+        </template>
+        <template>
+	        <van-popup v-model="codeShow" class="code-wrapper">
+	            <div class="coder">
+	                <div class="c-w">
+	
+	                </div>
+	                <p>我为“美好生活”代言</p>
+	                <p>立即分享给好友~</p>
+	            </div>
+	            <div class="close" @click.stop="codeShow=false"></div>
+	        </van-popup>
+	        <van-popup v-model="codeShow2" class="code-wrapper code-wrapper2">
+	            <div class="coder">
+	                <div class="c-w">
+	
+	                </div>
+	            </div>
+	            <div id="findR" @click.stop="finder"></div>
+	            <div class="close" @click.stop="codeShow2=false"></div>
+	        </van-popup>
+        </template>
+        
+    </div>
+    <script src="/jdvop/script/jquery-1.8.3.min.js"></script>
+    <script src="/jdvop/script/mobile/jquery.qrcode.min.js"></script>
+    <script src="/jdvop/script/mobile/vue.js"></script>
+    <script src="/jdvop/script/mobile/vant.js"></script>
+    <script >
+    	(function() {
+  var app = new Vue({
+    el: "#app",
+    data:function() {
+      return { 
+    	  codeShow: false,
+    	  codeShow2: false,
+    	  user:null,
+    	  codeurl:null
+    	};
+    },
+    methods:{
+    	finder:function(){
+    		location.href = 'https://admin.colorfulflorist.com/test/wechat/festival/f-center.html?fid=$!{currentUser.userId}&domain=$!{domain}&phone='+this.user.mobile+'&money='+this.user.money+'&fmoney='+this.user.freezeMoney;
+    	},
+    	openCode:function(){
+    		//根据判断一级分销还是二级分销
+    		if(this.user.parentID){
+    			this.codeShow=true
+    		}else{
+    			this.codeShow2=true
+    		}
+    		
+    	},
+    	toPerson:function(){
+    		location.href = '/jdvop/my/mobile/share_person.php?mobile='+this.user.mobile+'&rankName='+this.user.rankName+'&percent='+this.user.percent+'&parentID='+this.user.parentID+"&secPer="+this.user.secondhierarchy;
+    	},
+    	toWithdraw:function(){//佣金提现
+    		location.href = '/jdvop/my/mobile/share_withdraw.php?money='+this.user.money+'&phone='+this.user.mobile;
+    	},
+    	toDetail:function(){
+    		location.href = '/jdvop/my/mobile/share_money_detail.php?allm='+this.user.money;
+    	},
+    	share_html:function(){
+    		var str = "http://admin.colorfulflorist.com/test/wechat/festival/fatherd.html?userid=$!{currentUser.userId}&domain=$!{domain}&init=/jdvop/mobile/fenxiao/myProducts.php&open=1";
+    		location.href = str;
+    	},
+    	getUserInfo:function(){
+    		var _self = this;
+    		$.ajax({
+    			url:'/jdvop/mobile/fenxiao/userCenter.php',
+    			dataType:'json',
+    			data:{
+    				userId:$('#app').attr('userid')
+    			},
+    			success:function(res){
+    				if(res.code == 1){
+    					_self.user = res.data;
+    					_self.getCode();
+    				}
+    			}
+    		})
+    	},
+    	getCode:function(){
+    		var _self = this;
+    		$.ajax({
+    			url:'/jdvop/mobile/fenxiao/userQRCode.php',
+    			dataType:'json',
+    			data:{
+    				userId:$('#app').attr('userid')
+    			},
+    			success:function(res){
+    				if(res.code == 1){
+    					_self.codeurl = res.data;
+    					setTimeout(function(){
+    						jQuery(function(){
+    							jQuery('.code').qrcode(res.data);
+    						})
+    						jQuery(function(){
+    							jQuery('.c-w').qrcode(res.data);
+    						})
+    					},200)
+    				}
+    			}
+    		})
+    	}
+    },
+    beforeMount:function(){
+    	this.getUserInfo();
+    },
+    mounted:function() {
+      document.getElementsByTagName("html")[0].style.fontSize =
+        innerWidth * 0.1 + "px";
+      var _self = this;
+      setTimeout(function(){
+    	  $('.code-wrapper').click(_self.share_html);
+      },200)
+      
+    }
+  });
+})();
+    	
+    </script>
+</body>
+
+</html>

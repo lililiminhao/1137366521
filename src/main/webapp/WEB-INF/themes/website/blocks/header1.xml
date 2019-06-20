@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<theme description="头部-风格1" key="header1" type="header" default="true">
+    <blocks>
+        <block id="block_1" type="slider"> 
+            <layout>
+                <width value="1920" />
+                <height value="490" />
+            </layout>
+            <property max-size="5" min-size="1"/>
+            <preview><![CDATA[/jdvop/images/admin/img1_01.jpg]]></preview>
+        </block>
+        <block id="block_2" type="slider"> 
+            <layout>
+                <width value="240" />
+                <height value="145" />
+            </layout>
+            <property max-size="3" min-size="3"/>
+            <preview><![CDATA[/jdvop/images/admin/img1_01.jpg]]></preview>
+        </block>
+    </blocks>
+    <template>
+    <![CDATA[
+    <div class="main-banner">
+        <div class="slide-items j-top-slider">
+            <!--z这里的广告轮播图配置为 1920*454-->
+            <ul class="slides templet-js-slide" max="5" min="1" width="1920" height="454" key="block_1">
+                <li style="background-image:url(images/tmp/img1.png);"><a href="#" target="_blank"></a></li>
+                <li style="background-image:url(images/tmp/img1.png);"><a href="#" target="_blank"></a></li>
+                <li style="background-image:url(images/tmp/img1.png);"><a href="#" target="_blank"></a></li>
+                <li style="background-image:url(images/tmp/img1.png);"><a href="#" target="_blank"></a></li>
+                <li style="background-image:url(images/tmp/img1.png);"><a href="#" target="_blank"></a></li>
+            </ul>
+        </div>
+        <div class="a-img1 templet-js-slide" max="3" min="3" width="240" height="145" key="block_2">
+            <p class="img"> <a href="" title="广告图片1"><img src="" width="240" height="145" alt="广告图片1"/></a></p>
+            <p class="img"> <a href="" title="广告图片1"><img src="" width="240" height="145" alt="广告图片1"/></a></p>
+            <p class="img"> <a href="" title="广告图片1"><img src="" width="240" height="145" alt="广告图片1"/></a></p>
+        </div>
+    </div>
+    ]]>
+    </template>
+    <velocity>
+    <![CDATA[
+    <div class="main-banner">
+        <div class="slide-items j-top-slider">
+            <!--z这里的广告轮播图配置为 1920*454-->
+            <ul class="slides templet-js-slide" max="5" min="1" width="1920" height="454" key="block_1">
+                #foreach($img in $block_1.getEntries())
+                    <li style="background-image:url($!configTool.getImageHost()$!img.image);"><a href="$!img.linkTo" target="_blank"></a></li>
+                #end
+            </ul>
+        </div>
+        <div class="a-img1 templet-js-slide" max="3" min="3" width="240" height="145" key="block_2">
+            #foreach($img in $block_2.getEntries())
+                <p class="img"> <a href="$!img.linkTo" title="广告图片1"><img src="$!configTool.getImageHost()$!img.image" width="240" height="145" alt="广告图片1"/></a></p>
+            #end
+        </div>
+    </div>
+    ]]>
+    </velocity>
+    <preview><![CDATA[/jdvop/images/admin/img1_01.jpg]]></preview>
+</theme>

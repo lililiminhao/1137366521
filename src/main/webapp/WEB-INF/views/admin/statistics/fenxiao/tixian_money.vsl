@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/jquery.datetimepicker.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<script src="/jdvop/script/admin/jquery.datetimepicker.full.min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>分销商提现</title>
+<style>
+
+	[v-cloak]{
+		display:none;
+	}
+	tr.disabled{
+		text-decoration:line-through;
+		color:#bdb8b8;
+	}
+	.drop-down{
+		text-align:center;
+		width:auto;
+		text-indent:0;
+	}
+	.drop-down a{
+		display:block;
+	}
+	.drop-down p{
+		float:left;
+		margin-right:6px;
+	}
+	
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+    </p>
+    <span class="text">分销商提现</span>
+</div>
+<div id="iframePage">
+	<div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr">分销商提现</li>
+##                <li @click="toStp1">市民卡佣金</li>
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/statistics/couponList.php" method="get" @submit.prevent="getList">
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="key" v-model="form.key" class="common ml10 w160" placeholder="分销商姓名/分销商手机"/>
+                        </td>
+                        <td>
+                            <select name="isProvider" class="common ml10 w160 wse" @change="getType" ref="type">
+                                <option value="" selected>佣金状态</option>
+                                <option value="-1">提现拒绝</option>
+                                <option value="0">提现冻结</option>
+                                <option value="1">提现通过</option>
+                            </select>
+                        </td>
+						<td>
+                            <select name="hierarchy" class="common ml10 w160 wsc" @change="getType" ref="type">
+                                <option value="" selected>分销层级</option>
+                                <option value="0">一级</option>
+                                <option value="1">二级</option>
+                            </select>
+                        </td>
+                        <td style="margin-left:20px;">
+                            <input type="text" class="startTime common" name="startTime" value="$!startTime" placeholder="开始时间" />&emsp; - &emsp;
+                            <input type="text" class="endTime common" name="endTime" value="$!endTime" placeholder="结束时间" />
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:150px" />
+                <col  />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:90px" />
+                <col  />
+            </colgroup>
+            <tr>
+                <th>时间</th>
+                <th>明细</th>
+                <th>分销层级</th>
+                <th>分销商姓名</th>
+                <th>分销商手机</th>
+                <th>佣金状态</th>
+                <th>操作</th>
+            </tr>
+            <tr v-for="item in list">
+            	<td>{{item.createTime}}</td>
+            	<td>提现至微信{{item.amount}}元</td>
+            	<td v-html="getc(item.parentId)"></td>
+            	<td>{{item.userName}}</td>
+            	<td>{{item.mobile}}</td>
+            	<td v-html="getTyple(item.status)"></td>
+                <td class="tc js-option-parents">
+                	<div v-show="item.status==0">
+	                    <div class="drop-down js-dropDown">
+	                        <p class="s-inp" @click="throgh(item.id)">通过</p>
+	                        <p class="s-inp" @click="refuse(item.id)">拒绝</p>
+	                    </div>
+                    </div>
+                </td>
+			</tr>
+            
+        </table>
+        
+    </div>
+    <div class="layout-footer clearfix">
+       <ul class="multipage clearfix" v-if="pageInfo">
+            <li>共({{pageInfo.totalItems}})条</li><li style="margin:0px 20px 0px 15px;">{{position}}</li>
+            <li><span class="h-page" :class="{'no-page':pageInfo.currentPage==1}" @click="to1">首页</span></li>
+            <li><span class=" p-page" :class="{'no-page':pageInfo.currentPage==1}" @click="toPre">前一页</span></li>
+            <li><span class="current"> {{pageInfo.currentPage}} </span></li>
+            <li><span class=" p-page" :class="{'no-page':pageInfo.currentPage==pageInfo.totalPage}" @click="toNext">后一页</span></li>
+            <li><span class="e-page" :class="{'no-page':pageInfo.currentPage==pageInfo.totalPage}" @click="toLast">尾页</span></li>
+        </ul>
+    </div>
+</div>
+</div>
+</div>
+<script src="/jdvop/script/mobile/vue.js"></script>
+<script type="text/javascript">
+	var app = new Vue({
+		el:'#app',
+		data:function(){
+			return {
+				list:null,
+				form:{
+					key:'',
+                    hierarchy:'',
+					startTime:'',
+					endTime:'',
+					pageNum:1,
+					status:'',
+					level:''
+				},
+				pageInfo:null,
+				page:1
+			}
+		},
+		computed:{
+    		position:function(){
+				var pInfo = this.pageInfo;
+				if(pInfo){
+					var start = (pInfo.currentPage-1)*this.PageSize;
+					var end;
+					if(pInfo.totalPage == pInfo.currentPage){
+						end = pInfo.totalItems ;
+					}else{
+						end = start+this.PageSize
+					}
+					return '当前显示'+start+'~'+end+'条';
+				}else{
+					return '';
+				}
+			}
+    	},
+		watch:{
+			page:function(newC){
+				this.form.pageNum = newC;
+				this.getList();
+			}
+		},
+		methods:{
+			refuse:function(id){
+				var self = this;
+				$.ajax({
+					url:'/jdvop/admin/cash/refuse.php?id='+id,
+					dataType:'json',
+					success:function(res){
+						if(res.code == 1){
+							self.getList();
+						}
+					}
+				})
+			},
+			throgh:function(id){
+				var self = this;
+				$.ajax({
+					url:'/jdvop/admin/cash/permission.php?id='+id,
+					dataType:'json',
+					success:function(res){
+						if(res.code == 1){
+							self.getList();
+						}
+					}
+				})
+			},
+			getc:function(c){
+				return c?'二级分销':'一级分销';
+			},
+			importExcel:function(){
+				var _self = this;
+				this.form.startTime = $('.startTime').val();
+				this.form.endTime = $('.endTime').val();
+				var obj = this.form;
+				var arr = [];
+				for(var i in obj){
+					if(i!=='pageNum'){
+						arr.push(i+'='+obj[i]);
+					}
+				}
+				location.href = '/jdvop/admin/fenxiao/exportLog.php?'+arr.join('&');
+			},
+			getTyple:function(type){
+                return type == '-1'?'提现失败':type==1?'提现通过':'提现审核';
+			},
+			getList:function(){
+				var _self = this;
+				this.form.status = $('.wse option:selected').val();
+				this.form.level = $('.wsq option:selected').val();
+				this.form.hierarchy = $('.wsc option:selected').val();
+				this.form.startTime = $('.startTime').val();
+				this.form.endTime = $('.endTime').val();
+				$.ajax({
+					url:'/jdvop/admin/cash/pageQuery.php',
+					type:'post',
+					data:_self.form,
+					dataType:'json',
+					success:function(res){
+						if(res.code == 1){
+							_self.list = res.data.content;
+							_self.pageInfo = res.data.pagerSpec;
+							_self.PageSize = res.data.perPageSize;
+						}
+					}
+				})
+			},
+			to1:function(){
+				if(this.pageInfo.currentPage==1){
+					return;
+				}
+				this.page = 1;
+			},
+			toPre:function(){
+				if(this.pageInfo.currentPage==1){
+					return;
+				}
+				this.page--;
+			},
+			toNext:function(){
+				if(this.pageInfo.currentPage==this.pageInfo.totalPage){
+					return;
+				}
+				this.page++;
+			},
+			toLast:function(){
+				if(this.pageInfo.currentPage==this.pageInfo.totalPage){
+					return;
+				}
+				this.page = this.pageInfo.totalPage;
+			},
+			getType:function(){
+				var val = $(this.$refs.type).find('option:selected').val();
+				this.form.type = val;
+			},
+			toStp1:function(){
+				location.href="/jdvop/admin/website/admin_smk_money.php";
+			}
+		},
+		mounted:function(){
+			this.getList();
+		}
+	})
+
+	$.datetimepicker.setLocale('ch');
+    $('.startTime').datetimepicker({
+	    	format:"Y-m-d H:i"
+        });
+    $('.endTime').datetimepicker({
+	    	format:"Y-m-d H:i"
+        });
+        
+</script>
+
+</body>
+</html>

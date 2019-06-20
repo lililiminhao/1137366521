@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/common.js" type="text/javascript"></script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<style>
+	b.quan_use{
+		font-size: 12px;
+    	color: #de3232;
+	}
+</style>
+</head>
+<body class="pm56">
+    <div class="order-list">
+        <ul id="order_list">
+            #if(!$orderList.isEmpty())
+            #foreach($order in $orderList)
+            <li>
+                #set($entries = $orderService.findEntries($order))
+                #set($entry = $entries.get(0))
+                #set($storageUnit = $storageUnitService.findOne($entry.getStorageUnitId()))
+                #set($product  = $productTool.asProduct($storageUnit.getProductId()))
+                #set($isRefund = false)
+                #if($product.ownerType != "jingdong" && $order.getStatus() == 'waiting_confirmed')
+                    #if(!$order.isNiffer() && $returnOrNifferMap.get($order.id))
+                        #set($isRefund = true)
+                    #end
+                #end
+                <a href="/jdvop/my/mobile/order/${order.getId()}.php?isRefund=$isRefund">
+                    <p class="top">下单时间：<i>$!dateTool.format('yyyy-MM-dd', $order.createTime) $dateTool.format('HH:mm:ss', $order.createTime)</i></p>
+                    <div class="con clearfix">
+                        <p class="img">
+                            #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                <img src="$!product.getThumbnailImage()" />
+                            #else
+                                <img src="$configTool.getImageHost()/middle$!product.getThumbnailImage()" />
+                            #end
+                        </p>
+                        <p class="text">
+                            <span>订单编号 <i>$!order.key</i></span>
+                            <span>消费金额 <i  class="fwb">
+					        #if($order.voucherNum && $order.voucherNum>0)
+					        	&yen;$!numberTool.format('#0.00', $order.needPay)&nbsp;<i class="maincolor">(使用提货券)</i>
+					       	#else
+					       		&yen;$numberTool.format('#0.00', $order.totalCost)
+					        #end
+                                #if(!(!$order.coupon.amount))<b class="quan_use">&emsp;含优惠券: #if($!order.coupon.type ==3) $!order.coupon.amount 折
+                            #else ¥$!order.coupon.amount #end</b>#end</i></span>
+                            <span>订单状态 <i class="color999">
+                                    $!order.getStatus().getDescription()
+                                </i></span>
+                        </p>
+                        <span class="ico-arrow"></span>
+                    </div>
+                </a>
+            </li>
+            #end
+            #else
+            <div class="shopcart-none" style="padding-bottom: 100%; margin-bottom: -100%;"> 
+                <i class="icon"></i>
+                <p class="title" style="padding-bottom: 20px;">暂无订单详情！</p>
+                <div class="mod-btns webkitbox-h">
+                    <p class="flex1">
+                        <a href="/jdvop/mobile/products.php" class="mod-btn" style="width: 60%; margin-left: auto; margin-right: auto;">去购物</a>
+                    </p>
+                </div>
+            </div>
+            #end
+        </ul>
+        #if(!$orderList.isEmpty() && $orderList.size() > 4)
+            <div id="loaddin_status" class="tc" style="display: none;">已到页面最底部</div>
+        #end
+    </div>
+    #parse('footer_nav.vsl')
+    <script type="text/javascript">
+        var LOADDING    = false;
+        var CURRENT_PAGE    = 1;
+        var REACH_END       = false;
+        var SORT_FIELD      = "time.desc";
+        var STATUS          = "$!status";        
+        var RATIO           = $websiteTool.getWebsite().getRatio();
+        
+        $.ajaxSetup({
+            async : false
+        });
+        
+        function  doLoaddingMore() {
+            ++ CURRENT_PAGE;
+            var data    = {'ajax': true};
+            if (SORT_FIELD !== '') {
+                data['sort']  = SORT_FIELD;
+            }
+            if (STATUS !== '') {
+                data['status']  = STATUS;
+            }
+            data['page']    = CURRENT_PAGE;
+            $.get('/jdvop/mobile/ajaxOrders.php', data, function(d){
+                LOADDING    = false;
+                if (CURRENT_PAGE > d['pagerSpec']['totalPage']) {
+                    REACH_END   = true;
+                    $('#loaddin_status').html('已到页面最底部').show();
+                    return false;
+                } 
+                CURRENT_PAGE    = d['pagerSpec']['currentPage'];
+                var cnct    = d['content'];
+                if ('object' === typeof cnct && cnct.length > 0) {
+                    var html    = '';
+                    for(var i = 0; i < cnct.length; ++ i)
+                    {
+                        html += '<li>';
+                        html += '<a href="/jdvop/my/mobile/order/' + cnct[i]['id'] +'.php">';
+                        var strTime = format(cnct[i]['createTime']);
+                        html += '<p class="top">下单时间：<i>' + strTime + '</i></p>';
+                        var orderId = cnct[i]['id'];
+                        var status  = cnct[i]['status'];
+                        $.get('/jdvop/mobile/ajaxOrderEntrires.php', {orderId : orderId}, function(data){
+                            var storageUnitId = data[0]['storageUnitId'];
+                            $.get('/jdvop/mobile/ajaxStorageUnit.php', {storageUnitId : storageUnitId}, function(storageUnit){
+                                $.get('/jdvop/mobile/ajaxOrderProduct.php', {productId : storageUnit['productId']}, function(product){
+                                    html += '<div class="con clearfix">';
+                                    html += '<p class="img">';
+                                    if(product['ownerType'] == "jingdong" || product['ownerType'] == "system") {
+                                        html += '<img src="' + product['thumbnailImage'] + '"/> ';
+                                    } else {
+                                        html += '<img src="$configTool.getImageHost()/middle' + product['thumbnailImage'] + '"/> ';
+                                    }
+                                    html += '</p>';
+                                    html += '<p class="text">';
+                                    html += '<span>订单编号<i>' + cnct[i]['key'] + '</i></span>';
+                                    var price =  number_format(product['retailPrice'] * RATIO,2,'.','');
+                                    html += '<span>消费金额<i class="fwb">' + price + '</i></span>';
+                                    html += '<span>订单状态<i class="color999">';
+                                        if(status == "waiting_pay") {
+                                            status = "等待买家付款";
+                                        } else if(status == "waiting_audit") {
+                                            status = "等待客服审核";
+                                        } else if(status == "waiting_shipment") {
+                                            status = "待发货";
+                                        } else if(status == "waiting_confirmed") {
+                                            status = "等待确认收货";
+                                        } else if(status == "completed") {
+                                            status = "订单已完成";
+                                        } else if(status == "canceld") {
+                                            status = "订单作废";
+                                        } else if(status == "cancled_before_pay") {
+                                            status = "订单关闭";
+                                        } else if(status == "after_sale_service") {
+                                            status = "售后服务";
+                                        } 
+                                    html += status + '</i></span>';
+                                    html += '<span class="ico-arrow"></span>';
+                                    html += '</p>';
+                                    html += '</div>';
+                                }, 'json');
+                            }, 'json');
+                        }, 'json');
+                        html += '</a></li>';
+                    }
+                $('#order_list').append(html);
+            }
+        }, 'json');
+    }
+    $(function(){
+        $(window).on('scroll', function(){
+            if (!REACH_END) {
+                var tth = parseFloat($(window).height()) + parseFloat($(window).scrollTop());
+                if ($(document).height() <= (tth + 5)) {
+                    if (!LOADDING) {
+                        LOADDING    = true;
+                        $('#loaddin_status').html('正在加载内容...').show();
+                        doLoaddingMore();
+                    }
+                }
+            }
+        });
+        //删除订单
+        $(document).on('click', '.js_delete_order', function() {
+            mui.confirm('订单删除后不可恢复，是否确定删除？', '温馨提示', function(e){
+                if (e.index == 1) {
+                    var url = $('.js_delete_order').attr('rel');
+                    $.post(url, {}, function(data){
+                        if(data.isOk){
+                            location.reload();
+                        }
+                    }, "json");
+                }
+            });
+        });
+    });
+    
+    function format(timestamp){
+        var newDate = new Date();
+        newDate.setTime(timestamp);
+        Date.prototype.format = function(format) {
+               var date = {
+                      "M+": this.getMonth() + 1,
+                      "d+": this.getDate(),
+                      "h+": this.getHours(),
+                      "m+": this.getMinutes(),
+                      "s+": this.getSeconds(),
+                      "q+": Math.floor((this.getMonth() + 3) / 3),
+                      "S+": this.getMilliseconds()
+               };
+               if (/(y+)/i.test(format)) {
+                      format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+               }
+               for (var k in date) {
+                      if (new RegExp("(" + k + ")").test(format)) {
+                             format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                                    ? date[k] : ("00" + date[k]).substr(("" + date[k]).length));
+                      }
+               }
+               return format;
+        } 
+        return newDate.format('yyyy-MM-dd hh:mm:ss'); 
+    }
+    </script>
+</body>
+</html>

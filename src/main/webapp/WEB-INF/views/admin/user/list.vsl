@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>会员管理</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+        <a href="#" id="import_excel"><span class="btn-green2 mr10">批量导入会员</span> </a>
+        <a href="#" id="batchUpdate"><span class="btn-green2 mr10">批量编辑会员</span> </a>
+        <a href="#" id="batchImportIntegral"><span class="btn-green2 mr10">批量导入积分</span> </a>
+    </p>
+    <span class="text">会员管理</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                #if(!$enabled || $enabled == 'false')
+                    <li><a href="/jdvop/admin/websiteUser/list.php?enabled=true" title="已启用会员">已启用会员</a></li>
+                    <li class="curr"><a href="#" title="已禁用会员">已禁用会员</a></li>
+                #else
+                    <li class="curr"><a href="#" title="已启用会员">已启用会员</a></li>
+                    <li><a href="/jdvop/admin/websiteUser/list.php?enabled=false" title="已禁用会员">已禁用会员</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/websiteUser/list.php" method="get">
+                <input type="hidden" name="enabled" value="#if(!$enabled || $enabled == 'false') false #{else} true #{end}" />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w160" placeholder="用户名/姓名/手机号/邮箱"/>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                        <td><span class="btn-grey2 ml10" id="js_do_export">导出</span></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+            <a href="/jdvop/admin/websiteUser/add.php"><span class="btn-green2">添加会员</span></a>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:60px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:100px" />
+                <col/>
+            </colgroup>
+            <tr>
+                <th><label><input type="checkbox" id="select_all" /></label></th>
+                <th>用户名</th>
+                <th>昵称</th>
+                <th>手机</th>
+                <th>性别</th>
+                <th>Email</th>
+                <th>总获取积分</th>
+                <th>已消费积分</th>
+                <th>剩余积分</th>
+                <th>操作</th>
+            </tr>
+            #if($websiteUsers.hasContent())
+                #foreach($user in $websiteUsers)
+                <tr>
+                    <td class="tc"><label><input type="checkbox" class="select-item" name="ids[]" value="$!user.id" /></label></td>
+                    <td class="tc"><a href="/jdvop/admin/websiteUser/view.php?id=$!user.id" class="blue">$!esc.html($user.loginName)</a></td>
+                    <td class="tc">$!esc.html($user.nickName)</td>
+                    <td class="tc">$!esc.html($user.mobile)</td>
+                    <td class="tc">$!user.gender.description</td>
+                    <td class="tc">$!esc.html($user.email)</td>
+                    <td class="tr">$!generateIntegralMap.get($!user.id)</td>
+                    <td class="tr">
+                        #if($consunmeIntegralMap.get($!user.id))
+                            $!consunmeIntegralMap.get($!user.id)
+                        #else
+                            0
+                        #end
+                    </td>
+                    <td class="tc">$!user.integral</td>
+                    <td class="tc js-option-parents">
+                        <div class="drop-down js-dropDown">
+                            <span class="ico"></span>
+                            <p class="s-inp">操作</p>
+                        </div>
+                        <dl class="s-option js-sOption">
+                            <dd><a href = "" class="js-update-password" rel="$!user.id">修改密码</a></dd>
+                            <dd><a href = "/jdvop/admin/websiteUser/edit.php?id=$!user.id">编辑</a></dd>
+                            #if($user.enabled)
+                                <dd><a href="" class="js-add-integral" rel="$!user.id">充值</a></dd>
+                                <dd><a href="/jdvop/admin/websiteUser/setEnabled.php?ids[]=$!user.id&enabled=false"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要禁用这位会员么?">禁用</a></dd>
+                            #else
+                                <dd><a href="/jdvop/admin/websiteUser/setEnabled.php?ids[]=$!user.id&enabled=true" method="GET" class="ajax-request" ok-message="reload">启用</a></dd>
+                                #if($websiteUserService.isDeleteable($user))
+                                    <!--<dd><a href="/jdvop/admin/websiteUser/delete.php?ids[]=$!user.id"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要删除这位会员么?一旦删除将无法恢复!">删除</a></dd>-->
+                                #end
+                            #end
+                            <dd><a href="/jdvop/admin/websiteUser/view.php?id=$!user.id">详情</a></dd>
+                        </dl>
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关会员
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        <div class="btn-wrap">
+            #if(!$enabled || $enabled == 'false')
+                <span class="btn-red batch-action" batch-action="restore">启用</span>
+                <!--<span class="btn-grey batch-action" batch-action="delete">删除</span>-->
+            #else
+                <span class="btn-grey batch-action" batch-action="disable">禁用</span>
+            #end
+        </div>
+        $adminPg.pager($link, $websiteUsers.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+    
+function  disableBatch(data) {
+    top.artConfirm('请注意', '您真的要禁用这' + data.length + '位会员么?', function(v){
+        if (v) {
+            top.artProgress('禁用中，请稍后...');
+            $.get('/jdvop/admin/websiteUser/setEnabled.php?' + data.join('&'), {enabled : false}, function(d){
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    location.reload();
+                } else {
+                    top.artAlert('温馨提示', d.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+}
+function  deleteBatch(data) {
+    top.artConfirm('请注意', '您真的要删除这' + data.length + '位会员么?一旦删除，将无法恢复!', function(v){
+        if (v) {
+            top.artProgress('删除中，请稍后...');
+            $.get('/jdvop/admin/websiteUser/delete.php?' + data.join('&'), function(d){
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    location.reload();
+                } else {
+                    top.artAlert('温馨提示', d.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+}
+function  restoreBatch(data) {
+    top.artProgress('启用中，请稍后...');
+    $.get('/jdvop/admin/websiteUser/setEnabled.php?' + data.join('&'), {enabled : true}, function(d){
+        top.artProgress('[close]');
+        if (d.isOk) {
+            location.reload();
+        } else {
+            top.artAlert('温馨提示', d.message, 'error');
+        }
+    }, 'json');
+}
+function  doBatchAction(action) {
+    var data        = [];
+    $('input[name="ids[]"]:checked').each(function(){
+        var thiz    = $(this);
+        var id  = thiz.val();
+        if (id !== undefined) {
+            id  = parseInt(id);
+            if (id !== NaN && id > 0) {
+                data.push('ids[]=' + id);
+            }
+        }
+    });
+    if (data.length > 0) {
+        if (action === 'disable') {
+            disableBatch(data);
+        } else if (action === 'delete') {
+            deleteBatch(data);
+        } else if (action === 'restore') {
+            restoreBatch(data);
+        }
+    } else {
+        top.artAlert('温馨提示', '您必须选中一些会员才可以执行此操作!');
+    }
+}
+
+$(function(){
+    $(document).on('click', '#js_do_export', function(e){
+        e.preventDefault();
+        var l   = location.href.replace('/jdvop/admin/websiteUser/list.php', '/jdvop/admin/websiteUser/export.php');
+        $('#export_ifrm').attr('src', l);
+    });
+    
+    $(document).on('click', '#js_do_export_integral', function(e){
+        e.preventDefault();
+        var l   = location.href.replace('/jdvop/admin/websiteUser/list.php', '/jdvop/admin/websiteUser/integral/export.php');
+        $('#export_ifrm').attr('src', l);
+    });
+    
+    $('.batch-action').on('click', function(e){
+        e.preventDefault();
+        var action  = $(this).attr('batch-action');
+        if (action !== undefined) {
+            doBatchAction(action);
+        }
+    });
+    
+    $('#import_excel').on('click', function(e){
+        e.preventDefault();
+        window['SELECT_FILE_FORM']   = dialog({
+            width   : 450,
+            height  : 230,
+            title   : '批量导入会员',
+            content : '<div class="con pt20 pl20">'
+                      + '<p class="js-show-length"><i class="fl">缘由：</i><textarea name="importReason" class="common ml10 h26 w260 js-change-length" style="resize: none"></textarea><span class="js-show-length red">注：最多可以输入<i class="js-num">200</i>字</span></p>'
+                      + '<a class="btn-grey2 js-upload" style="margin-left:45px;" data-upload-url="/jdvop/admin/websiteUser/batch/importWebsiteUser.php?format=xls" title="选择文件">选择文件</a>'
+                      + '<span class="pl30"><a href="/excel/IMPORT_USERINFO.xls" target="hiden_frm">点击此处下载导出模板</a></span>'
+                      + '<p class="pt20 red">注：如需增加积分可以选填缘由，24小时之内一个用户只能导入一次积分，未启用的会员不会添加积分!</p>'
+                      + '</div>',
+            onclose : function() {
+                this.remove();
+                window['SELECT_FILE_FORM']  = undefined;
+            }
+        });
+        window['SELECT_FILE_FORM'].showModal();
+    });
+   
+     $(document).on('click', 'span.js-upload', function(e){
+        e.preventDefault();
+        var url = $(this).attr('data-upload-url') + "&it=" + $('.js-it').val();
+        $('#excelFile').fileupload('option', 'url', url);
+        $('#excelFile').click();
+    });
+    
+    $('#batchUpdate').on('click', function(e){
+        e.preventDefault();
+        window['SELECT_FILE_FORM']   = dialog({
+            width   : 450,
+            height  : 230,
+            title   : '批量编辑会员',
+            content : '<div class="con pt20">'
+                      + '<p><i class="fl">缘由：</i><textarea name="importReason" class="common ml10 h26 w260" style="resize: none"></textarea><span class="js-show-length red">注：最多可以输入<i class="js-num">200</i>字</span></p>'
+                      + '<a class="btn-grey2  js-upload" style="margin-left:45px;" data-upload-url="/jdvop/admin/websiteUser/batchUpdate.php" title="选择文件">选择文件</a>'
+                      + '<span class="pl30"><a href="#" id="js_do_export">点击此处导出会员信息</a></span></p>'
+                      + '<p class="pt20 red">注：如需增加积分可以选填缘由，24小时之内一个用户只能导入一次积分，未启用的会员不会添加积分!</p>'
+                      + '</div>',
+            onclose : function() {
+                this.remove();
+                window['SELECT_FILE_FORM']  = undefined;
+            }
+        });
+        window['SELECT_FILE_FORM'].showModal();
+    });
+  
+    $('#batchImportIntegral').on('click', function(e){
+        e.preventDefault();
+        window['SELECT_FILE_FORM']   = dialog({
+            width   : 450,
+            height  : 230,
+            title   : '批量添加积分',
+            content : '<div class="con pt20">'
+                      + '<p><i class="fl">缘由：</i><textarea name="importReason" class="common ml10 h26 w260" style="resize: none"></textarea></p>'
+                      + '<a class="btn-grey2  js-upload" style="margin-left:45px;" data-upload-url="/jdvop/admin/integral/batch/batchImportIntegral.php" title="选择文件">选择文件</a>'
+                      + '<span class="pl30"><a href="#" id="js_do_export_integral">点击此处导出会员信息</a></span></p>'
+                      + '<p class="pt20 red">注：如需增加积分可以选填缘由，24小时之内一个用户只能导入一次积分，未启用的会员不会添加积分!</p>'
+                      + '</div>',
+            onclose : function() {
+                this.remove();
+                window['SELECT_FILE_FORM']  = undefined;
+            }
+        });
+        window['SELECT_FILE_FORM'].showModal();
+    });
+  
+    $(document).on('click', 'a.js-upload', function(e){
+        e.preventDefault();
+        var importReason = $(this).parent().find('textarea[name="importReason"]').val();
+        var url;
+        if(importReason == "") {
+            url = $(this).attr('data-upload-url');
+        } else {
+            if($(this).attr('data-upload-url').indexOf("?") === -1) {
+                url = $(this).attr('data-upload-url') + "?importReason=" + importReason;
+            } else {
+                url = $(this).attr('data-upload-url') + "&importReason=" + importReason;
+            }
+        }
+        $('#excelFile').fileupload('option', 'url', url);
+        $('#excelFile').click();
+    });
+   
+    $('#excelFile').fileupload({
+        dataType    : 'json',
+        autoUpload  : true,
+        sequentialUploads   : true,
+        start       : function(e) {
+            top.artProgress('文件上传中，请稍后...');
+        },
+        always      : function(e, data) {
+            top.artProgress('[close]');
+        },
+        done        : function(e, data) {
+            top.artProgress('[close]');
+            if (data.result.isOk) {
+                top.artAlert('温馨提示', data.result.message, '/jdvop/admin/websiteUser/list.php','ok');
+            } else {
+                top.artAlert('温馨提示', data.result.message, 'error');
+            }
+        },
+        fail    : function(e, data){
+            top.artProgress('[close]');
+            top.artAlert('温馨提示', '因为网络原因，上传失败!', 'error');
+        }
+    });
+    
+    $(document).on("click",".js-update-password",function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        top.dialog({
+            width: 500,
+            title: '修改密码',
+            content:'<div class="con">'
+                    +   '<table>'
+                    +   '<colgroup>'
+                    +   '<col style="width: 100px;">'
+                    +   '<col>'
+                    +   '</colgroup>'
+                    +   '<tr><td class="tr">新密码：</td><td><input type="text" name="password" class="common w180"/></td></tr>'
+                    +   '</table>'
+                    +'</div>',
+            okValue: '确定',
+            ok: function (){
+                var id  = thiz.attr("rel");
+                var pwd = top.$('input[name="password"]').val();
+                $.post('/jdvop/admin/websiteUser/editPwd.php', {id : id, pwd : pwd}, function(data){
+                    if (data.isOk) {
+                        location.reload();
+                    } else {
+                        top.artAlert('温馨提示', data.message, 'error');
+                        return;
+                    }
+                }, 'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            }
+            
+        }).showModal();
+    });
+    
+    $(document).on("click",".js-add-integral",function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        top.dialog({
+            width: 400,
+            title: '填写充值信息',
+            content:'<div class="con">'
+                    +   '<table>'
+                    +   '<colgroup>'
+                    +   '<col style="width: 100px;">'
+                    +   '<col />'
+                    +   '</colgroup>'
+                    +   '<tr><td class="tr"><i class="orange">*</i>充值：</td><td><input type="text" name="integral" class="common w180 filter-input" filter-rule="isnumber" /> &nbsp分</td></tr>'
+                    +   '<tr><td class="tr">缘由：</td><td><input type="text" name="reason" class="common w180"/></td></tr>'
+                    +   '</table>'
+                    +'</div>',
+            okValue: '确定',
+            ok: function (){
+                var id  = thiz.attr("rel");
+                var integral = top.$('input[name="integral"]').val();
+                if(integral == ''){
+                    top.artAlert('温馨提示', '请输入需要充值的积分!');
+                    return false;
+                }
+                var reason = top.$('input[name="reason"]').val();
+                $.post('/jdvop/admin/integral/addIntegral.php', {id : id, integral : integral, reason : reason}, function(data){
+                    if (data.isOk) {
+                        location.reload();
+                    } else {
+                        top.artAlert('温馨提示', data.message, 'error');
+                        return;
+                    }
+                }, 'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            },
+            
+        }).showModal();
+    });
+});
+</script>
+
+</body>
+</html>

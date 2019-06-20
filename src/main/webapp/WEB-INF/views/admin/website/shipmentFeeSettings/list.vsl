@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>快递费用模板管理</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">快递费用模板管理</span>
+    
+
+</div>
+<div id="iframePage">
+        <div class="right fr p10 js-option-parents">
+        <a href="/jdvop/admin/shipmentFeeSettingAdd.php"><span class="btn-green2">添加</span></a>
+        </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:20%" />
+                <col style="width:20%" />
+                <col style="width:20%" />
+                <col style="width:20%" />
+                <col/>
+            </colgroup>
+            <tr>
+                <th>模板ID</th>
+                <th>模板名称</th>
+                <th>最后修改时间</th>
+                <th>操作</th>
+            </tr>
+            #foreach($shipmentFeeSetting in $shipmentFeeSettings)
+            <tr>
+                <td class="tc">$!shipmentFeeSetting.id</td>
+                <td class="tc">$!shipmentFeeSetting.name</td>
+                <td class="tc">$!date.format('yyyy-MM-dd HH:mm:ss ',$!shipmentFeeSetting.lastModifyTime)</td>
+                <td class="tc js-option-parents">
+                    #if($shiro.isPermitted('provide:shipment'))
+                        <div class="drop-down js-dropDown">
+                            <span class="ico"></span>
+                            <p class="s-inp">操作</p>
+                        </div>
+                        <dl class="s-option js-sOption">
+                            <dd><a href = "/jdvop/admin/shipmentFeeSettingEdit.php?id=$shipmentFeeSetting.id">编辑</a></dd>
+                            
+                            #if($shiro.isPermitted('provide:shipment'))
+                            <dd><a href="/jdvop/admin/shipmentFeeSettingDelete.php?id=$shipmentFeeSetting.id" class="ajax-request" ok-message="reload" cfm-message="继续该操作将导致您选中的分类彻底删除，一旦删除，将无法恢复!">删除</a></dd>
+                            #end
+                        </dl>
+                    #end
+                </td>
+            </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+<!--        <div class="btn-wrap">
+            #if(!$enabled || $enabled == 'false')
+                <span class="btn-red batch-action" batch-action="restore">启用</span>
+                <span class="btn-grey batch-action" batch-action="delete">删除</span>
+            #else
+                <span class="btn-grey batch-action" batch-action="disable">禁用</span>
+            #end
+        </div>-->
+
+    </div>
+</div>
+
+<script type="text/javascript">
+</script>
+
+</body>
+</html>

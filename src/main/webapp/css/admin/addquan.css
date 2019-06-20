@@ -1,0 +1,63 @@
+#add_quan {
+  margin: 15px; }
+  #add_quan h3 {
+    color: #333;
+    font-weight: 500;
+    line-height: 36px;
+    font-size: 18px; }
+  #add_quan .content {
+    padding: 24px 0;
+    border: 1px solid #d7d7d7; }
+    #add_quan .content li {
+      -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+      padding-left: 20px;
+      margin-bottom: 24px;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      height: 24px;
+      line-height: 24px; }
+      #add_quan .content li label {
+        margin-right: 12px; }
+    #add_quan .content .type_content {
+      height: 96px; }
+    #add_quan .content .copy {
+      color: #059919;
+      margin-left: 12px; }
+    #add_quan .content input[type="text"] {
+      text-indent: 3px; }
+    #add_quan .content input[type="radio"],
+    #add_quan .content input[type="checkbox"] {
+      margin-right: 3px; }
+    #add_quan .content i {
+      color: red; }
+    #add_quan .content i + span {
+      font-size: 14px; }
+    #add_quan .content #searchSaler {
+      padding: 0 12px;
+      border: 1px solid #059919;
+      border-radius: 3px;
+      cursor: pointer;
+      color: #059919; }
+    #add_quan .content select {
+      width: 100px; }
+    #add_quan .content select + select {
+      margin-left: 12px; }
+  #add_quan .opt {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin-top: 24px; }
+    #add_quan .opt button {
+      width: 96px;
+      border-radius: 3px;
+      margin-right: 24px;
+      outline: none;
+      cursor: pointer;
+      line-height: 24px;
+      font-size: 14px; }
+    #add_quan .opt button:first-child {
+      background: teal;
+      border: 0;
+      color: #fff; }

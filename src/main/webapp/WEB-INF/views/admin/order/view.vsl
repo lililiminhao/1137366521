@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>订单详情</title>
+<script type="text/javascript">
+$(function(){
+    $(".js-tabList li").click(function(){
+        var oIndex=$(this).index();
+        $(this).addClass("curr").siblings().removeClass('curr');
+        $(".js-tabContent .item").eq(oIndex).show().siblings().hide();
+    });
+});
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+     <a href="javascript:history.back(-1)"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">订单详情</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <p class="text fwb">基本信息</p>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width: 80px;" />
+                <col style="width: 220px;" />
+                <col style="width: 80px;" />
+                <col style="width: 220px;" />
+                <col style="width: 80px;" />
+                <col style="width: 220px;" />
+            </colgroup>
+            <tr>
+                <td class="tr">订单编号：</td>
+                <td>$!order.key</td>
+                <td class="tr">下单日期：</td>
+                <td>$!date.format('yyyy-MM-dd HH:mm:ss',$order.createTime)</td>
+                <td class="tr">配送日期：</td>
+                <td>$order.deliveryDateType.description</td>
+            </tr>
+            <tr>
+                <td class="tr">订单状态：</td>
+                <td>$!order.status.description</td>
+                <td class="tr">购买账号：</td>
+                <td>$!user.loginName</td>
+                <td class="tr">订单小计：</td>
+                    <!--#set($productPrice = $math.sub($order.needPay, $order.shipmentFee))-->
+
+                <td>¥$!numberTool.format("#0.00",$$order.needPay) <!--#if($order.deliveryObjectType == "provider") + 运费：¥$order.shipmentFee #end--></td>
+            </tr>
+
+            <tr>
+                #set($enterpriseInfo = '')
+                #set($enterpriseInfo = $enterpriseMap.get($!order.enterpriseId))
+                <td class="tr">企业名：</td>
+                <td>$!enterpriseInfo.name</td>
+                #set($paterOrder = $orderService.findOne($!order.originalOrderId))
+
+                <td class="tr">#if($paterOrder) 父订单号：#end</td>
+                <td>
+                <a href="/jdvop/admin/order.php?id=$!{order.originalOrderId}">
+                    $!paterOrder.key
+                </a>
+                </td>
+
+            </tr>
+            <tr>
+                <td class="tr">备注信息：</td>
+                <td colspan="5">$!order.remark</td>
+            </tr> 
+            <tr style="display: none">
+                <td class="tr">买家留言：</td>
+                <td  colspan="5" >$!order.userRemark</td>
+            </tr>
+        </table>
+    </div>
+        <div class="tab-column mt20">
+            <div class="con">
+                <ul class="clearfix js-tabList">
+                    <li class="curr"><a href="javascript:;" title="商品明细">商品明细</a></li>
+                    <li><a href="javascript:;" title="收货信息">收货信息</a></li>
+                    <li><a href="javascript:;" title="支付信息">支付信息</a></li>
+                    <li><a href="javascript:;" title="物流信息">物流信息</a></li>
+                    <li><a href="javascript:;" title="操作日志">操作日志</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="automatic-box  js-tabContent" style="border: 1px solid #dedede; margin-top: 0; border-top:none;">
+            <!--商品明细-->
+            <div class="item p20">
+                <table class="common">
+                    <colgroup>
+                        <col style="width:66px;" />
+                        <col style="width:120px;" />
+                        <col style="width:120px;" />
+                        <col style="width:120px;" />
+                        <col style="width:120px;" />
+                        <col style="width:120px;" />
+                    </colgroup>
+                    <tr>
+                        <th>商品图片</th>
+                        <th>商品名称</th>
+                        <th>商品品牌</th>
+                        <th>商品单价</th>
+                        <th>订购数量</th>
+                        <th>商品总价</th>
+                    </tr>
+                    #foreach($entry in $entries)
+                    #set($sku   = $storageUnitService.findOne($entry.storageUnitId))
+                    #set($product   = $productService.findOne($sku.productId))
+                    <tr>
+                        <!--target="_blank"-->
+                        <td>
+                            <a href="/jdvop/admin/product.php?id=$!product.id" >
+                                #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                    <img src="$!product.getThumbnailImage()" width="60" height="60" />
+                                #else
+                                    <img src="$!configTool.getImageHost()/thumbnail/$product.getThumbnailImage()" width="60" height="60" />
+                                #end
+                            </a>
+                        </td>
+                        <td><a href="/jdvop/admin/product.php?id=$product.id" >$!product.name</a></td>
+                        <td class="tc">$!product.brand.name</td>
+                        <td class="tr">
+                            #set($price = $math.mul($entry.soldPrice, $websiteTool.getWebsite().getRatio()))
+                            &yen;$!numberTool.format("#0.00",$price)
+                        </td>
+                        <td class="tr">$entry.amount</td>
+                        <td class="tr">
+                            #set($total = $price * $entry.amount)
+                            &yen;$!numberTool.format("#0.00",$total)
+                        </td>
+                    </tr>
+                    #end
+                    <tr>
+                        <td colspan="6" class="tr" style = "font-size: 14px;">
+                        商品总额:<i class="red ffa fwb">&yen;$!numberTool.format('#0.00', $order.totalCost)</i>
+                        <br>
+                        运费价格:<i class="red ffa fwb">&yen;$!numberTool.format('#0.00', $order.shipmentFee)</i>
+                         <br>
+                        优惠折扣:<i class="red ffa fwb">&yen;$!numberTool.format('#0.00', $order.couponMoney)</i>
+                         <br>
+                        订单小计:<i class="red ffa fwb">&yen;$!numberTool.format('#0.00', $order.needPay)</i></td>
+                    	
+                    </tr>
+                </table>
+            </div>
+            <!--收货信息-->
+            <div class="item p20 hide">
+                <table class="common">
+                    <colgroup>
+                        <col style="width: 100px;" />
+                        <col />
+                    </colgroup>
+                    <tr>
+                        <td class="tr">收货人名：</td>
+                        <td>$!order.receiverName</td>
+                    </tr>
+                    <tr>
+                        <td class="tr">联系手机：</td>
+                        <td>$!order.receiverMobile</td>
+                    </tr>
+					<tr>
+                        <td class="tr">身份证号：</td>
+                        <td>$!order.receiverIdentityCard</td>
+                    </tr>
+                    <tr>
+                        <td class="tr">详细地址：</td>
+                        <td>$!order.province.name $!order.city.name $!order.county.name $!order.town.name $!order.receiverAddr</td>
+                    </tr>
+                </table>
+            </div>
+            <!--支付信息-->
+            <div class="item p20 hide">
+                <table class="common">
+                    <colgroup>
+                        <col style="width: 100px;" />
+                        <col />
+                    </colgroup>
+                    <tr>
+                        <td class="tr">支付方式：</td>
+                        <td>
+                            #if($!paylog)
+                                $!paylog.payType.description
+                            #else
+                                - -
+                            #end
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">订单总价：</td>
+                        <td>
+                        		
+                            #if($!paylog)
+                                <i class="red">$!numberTool.format('#0.00', $!{order.totalCost})</i> 元
+                            #else
+                                - -
+                            #end
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="tr">实付金额：</td>
+                        <td>
+                            #if($!really)
+                                <i class="red">$!numberTool.format('#0.00', $!really)</i> 元
+                            #elseif($!paylog)
+                            	 <i class="red">$!numberTool.format('#0.00', $order.getNeedPay())</i> 元
+                            #else
+                                - -
+                            #end
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr>
+                        <td class="tr">优惠券：</td>
+                        <td>#if($order.couponMoney) $!order.couponMoney #else - - #end</td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="tr">支付完成日期：</td>
+                        <td>#if($paylog.paiedTime) $!date.format('yyyy-MM-dd HH:mm:ss',$!paylog.paiedTime) #else - - #end</td>
+                    </tr>
+                    
+                    
+                    <tr>
+                        <td class="tr">支付状态：</td>
+                        <td>#if($paylog.paied) 支付成功 #else - - #end</td>
+                    </tr>
+                    <tr>
+                        <td class="tr">支付的IP：</td>
+                        <td>
+                            #if($!paylog)
+                                $!paylog.lastPayIPAddr
+                            #else
+                                - -
+                            #end
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">交易流水号：</td>
+                        <td>#if($paylog.outerOrderKey) $!paylog.outerOrderKey #else - - #end</td>
+                    </tr>
+                </table>
+            </div>
+            <!--物流信息-->
+            #if($order.deliveryObjectType == "provider" || $order.deliveryObjectType == "enterprise")
+                <div class="item p20 hide">
+                    <table class="common">
+                        <colgroup>
+                            <col style="width: 100px;"/>
+                            <col style="width:240px;"/>
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <td class="tr">物流公司：</td>
+                            <td>
+                                #if($shipmentLog)
+                                    $!shipmentLog.shipmentCompany.name
+                                #else
+									尚未发货
+                                #end
+                            </td>
+                            <td rowspan="3" valign="top" style="padding: 0;">
+                                <table width="100%">
+                                    <tr>
+                                        <th>物流信息</th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p class="pl20">暂无物流信息</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">快递单号：</td>
+                            <td>
+                                #if ($shipmentLog)
+                                    $shipmentLog.shipmentOrder
+                                #else
+									尚未发货
+                                #end
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">物流状态：</td>
+                            <td>状态未知</td>
+                        </tr>
+                    </table>
+                </div>
+            #else
+                <div class="item p20 hide">
+                    <table class="common">
+                        <colgroup>
+                            <col style="width: 100px;"/>
+                            <col style="width:240px;"/>
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <td class="tr">物流公司：</td>
+                            <td>#if($sod) $sod.shipmentName #else 尚未发货 #end</td>
+                            <td rowspan="3" valign="top" style="padding: 0;">
+                                <table width="100%">
+                                    <tr>
+                                        <td class="tc" colspan="2">物流信息</td>
+                                    </tr>
+                                    #if($sod)
+                                        #if($order.deliveryObjectType == 'jingdong')
+                                            #foreach($foo in [$sod.contents.size()..1])
+                                                #set($foo = $math.sub($foo, 1))
+                                                #set($contents = $sod.contents.toArray())
+                                                <tr #if($velocityCount == 1) class="green fwb" #end>
+                                                    <td>$!dateTool.format('yyyy-MM-dd HH:mm:ss', $contents[$foo].time) </td>
+                                                    <td class="pl20p">$!contents[$foo].description</td>
+                                                </tr>
+                                            #end
+                                        #else
+                                            #foreach($entry in $sod.contents)
+                                                <tr #if($velocityCount == 1) class="green fwb" #end>
+                                                    <td>$!dateTool.format('yyyy-MM-dd HH:mm:ss', $entry.time)</td>
+                                                    <td class="pl20p">$!entry.description</td>
+                                                </tr>
+                                            #end
+                                        #end
+                                    #else
+                                    <tr>
+                                        <td class="tc" colspan="2">暂无物流信息</td>
+                                    </tr>
+                                    #end
+                                </table>
+                            </td>
+                        </tr>
+                        #if($sod)
+                        <tr>
+                            <td class="tr">快递单号：</td>
+                            <td>
+                                $sod.shipmentOrder
+                            </td>
+                        </tr>
+                        #end
+                    </table>
+                </div>
+            #end
+            <!--操作日志-->
+            <div class="item p20 hide">
+                <table class="common">
+                        <colgroup>
+                            <col style="width: 220px;" />
+                            <col />
+                            <col style="width: 140px;" />
+                            <col style="width: 140px;" />
+                        </colgroup>
+                        <tr>
+                            <th>操作者</th>
+                            <th>操作详情</th>
+                            <th>操作日期</th>
+                            <th>操作IP</th>
+                        </tr>
+                        #if (!$logs.isEmpty())
+                        #foreach($log in $logs)
+                        #set($oldEntries = '')
+                        #set($newEntries = '')
+                        <tr>
+                            <td>$!log.ext['workerName']</td>
+                            <td>
+                                $!log.ext['operation']
+                                
+                                #set($oldEntries = $log.ext['oldEntry'])
+                                #if($oldEntries && !$oldEntries.isEmpty())
+                                <br/><label class="blue">退换单原始商品信息:
+                                #foreach($entry in $oldEntries)
+                                &nbsp;&nbsp;SKU:$entry.storageUnitId&nbsp;&nbsp;商品个数:$entry.amount
+                                #end
+                                </label>
+                                #end
+
+                                #set($newEntries = $log.ext['newEntry'])
+                                #if($newEntries && !$newEntries.isEmpty())
+                                <br/><label class="orange">退换单编辑商品信息:
+                                #foreach($entry in $newEntries)
+                                &nbsp;&nbsp;SKU:$entry.storageUnitId&nbsp;&nbsp;商品个数:$entry.amount
+                                #end
+                                </label>
+                                #end
+                            </td>
+                            <td>$dateTool.format('yyyy-MM-dd HH:mm:ss', $log.time)</td>
+                            <td>$!log.ext['operateIP']</td>
+                        </tr>
+                        #end
+                        #else
+                        <tr>
+                            <td colspan="4">暂无日志</td>
+                        </tr>
+                        #end
+                    </table>
+            </div>
+        </div>
+</div>
+</body>
+</html>

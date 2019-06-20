@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/detail_quan.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/mobile/vue.js"></script>	
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title></title>
+<title></title>
+<!-- <title>$!esc.html($websiteTool.getWebsite().getName())</title> -->
+<style>
+	.quan_list li .li_r span.have{
+		color:#999;
+		border-color:#999;
+	}
+	#if($isEnterpriseZoneProduct)
+		.fixed-bottom1 .btn_col{
+			margin:0;
+		}
+		#butNow{
+			background:#f55d12;
+			width:96%;
+			margin-right:2%;
+		}
+	#end
+</style>
+<script>
+	#if($isEnterpriseZoneProduct)
+		var isEnterpriseZoneProduct = true;
+	#else
+		var isEnterpriseZoneProduct = false;
+	#end
+	// 當前用戶可以提貨的數量
+	var thisProductTotalVoucher = $thisProductTotalVoucher;
+</script>
+</head>
+<body class="pm56" userid="$!{currentUser.userId}">
+    <div class="img-detail">
+        <div class="img-wrap">
+            #if($product.enableOverseas)
+                <span class="ico-kuajing-bg"><!--跨境小图标--></span>
+            #end
+            <ul class="swiper-wrapper">
+                #foreach($!img in $!productImageList)
+                    #if($!product.ownerType == "system")
+                        <li class="swiper-slide"><img src="$!img.imageUrl"></li>
+                    #else
+                        <li class="swiper-slide"><img src="$configTool.getImageHost()$!img.imageUrl"></li>
+                    #end
+                #end
+            </ul>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+    <form id="buy_form" action="/jdvop/shoppingCart/chooseEntry.php" method="get">
+        <input type="hidden" name="isSelected[]"  value="true"/>
+        ##if($fid)
+        ##<input type="hidden"  name="fstr" />
+        ##end
+        <input type="hidden" name="entry[]" value="$productTool.getStorageUnits($product.id).get(0).id"/>
+        <input type="hidden" name="type[]"  value="sku"/>
+        <input type="hidden" name="sentry[]"  value="$!product.id"/>
+        <input type="hidden" name="stype[]"  value="product"/>
+        <input type="hidden" name="productOwnerType[]"  value="$!product.ownerType"/>
+        <input type="hidden" name="fenxiaoUserId[]"  value="$!{fid}"/>
+
+
+        <input type="hidden" name="uid"  value="$!currentUser.userId"/>
+        <input type="hidden" name="fpid"  value="$!fp.id"/>
+        <div class="product-name">
+            <div class="name webkitbox-h">
+                <p class="left flex2">$!product.name</p>
+            </div>
+            <div class="price webkitbox-h">
+				#if($productPoolEntry)
+					<div class="employee-cont clearfix">
+                        <span class="btn fl">企业专享价</span>
+                        <span class="intergal-num fl">&yen;$!numberTool.format('#0.00', $productPoolEntry.exclusivePrice)</span>
+                        <span class="txt fl"></span>
+                        <del class="original-price fl">&yen;$!numberTool.format('#0.00', $product.retailPrice)</del>
+                    </div>
+				#else
+					<div class="left  tl red fs14p">
+                        <p class="fl">
+                            <i class="red fs20p">&yen;$!numberTool.format('#0.00', $product.retailPrice)</i>
+                            #if($!numberTool.format('#0.00', $product.retailPrice) != $!numberTool.format('#0.00', $product.marketPrice))
+                                <i style=" text-decoration:line-through; color:#9e9e9e;">   原价:$!numberTool.format('#0.00', $product.marketPrice)</i>
+                            #end
+                        </p>
+					</div>
+                #end
+            </div>
+        </div>
+        <div class="delivery-address">
+        	<div class="ling_quan">
+        		<span style="line-height:24px;">领券：</span>
+        		<ul class="quan_item_wrapper">
+        		</ul>
+        	</div>
+            <div class="webkitbox-h">
+                <p class="">库存：</p>
+                <p class="pl10 red">
+                    #if($isSelling)
+                        #if($isStock)
+							有货 
+                        #{else}
+                            <i class="red">无货</i>
+                        #{end}
+                    #{else} 
+                        <i class="red">已下架</i> 
+                    #{end}
+                </p>
+                &nbsp;&nbsp;
+                <p style="color:#9e9e9e;">
+                    (已售$!product.salesVolume件)
+                </p>
+            </div>
+            <p class="last">规格：$!product.productCode</p>
+            <p class="last">品 牌：$!product.getBrand().name</p>
+            <div class="mt10 clearfix"><i class="fl color999" style="line-height: 40px;"> 数 量：</i> 
+                <div class="num_wrap">
+                    <span class="minus minus_disabled" id="minus"></span>
+                    <input class="num" id="numInput" name="amount[]" type="number" value="1"/>
+                    <span class="plus" id="plus" max="68"></span>
+                </div>
+                #if($!fp.buyNumPerPerson && $!fp.buyNumPerPerson > 0)<i class="pl20p lh40p">每人限购$!fp.buyNumPerPerson件 </i>#end
+            </div>
+        </div>
+    </form>
+    <div class="text-detail mt10">
+        <h2 class="title">图文详情</h2>
+        <div class="auto-wrap">
+            <table  class="parameters">
+                <colgroup>
+                    <col />
+                </colgroup>
+                <tr>
+                    <td>$!productDescription.getDescription()</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="fixed-bottom1">
+    	#if($isEnterpriseZoneProduct)
+    		<div class="btn_col">
+	            <a class="btn btn_buy" id="butNow" href="javascript:;">立即购买</a>
+	        </div>
+    	#else
+	        #if($isSelling && $isStock)
+	        <div class="btn_col">
+	            #if(!$fp)<a class="btn btn_cart js-btnCart" id="addCart" href="javascript:;" >加入购物车</a>#end
+	            <a class="btn btn_buy" id="butNow" href="javascript:;">立即购买</a>
+	        </div>
+	        #else
+	        <div class="btn_col">
+	            #if(!$fp)<a class="btn btn_cart disabled" href="javascript:;" >加入购物车</a>#end
+	            <a class="btn btn_buy disabled" href="javascript:;">立即购买</a>
+	        </div>
+	        #end
+	        #if(!$fp)
+	        <a class="cart_wrap" href="/jdvop/shoppingCart/myCart.php">
+	            <i class="i_cart" num="$!spcart.totalAmount()"></i>
+	            <span class="cart"></span>
+	            <span class="add_num" id="popone">+1</span>
+	        </a>
+	        #end
+	    #end
+    </div>
+    
+    <!-- 优惠券领取处 -->
+    <div id="quan_list_wrapper">
+        <div class="quan_list">
+            <div class="title">优惠券<i></i></div>
+            <ul>
+                <li :class="getClass(coupon)" v-for="(coupon,index) in quanlist">
+                    <div class="li_l ver_center">
+                        <p>￥<span>{{coupon.amount}}</span></p>
+                        <p v-html="getKan(coupon)"></p>
+                    </div>
+                    <div class="li_c ver_center">
+                        <p class="type">{{coupon.name}}</p>
+                        <div class="time" v-html="getTime(coupon)"></div>
+                    </div>
+                    <div class="li_r" @click="getQuan(coupon)">
+                        <span :class="{'have':coupon.hasRevice == 1}"><template v-if="coupon.hasRevice == 0">立即</template><template v-else>已</template>领取</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script>
+    	var app = new Vue({
+    		el:'#quan_list_wrapper',
+    		data:function(){
+    			return {
+    				quanlist:[]
+    			}
+    		},
+    		methods:{
+    			getQuan:function(item){
+    				var userId = $('body').eq(0).attr('userid');
+		    		if(!userId){
+		    			location.href = '/jdvop/my/mobile/userCenter.php';
+		    			return;
+		    		}
+		    		if(item.hasRevice == 1){
+		    			return;
+		    		}
+		    		var _self = this;
+		    		$.ajax({
+		    			url:'/jdvop/mobile/receiveCoupon.php',
+		    			type:'get',
+		    			data:{
+		    				userId:userId,
+		    				couponId:item.id
+		    			},
+		    			success:function(res){
+		    				res = JSON.parse(res);
+		    				mui.alert(res.msg, '温馨提示');
+		    				if(res.code ==1 ){
+		    					_self.getIcons();
+		    				}
+		    			}
+		    		})
+    			},
+    			getTime:function(item){
+    				return (item.startTime + '~' +item.endTime).replace(/-/g,'.');
+    			},
+    			getClass:function(item){
+    				if(item.type == 1){
+    					return 'manjian'
+    				}
+    				if(item.type == 2){
+    					return 'zhijian'
+    				}
+    				if(item.type == 3){
+    					return 'zhekou'
+    				}
+    			},
+    			getKan:function(item){
+    				if(item.type == 1){
+    					return '满'+item.usable+'元可用'
+    				}
+    				if(item.type == 2){
+    					return '直减'+item.amount+'元'
+    				}
+    				if(item.type == 3){
+    					return item.amount+'折'
+    				}
+    			},
+    			getIcons:function(){
+    				var _self = this;
+    				$.ajax({
+    					url:'/jdvop/mobile/product/findCoupon.php',
+    					type:'get',
+    					data:{
+    						targetId:${product.id}
+    					},
+    					success:function(res){
+    						res = JSON.parse(res);
+    						if(res.code == 1){
+    							_self.quanlist = res.data;
+    							if(res.data.length == 0){
+    								$('.ling_quan').hide();
+    								return;
+    							}
+    							var arr = res.data;
+    							var str = '';
+    							for(var i = 0;i < arr.length;i++){
+    								if(i<4){
+    									var item = arr[i];
+    									if(item.type == 1){
+    										str += '<li>满'+ item.usable+'减'+ item.amount+'</li>'
+    									}
+    									if(item.type == 2){
+    										str += '<li class="zhijian">直减'+ item.amount+'元</li>'
+    									}
+    									if(item.type == 3){
+    										str += '<li class="zhekou">'+ item.amount+'折</li>'
+    									}
+    								}
+    							}
+    							$('.quan_item_wrapper').html(str);
+    						}
+    					}
+    				})
+    			}
+    		},
+    		mounted:function(){
+    			this.getIcons()
+    		}
+    	})
+    </script>
+    
+    
+    <!--点击购物车 体验弹框-->
+    #if(!$fp)
+    <div class="js-num-mark" style="display: none; transition: 3s; position: fixed; width: auto; border-radius:6px; -webkit-box-shadow: 0 0 3px 3px rgba(150, 150, 150, 0.7);box-shadow: 0 0 3px 3px rgba(150, 150, 150, 0.7); z-index: 999; top: 50%; left: 35%; text-align: center;background: rgba(0, 0, 0, 0.7); color: #fff; padding: 10px 12px;">
+       添加成功！
+    </div>
+    #end
+    <script src="/jdvop/script/mobile/swiper.js"></script>
+    <script>
+        var swiper = new Swiper('.img-wrap', {
+            pagination: '.swiper-pagination',
+            debugger: true
+        });
+        //收起优惠券列表
+        $('.title i').on('click', function () {
+            $('.quan_list').animate({ bottom: '-100%' }, 300, function () {
+                $('#quan_list_wrapper').hide();
+            });
+        });
+        //展开优惠券列表
+        $('.ling_quan').on('click',function(){
+        	$('#quan_list_wrapper').show();
+        	$('.quan_list').animate({ bottom: '0' }, 300);
+        })
+        function modify() {
+            var maxAmount = parseInt($('#plus').attr('max'));
+            var amount = parseInt($('input[name="amount[]"]').val());
+            if(amount === '') {
+                $('input[name="amount[]"]').val('1');
+            } else {
+                if(amount > maxAmount) {
+                    $('input[name="amount[]"]').val(maxAmount);
+                } else {
+                    $('input[name="amount[]"]').val(amount);
+                }
+            }
+        }
+        $(function() {
+            //加入购物车
+            $("#addCart").bind("click", function() {
+                var obj = $(this);
+                if (!obj.hasClass("curr")) {
+                    obj.addClass("curr");
+                    var _amount = parseInt($('input[name="amount[]"]').val());
+                    if (_amount === '' || _amount < 1) {
+                        $('input[name="amount[]"]').val('1');
+                        _amount = 1;
+                    }
+                    var totalAmount = $('.i_cart').attr('num');
+                    var _param = {entry: $productTool.getStorageUnits($product.id).get(0).id, type: 'sku', sentry: $product.id, stype: 'product', amount: _amount,#if($fid)'fid':$fid #end};
+                    $.post("/jdvop/shoppingCart/add.php", _param, function(result) {
+                        var data = eval('(' + result + ')');
+                        if(data.isOk){
+                            $(".js-num-mark").show();
+                            $("#popone").addClass("show");
+                            setTimeout(function(){
+                                $(".js-num-mark").hide();
+                                $("#popone").removeClass("show");
+                            }, 300);
+                            var cartNum = parseInt(_amount) + parseInt(totalAmount);
+                            $('.i_cart').attr('num', cartNum);
+                            $('#popone').text('+' + _amount);
+                            $('input[name="amount[]"]').val(_amount);
+                            obj.removeClass("curr");
+                        }
+                    }, 'application/json');
+                }
+            });
+            //立即购买
+            $("#butNow").bind("click", function() {
+               // modify();
+                var uid = $('input[name="uid"]').val();
+                var fpid = $('input[name="fpid"]').val();
+                //var fid = $('body').attr('fid');
+                //var pid = $('body').attr('pid');
+            	//var _amount = parseInt($('input[name="amount[]"]').val());
+            	//$('input[name="fstr"]').val(pid+'_'+fid+'_'+_amount);
+                if(uid === '' || fpid === ''){
+                    $('input[name="amount[]"]').removeAttr('disabled');
+                    $("#buy_form").submit();
+                    $('input[name="amount[]"]').attr('disabled', 'disabled');
+                }else{//如果是限时兑换产品 且用户已经登录
+                   var _param  = {fpid:fpid, amount:$('input[name="amount[]"]').val()};
+                   //如果个人限购 数量已满 弹出提示框
+                   $.post("/jdvop/activity/limitExchange/checkBeforeSubmit.php", _param, function(result){
+                       var data = eval('(' + result + ')');
+                       if(data.isOk){
+                            $("#buy_form").submit();
+                       }else{
+                            mui.alert(data.message, '温馨提示');
+                       }
+                   }, 'application/json');
+                }
+            });
+            //增加数量
+            $('#plus').bind("click", function(e) {
+                e.preventDefault();
+                
+                #if($isEnterpriseZoneProduct && $thisProductTotalVoucher>0)
+                	var maxNum = $thisProductTotalVoucher;
+                #else
+                	var maxNum = parseInt($(this).attr('max'));
+                #end
+
+                var thizAmount = $(this).siblings('input[name="amount[]"]');
+                if(parseInt(thizAmount.val()) === maxNum||parseInt(thizAmount.val())>maxNum) {
+                    $(this).addClass('disabled');
+                    return false;
+                }
+                $('#minus').removeClass('minus_disabled');
+                thizAmount.val(parseInt(thizAmount.val()) + 1);
+            });
+            //直接设置
+            $('#numInput').bind("blur", function(e) {
+                e.preventDefault();
+
+                #if($isEnterpriseZoneProduct && $thisProductTotalVoucher>0)
+                    var maxNum = $thisProductTotalVoucher;
+                #else
+                    var maxNum = 999;
+                #end
+
+                var thizAmount = $(this);
+                if(parseInt(thizAmount.val())>maxNum) {
+                    thizAmount.val(maxNum);
+                }
+                if(parseInt(thizAmount.val())<1)
+                {
+                    thizAmount.val(1);
+                }
+
+            });
+
+            //减少数量
+            $('#minus').bind("click", function(e) {
+                e.preventDefault();
+                var thizAmount = $(this).siblings('input[name="amount[]"]');
+                var amount = parseInt(thizAmount.val()) - 1;
+                if (amount <= 1) {
+                    $(this).addClass('minus_disabled');
+                    thizAmount.val('1');
+                } else {
+                    thizAmount.val(amount);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

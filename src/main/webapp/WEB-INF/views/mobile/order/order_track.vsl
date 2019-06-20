@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script  type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script  type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+</head>
+<body class="pm56">
+    #if($sod)
+        <div class="logistics pt44">
+            <div class="top">
+                <p class="txt1">$sod.shipmentName</p>
+                <p class="txt2">快递单号：<i class="num">$sod.shipmentOrder</i></p>
+            </div>
+            <div class="cont">
+                <h2 class="title">物流跟踪</h2>
+                <ul>
+                    #if($order.deliveryObjectType == 'jingdong')
+                    #foreach($foo in [$sod.contents.size()..1])
+                        #set($foo = $math.sub($foo, 1))
+                        #set($contents = $sod.contents.toArray())
+                        <li>
+                            <span class="dot"></span>
+                            <div class="txt-wrap">
+                                <p class="txt">$!contents[$foo].description</p>
+                                <p class="time">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $contents[$foo].time) </p>
+                            </div>
+                        </li>
+                    #end
+                    #else
+                        #foreach($entry in $sod.contents)
+                        <li>
+                            <span class="dot"></span>
+                            <div class="txt-wrap">
+                                <p class="txt">$!entry.description</p>
+                                <p class="time">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $entry.time) </p>
+                            </div>
+                        </li>
+                        #end
+                    #end
+                </ul>
+            </div>
+        </div>
+    #else
+        <div class="tc mt30 fs20p" style="color:#999">暂无物流信息</div>
+    #end
+</body>
+</html>

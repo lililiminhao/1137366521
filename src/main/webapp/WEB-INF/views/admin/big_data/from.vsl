@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src='/jdvop/script/admin/echarts.min.js'></script>
+<script type="text/javascript" src='/jdvop/script/admin/my97/WdatePicker.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="../jdvop/script/html5.js"></script><![endif]-->
+<title>性别占比—新增用户</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.back(-1)" title=""><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">性别占比</span>
+</div>
+<div id="iframePage">
+	<div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class=""><a href="/jdvop/admin/genderAnalysis.php">总体概览</a></li>
+                <li class="curr"><a href="/jdvop/admin/genderAnalysisAdd.php">新增用户</a></li>
+                <li class=""><a href="/jdvop/admin/activeUserAnaysis.php">活跃用户</a></li>
+                <li class=""><a href="/jdvop/admin/visitUserAnaysis.php">启动用户</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="highlight_e4e4e4 sex-ratio clearfix">
+                #set($sum = 0)
+                #foreach($da in $data.entrySet())
+                #set($sum = $sum + $!da.value.value1)
+                #end
+    	<div class="fl graphic-shows">
+    		<p class="numall">新增总量:<i>$!sum</i>人</p>
+    		<div class="wrap" id="js-graphic">
+    			
+    		</div>
+    	</div>
+    	<div class="txt-shows fl">
+    		<div class="time fr">
+                    <form   action="/jdvop/admin/genderAnalysisAdd.php" method="get">
+                    <table>
+                        <tr>
+                        <td>日期：</td>
+                        <td><input id="maxTime" class="common w200" name="maxTime" value="$!request.getParameter('maxTime')" type="text"  onfocus="var minTime=$dp.$('minTime');WdatePicker({readOnly:true, skin:'blueFresh', onpicked:function(){minTime.focus();},dateFmt:'yyyy-MM-dd 00:00:00',maxDate:'#F{$dp.$D(\'minTime\')}'})"  placeholder="起始日期" readonly=""/>
+                            -
+                            <input id="minTime" class="common w200" name="minTime"  value="$!request.getParameter('minTime')" type="text" onfocus="WdatePicker({readOnly:true, skin:'blueFresh',minDate:'#F{$dp.$D(\'maxTime\')}',dateFmt:'yyyy-MM-dd 23:59:59'})" placeholder="结束日期" readonly=""/>
+                        </td>
+                        <td>
+                            <button type="submit" class="btn-grey2 ml10" >搜索</button>
+                        </td>
+                        </tr>
+                    </table>
+                </form>
+    		</div>
+    		<table class="common">
+            <colgroup>
+                <col style="width: 120px;">
+                <col style="width: 120px;">
+                <col style="width: 120px;">
+                <col style="width: 120px;">
+                <col style="width: 120px;">
+            </colgroup>
+            <tr>
+                <th>日期</th>
+                <th>用户总量</th>
+                <th>男性占比</th>
+                <th>女性占比 </th>
+                <th>其他占比</th>
+           	</tr>
+                #foreach($da in $datas.entrySet())
+                <tr>
+                    <td>$!da.key</td>
+                    #if($dataFlag && $dataFlag.containsKey($da.key))
+                        <td><p class="txt">$!da.value.value1
+                            #if($dataFlag.get($da.key).value1)
+                                <i class="icon"></i>
+                            #else
+                                <i class="icon decline"></i>
+                            #end
+                            </p>
+                        </td>
+                        <td><p class="txt">$!da.value.value2%
+                            #if($dataFlag.get($da.key).value2)
+                                <i class="icon"></i>
+                            #else
+                                <i class="icon decline"></i>
+                            #end
+                            </p>
+                        </td>
+                        <td><p class="txt">$!da.value.value3%
+                            #if($dataFlag.get($da.key).value3)
+                                <i class="icon"></i>
+                            #else
+                                <i class="icon decline"></i>
+                            #end
+                            </p>
+                        </td>
+                        <td><p class="txt">$!da.value.value4%
+                            #if($dataFlag.get($da.key).value4)
+                                <i class="icon"></i>
+                            #else
+                                <i class="icon decline"></i>
+                            #end
+                            </p>
+                        </td>
+                    #else
+                        <td><p class="txt">$!da.value.value1</p></td>
+                        <td><p class="txt">$!da.value.value2%</p></td>
+                        <td><p class="txt">$!da.value.value3%</p></td>
+                        <td><p class="txt">$!da.value.value4%</p></td>
+                    #end
+                </tr>
+                #end
+                #set($maleSums = $math.round($math.mul($math.div($maleSum,$sum),100)))
+                #set($femaleSums = $math.round($math.mul($math.div($femaleSum,$sum),100)))
+                #set($unkownSums = $math.round($math.mul($math.div($unkownSum,$sum),100)))
+          </table>
+    	</div>
+    </div>
+</div>
+<script type="text/javascript">
+        #set($maleSum = 0)
+        #set($femaleSum = 0)
+        #set($unkownSum = 0)
+        #foreach($da in $data.entrySet())
+        #set($maleSum = $maleSum + $!da.value.value2 )
+        #set($femaleSum = $femaleSum + $!da.value.value3)
+        #set($unkownSum = $unkownSum + $!da.value.value4)
+        #end
+        #set($maleSums = $math.round($math.mul($math.div($maleSum,$sum),100)))
+        #set($femaleSums = $math.round($math.mul($math.div($femaleSum,$sum),100)))
+        #set($unkownSums = $math.round($math.mul($math.div($unkownSum,$sum),100)))
+        // 基于准备好的dom，初始化echarts实例
+        var ss1 = $maleSum;
+        var ss2 = $maleSums;
+        var ss3 = $femaleSum;
+        var ss4 = $femaleSums;
+        var ss5 = $unkownSum;
+        var ss6 = $unkownSums;
+        var myChart = echarts.init(document.getElementById('js-graphic'));
+        // 指定图表的配置项和数据
+       sexRatio = {
+		    tooltip: {
+		        trigger: 'item',
+		        formatter: "{a} <br/>{b}: {c} ({d}%)"
+		    },
+		    legend: {
+		        y: 'bottom',
+		        data:["男性"+ ss2 + "%","女性" + ss4 + "%","未知" + ss6 + "%"]
+		    },
+		    series: [
+		        {
+		            name:'性别比率',
+		            type:'pie',
+		            radius: ['40%', '55%'],
+		            data:[
+		                {
+		                	value:ss1, 
+		                	name:"男性"+ ss2 + "%",  
+		                	itemStyle:{
+		                  		normal:{color:'#1d89cf'}
+		              		}
+	                	},
+	                	{
+		                	value:ss3, 
+		                	name:"女性" + ss4 + "%",  
+		                	itemStyle:{
+		                  		normal:{color:'#e66454'}
+		              		}
+	                	},
+	                	{
+		                	value:ss5, 
+		                	name:"未知" + ss6 + "%",  
+		                	itemStyle:{
+		                  		normal:{color:'#f4b04f'}
+		              		}
+	                	}
+		            ],
+		        }
+		    ]
+		};
+   		 // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(sexRatio);
+        window.onresize = myChart.resize;
+   </script>
+</body>
+</html>

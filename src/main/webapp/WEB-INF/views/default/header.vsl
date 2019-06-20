@@ -1,0 +1,194 @@
+
+<div class="shortcut">
+    <div class="w1200 w990 con clearfix">
+        <ul class="fl">
+            <li>
+                您好，欢迎登录$!esc.html($websiteTool.getWebsite().getName())！
+            </li>
+        </ul>
+        <ul class="fr">
+            <li>
+                #if($currentUser)
+                #{if}($currentUser.nickName)
+                    $!currentUser.nickName
+                #{else}
+                    $!currentUser.loginName
+                #{end}&nbsp;&nbsp;<a href="/jdvop/my/generate/integrals.php" class="red">积分余额 $!currentUser.integral 分  </a><i></i>  
+                    <a href="/jdvop/logout.php" title="退出">退出  </a><i>|</i> 
+                    <a href="/jdvop/my/orders.php" title="我的订单">我的订单</a><i>|</i> 
+                #else
+                    <a href="/jdvop/login.php" title="登录" >登录</a><i>|</i>
+                    <a href="/jdvop/register/register.php" title="免费注册"  class="js-register">免费注册</a><i>|</i>
+                #end
+                <a href="/jdvop/help/view.php?key=关于商城" title="帮助中心">帮助中心</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--head-->
+<div class="head clearfix">
+    <div class="w1200 w990 con">
+        <div class="logo fl">
+            <a href="/jdvop/index.php" title="$!esc.html($websiteTool.getWebsite().getName())">
+                <img src="$configTool.getImageHost()$!websiteTool.getWebsite().getLogo()" alt="$!esc.html($websiteTool.getWebsite().getName())"  width="360" height="80"/>
+                <div class="medal-light"><i></i></div>
+            </a>
+        </div>
+        <a href="/jdvop/shoppingCart/myCart.php" title="我的购物车">
+            <div class="shopping-cart fr">
+                    我的购物车  
+                    <i class="ico-arrow"></i>
+                    <i class="ico-car"></i>
+                    <i class="num">$!spcart.totalAmount()</i>
+            </div>
+        </a>
+        <div class="search fr">
+            <form action="/jdvop/products.php" method="GET">
+                <div class="form">
+                    <input name="k" type="text" value="$!esc.html($!request.getParameter('k'))" placeholder="搜索您需要的礼品" class="text"/>
+                    <input type="submit" class="but" value="搜索"/> 
+                </div>
+           </form>
+        </div>
+    </div>
+</div>
+<!--导航 -->
+<div class="nav">
+    <ul class="w1200 con w990 clearfix">
+        <li class="nav-categorys js-nav-show">
+            <h2 class="nav-category-title"><i class="ico"></i>全部商品分类</h2>
+            <div class="product-categories">
+                <ul>
+                    #set($websiteProductTag = $website.getExt().get('ENABLE_WEBSITE_PRODUCTTAG'))
+                    #if($websiteProductTag && $websiteProductTag == 'true')
+                        #set($rootTags = $websiteProductTagTool.getRootTag())
+                        #foreach($rootTag in $rootTags)
+                        #set($tagChilds = $websiteProductTagTool.getChilds($rootTag.id))
+                            <li>
+                                <a href="/jdvop/products.php?wpt=$rootTag.id" class="tit">$rootTag.name</a>
+                                <em class="ico-arrow"></em>
+                                
+                                <div class="category-popup" #if($tagChilds.isEmpty()) style="display: none" #end>
+                                    <dl>
+                                        #foreach($cct in $tagChilds)
+                                        <dd>
+                                            <a href="/jdvop/products.php?wpt=$!cct.id" title="$!cct.name">$!cct.name</a>
+                                        </dd>
+                                        #end
+                                    </dl>
+                                </div>
+                            </li>
+                        #end
+                    #else
+                        #set($rootCateList = $productCateTool.rootCates())
+                        #foreach($root in $rootCateList)
+                        #set($childCates = $root.childs)
+                        <li>
+                            <a href="/jdvop/products.php?c=$root.id" class="tit">$root.name</a>
+                            <em class="ico-arrow"></em>
+                            <div class="category-popup" #if($childCates.isEmpty()) style="display: none" #end>
+                                <dl>
+                                    #foreach($cct in $childCates)
+                                    <dd>
+                                        <a href="/jdvop/products.php?c=$!cct.id" title="$!cct.name">$!cct.name</a>
+                                    </dd>
+                                    #end
+                                </dl>
+                            </div>
+                        </li>
+                        #end
+                    #end
+                </ul>
+              <p class="cls-bot j-clsBot">点击查看更多>></p>
+            </div>
+        </li>
+        <li class="item curr"><a href="/jdvop/index.php" title="首页">首页</a></li>
+        <li class="item"><a href="/jdvop/products.php?sort=time.desc" title="产品中心">产品中心 </a></li>
+        #set($navigations = $websiteTool.getNavigationItems())
+        #foreach($navigation in $navigations)
+            #set($navigationLink = "#")
+            #if($navigation.type.name() == "index")
+                #set($navigationLink = "/jdvop/index.php")
+            #elseif($navigation.type.name() == "aboutUs")
+                #set($navigationLink = "/jdvop/help/view.php?key=关于商城")
+            #elseif($navigation.type.name() == "allProducts")
+                #set($navigationLink = "/jdvop/products.php")
+            #elseif($navigation.type.name() == "product")
+                #set($navigationLink = "/jdvop/product/" + $navigation.target + ".php")
+            #elseif($navigation.type.name() == "categoryProducts")
+                #set($navigationLink = "/jdvop/products.php?c=" + $navigation.target)
+            #elseif($navigation.type.name() == "brandProducts")
+                #set($navigationLink = "/jdvop/products.php?b=" + $navigation.target)
+            #elseif($navigation.type.name() == "page")
+                #set($navigationLink = "")
+            #elseif($navigation.type.name() == "column")
+                #set($navigationLink = "")
+            #elseif($navigation.type.name() == "link")
+                #set($navigationLink = $navigation.target)
+            #elseif($navigation.type.name() == "lottery")
+                #set($navigationLink = "/jdvop/activity/lottery.php?id=" + $navigation.target)
+            #elseif($navigation.type.name() == "forwardIntegral")
+                #set($navigationLink = "/jdvop/forward/list.php")
+            #elseif($navigation.type.name() == "limitExchange")
+                #set($navigationLink = "/jdvop/activity/limitExchange/list.php")
+            #end
+            #if($velocityCount < 5)
+            <li class="item"><a href="$!navigationLink" title="$!navigation.name">$!navigation.name</a></li>
+            #end
+        #end 
+    </ul>
+</div>
+###parse('/register.vsl')
+   <script type="text/javascript">
+    $(function(){
+        //商品分类添加索引
+        $('.product-categories>ul>li').each(function(){
+            $(this).attr('class','key'+($(this).index()+1));
+        });
+        //商品分类显示隐藏
+        $('.product-categories>ul>li').hover(function(){
+            $(this).addClass('curr').siblings().removeClass('curr');
+        },function(){
+            $(this).removeClass('curr');
+        });
+        //分类点击查看更多
+        if($(".product-categories li").length > 8) {
+            $(".product-categories .j-clsBot").show();
+            $(".product-categories li:gt(7)").hide();
+            $(".product-categories li").each(function(){
+                var aIndex = $(this).index();
+                var oHeight=-aIndex*$(this).outerHeight()+"px";
+                $(this).find(".category-popup").css({"top":oHeight});
+            });
+        } else {
+            $(".product-categories li").each(function(){
+                $(this).css({"height":"56px"});
+                var aIndex = $(this).index();
+                var oHeight=-aIndex*$(this).outerHeight()+"px";
+                $(this).find(".category-popup").css({"top":oHeight});
+            });
+        };
+        var isOK=true;
+        $(".j-clsBot").click(function(){
+            if(isOK){
+                $(this).text("收起");
+                $(".product-categories li:gt(7)").show();
+                $(".product-categories").css({
+                    "height":"auto",
+                    "padding-bottom":"22px"
+                });
+                $('.category-popup').css("min-height",function(){return $(".product-categories").outerHeight()-4;});
+                isOK=false;
+            }else{
+                isOK=true;
+                $(this).text("点击查看更多>>"); 
+                $(".product-categories li:gt(7)").hide();
+                $(".product-categories").css({
+                    "height":"452px",
+                    "padding-bottom":"0"
+                });
+               $('.category-popup').css("min-height","450px");
+            };
+        });
+    });
+    </script>

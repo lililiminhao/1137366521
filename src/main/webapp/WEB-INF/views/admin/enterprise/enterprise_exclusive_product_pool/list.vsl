@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>专享池列表</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+    </p>
+    <span class="text">专享池列表</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr"><a href="#" title="专享池列表">专享池列表</a></li>
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/enterpriseExclusiveProductPool.php" method="get">
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="name" value="$!esc.html($request.getParameter('name'))" class="common ml10 w160" placeholder="企业专享池名称"/>
+                        </td>
+                        <td>
+                            <select name="enable"class="common ml10 w160" style="height:28px; width:160px">
+                                <option value="">请选择</option>
+                                 #if($shiro.isPermitted('enterprise_exclusive:startUse'))
+                                 <option #if($request.getParameter('enable')==true) selected #end value="true" >启用</option>
+                                 #end
+                                 #if($shiro.isPermitted('enterprise_exclusive:endUse'))
+                                 <option #if($request.getParameter('enable')==false) selected #end value="false" >禁用</option>
+                                 #end
+                                
+                                
+                            </select>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+        #if($shiro.isPermitted('enterprise_exclusive:create'))
+            <a href="/jdvop/admin/enterpriseExclusiveProductPool/edit.php"><span class="btn-green2">创建专享池</span></a>
+        #end
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:50px" />
+                <col style="width:120px" />
+                <col style="width:60px"/>
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:60px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col/>
+            </colgroup>
+            <tr>
+                <th>专享池ID</th>
+                <th>专享池名称</th>
+                <th>商品数量</th>
+                <th>备注</th>
+                <th>创建时间</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            #if($productPools.hasContent())
+                #foreach($productPool in $productPools)
+                <tr>
+                    <td class="tc">$!esc.html($productPool.id)</td>
+                    <td class="tc">$!esc.html($productPool.name)</td>
+                    <td class="tc">$!productPoolService.countByProductPool($productPool, null)</td>
+                    <td class="tc">$!esc.html($productPool.remark)</td>
+                    <td class="tc">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $!productPool.createTime)</td>
+                    <td class="tc">
+                    #if($!productPool.type==1) 企业 #else 系统  #end 
+                    </td>
+                    <td class="tc">#if($!productPool.enable) 启用 #else 禁用 #end </td>
+                    <td class="tc js-option-parents">
+                        <div class="drop-down js-dropDown">
+                            <span class="ico"></span>
+                            <p class="s-inp">操作</p>
+                        </div>
+                        <dl class="s-option js-sOption">
+                        	#if($shiro.isPermitted('enterprise_exclusive:view_product'))
+                        	 	<dd><a href = "/jdvop/admin/enterprise/pool/productEntries.php?poolId=$!productPool.id">查看产品</a></dd>
+                        	#end
+                        	#if($shiro.isPermitted('enterprise_exclusive:edit'))
+                        		<dd><a href = "/jdvop/admin/enterpriseExclusiveProductPool/edit.php?id=$!productPool.id">编辑</a></dd>
+                        	#end
+                        	#if($shiro.isPermitted('enterprise_exclusive:endUse'))
+                        	#end
+                        	#if($shiro.isPermitted('enterprise_exclusive:import_product'))
+                        		<dd><a href = "/jdvop/admin/enterprise/pool/productEntry/batchImport.php?poolId=$!productPool.id">导入关联</a></dd>
+                        	#end
+                        	
+                        	  #if($!productPool.enable)
+                        	   	#if($shiro.isPermitted('enterprise_exclusive:startUse'))
+                            	<dd><a href = "/jdvop/admin/enterpriseExclusiveProductPool/setEnable.php?id=$!productPool.id&enable=false"  method="GET" class="ajax-request" ok-message="reload" >禁用</a></dd>
+                            	#end
+                            #else
+                            	#if($shiro.isPermitted('enterprise_exclusive:endUse'))
+                            	<dd><a href = "/jdvop/admin/enterpriseExclusiveProductPool/setEnable.php?id=$!productPool.id&enable=true"  method="GET" class="ajax-request" ok-message="reload" >启用</a></dd>
+                           		#end
+                            #end
+                        	#if($shiro.isPermitted('enterprise_exclusive:edit_product'))
+                        		   <dd><a href = "/jdvop/admin/enterpriseExclusiveProductPoolEntry/choose.php?id=$!productPool.id">关联产品</a></dd>
+                        	#end
+                        	
+                        	#if($shiro.isPermitted('enterprise_exclusive:delete'))
+                        		<dd><a href = "/jdvop/admin/enterpriseExclusiveProductPool/delete.php?id=$!productPool.id"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要删除企业专享池吗?一旦删除将无法恢复!">删除</a></dd>
+                        	#end
+                           
+                            
+                         
+                          
+                            
+                        </dl>
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关内容
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $productPools.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+
+</script>
+
+</body>
+</html>

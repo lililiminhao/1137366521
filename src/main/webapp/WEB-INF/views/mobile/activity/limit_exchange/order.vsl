@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+</head>
+    <body class="pm56">
+        <header class="bar-nav">
+            <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+            <h1 class="title">提交订单 </h1>
+        </header>
+        #if($addressId)
+            #set($address = $addressService.findOne($addressId))
+            <article class="clearfix address" id="to_select_address">
+                <div class="name clearfix"> 
+                    <p class="flex1" style="line-height: 26px;"><img src="/jdvop/images/mobile/ico_name.png" class="ico_name fl"/>$!address.receiverName</p>     
+                    <p class="flex1" style="line-height: 26px;"><img src="/jdvop/images/mobile/ico_phone.png" class="ico_phone fl"/>$!address.mobile</p> 
+                </div>
+                <p>$!address.province.name $!address.city.name $!address.county.name #if($address.town && $address.town.id > 0)$!address.town.name#{end} $!address.address</p>
+                <span class="ico-arrow-left"></span>
+            </article>
+            <input type="hidden" name="addressId" value="$!address.id" />
+        #else
+            #if($addressList && $addressList.size() > 0)
+                #set($address = $addressList.get(0))
+                <article class="clearfix address" id="to_select_address">
+                    <div class="name clearfix"> 
+                        <p class="flex1" style="line-height: 26px;"><img src="/jdvop/images/mobile/ico_name.png" class="ico_name fl"/>$!address.receiverName</p>     
+                        <p class="flex1" style="line-height: 26px;"><img src="/jdvop/images/mobile/ico_phone.png" class="ico_phone fl"/>$!address.mobile</p> 
+                    </div>
+                    <p>$!address.province.name $!address.city.name $!address.county.name #if($address.town && $address.town.id > 0)$!address.town.name#{end} $!address.address</p>
+                    <span class="ico-arrow-left"></span>
+                </article>
+                <input type="hidden" name="addressId" value="$!address.id" />
+            #else
+                <article class="clearfix address" id="to_select_address">
+                    <p class="prompt tc" style="padding-top: 30px; font-size: 18px; font-family: arial; color: #333;">添加收货人信息</p>  
+                    <span class="ico-arrow-left"></span>
+                </article>
+            #end
+        #end
+        <div class="shopcart-list noChecked mt10">
+            <h2 class="top">订单信息</h2>
+            <form id="submit_order_form" method="POST">
+                    <input type="hidden" name="fpid" value="$flashProduct.id" />
+                    <input type="hidden" name="myAddressId"/>
+                    <input type="hidden" name="amount"  value="$amount"/>
+                <ul>
+                        <li class="clearfix">
+                            <p class="img">
+                                    <img src="$flashProduct.thumbnailImage" width="80" height="80"/> 
+                            </p>
+                            <div class="text">
+                                <span class="name">$flashProduct.name</span>
+                                 #set($discountPrice = $flashProduct.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                                 <em class="price">积分：<i class="red">$!numberTool.format('#0', $discountPrice)</i> </em> <br>
+                                <em class="price">数量：<i>$amount</i> </em> 
+                            </div>
+                        </li>
+                </ul>
+            </form>
+        </div>
+        <section class="fixed-column webkitbox-h">
+            <p class="flex1  but-orange">
+                <a href="javascript:;" class="submit-order ico-shopping">提交订单</a>
+            </p>
+        </section>
+        <script type="text/javascript">
+            $(function() {
+                $('#to_select_address').on('click', function() {
+                    location = '/jdvop/my/mobile/address.php?islimitExchangeSubmitOrder=true';
+                });
+                
+                //提交订单
+                $('.submit-order').bind("click", function() {
+                    var addrId = $('input[name=addressId]').val();
+                    if (addrId === '' && addrId <= 0) {
+                        mui.alert('请选择您的收货地址！', '温馨提示');
+                        return false;
+                    }
+                    $("input[name=myAddressId]").attr('value', addrId);
+                    $.post("/jdvop/activity/limitExchange/submit.php", $("#submit_order_form").serialize(), function(result) {
+                        var data = eval('(' + result + ')');
+                        if (data.isOk) {
+                            location.href = "/jdvop/shoppingCart/success.php?id=" + data.message;
+                        } else {
+                            mui.alert(data.message, '温馨提示');
+                            return false;
+                        }
+                    }, 'application/json');
+                });
+            });
+        </script>
+    </body>
+</html>

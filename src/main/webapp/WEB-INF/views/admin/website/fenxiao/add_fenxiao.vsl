@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+<style>
+	.tab-column .con{
+		background:#fff;
+		border-bottom:0;
+	}
+	.add-product{
+		padding-top:0;
+	}
+	[v-cloak]{
+		display:none;
+	}
+</style>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.go(-1)"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">新增分销商</span>
+</div>
+<div id="iframePage" v-cloak ids="$!{id}" watch="$!{watch}">
+    <div class="tab-column">
+        <div class="con">
+            
+        </div>
+    </div>
+    <form id="js-data-form" :action="id?'/jdvop/admin/fenxiao/editUser.php':'/jdvop/admin/fenxiao/addUser.php'" method="POST" @submit.prevent="onSubmit">
+        <input v-if="id" type="hidden" name="id" v-model="id"/>
+        <div class="automatic-box clearfix highlight_e4e4e4" style="border-top: none;">
+            <div class="add-product">
+                <table>
+                    <colgroup>
+                        <col style="width: 120px;" />
+                        <col style="width: 300px;" />
+                    </colgroup>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>分销商姓名：</td>
+                        <td>
+                            <input :readonly="watch==1" type="text" name="userName" v-model="name" class="common h30 w240" maxlength="30" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>分销商手机：</td>
+                        <td>
+                            <input :readonly="watch==1" type="text" name="mobile" v-model="mobile" class="common h30 w240" maxlength="50" /> 
+                        </td>
+                    </tr>
+                    <td class="tr"><i class="red">*</i>分销等级：</td>
+                        <td colspan="3">
+                     <select :disabled="watch==1" class="common w160 h32 mr6" name="rankId" id="js-select" @change="changD">
+                          	<option value="-1" :selected="id" >请选择</option>
+                          	<template v-if="id">
+                          		<option  :value="item.id" v-if="item.dataFlag==1" :selected="rankId==item.id" :per="item.percent" :smk_per="item.secondHierarchy" v-for="item in dengjiList">{{item.name}}</option>
+                          	</template>
+                          	<template v-else>
+                          		<option  :value="item.id" v-if="item.dataFlag==1"  :per="item.percent" :smk_per="item.secondHierarchy" v-for="item in dengjiList">{{item.name}}</option>
+                          	</template>
+                          	
+                     </select>
+                   </td>
+                   <tr>
+                        <td class="tr"><i class="red">*</i>一级分销商佣金比例：</td>
+                        <td>
+                            <input type="text" readonly name="percent" v-model="percent" class="common h30 w240" maxlength="50" />%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>二级分销商佣金比例：</td>
+                        <td>
+                            <input type="text" readonly name="secondHierarchy" v-model="secondHierarchy" class="common h30 w240" maxlength="50" />%
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="layout-footer pb30" v-show="watch!=1">
+            <div class="btn-wrap" >
+                <button type="submit" class="btn-orange">确定</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type='text/javascript' src='/jdvop/script/mobile/vue.js'></script>
+<script>
+	var app = new Vue({
+		el:'#iframePage',
+		data:function(){
+			return {
+				dengjiList:[],
+				percent:'',
+				smkPercent:'',
+				watch:0,
+				id:'',
+				name:'',
+				mobile:'',
+				rankId:'-1',
+                secondHierarchy:''
+			}
+		},
+		methods:{
+			changD:function(){
+				var T = $('[name="rankId"]').find('option:selected');
+				if(T.val() == -1){
+					this.percent = '';
+//					this.smkPercent = '';
+					this.secondHierarchy = '';
+					return;
+				}
+				this.percent = T.attr('per')+'%';
+//				this.smkPercent = T.attr('smk_per')+'%';
+				this.secondHierarchy = T.attr('smk_per')+'%';
+				this.rankId = T.val();
+			},
+			getDengji:function(){
+				var _self = this;
+				$.ajax({
+					url:'/jdvop/admin/fenxiao/findAllRank.php',
+					type:'get',
+					dataType:'json',
+					success:function(res){
+						if(res.code == 1){
+							_self.dengjiList = res.data;
+						}
+					}
+				})
+			},
+			onSubmit:function(){
+				var _self = this;
+				var thiz = $('#js-data-form');
+				var name = $('[name="userName"]').val();
+				var call = $('[name="mobile"]').val();
+				var rankId = $('[name="rankId"]').find('option:selected').val();
+				if(!name||!call||rankId == -1){
+					top.artAlert("温馨提示", '请完善必填项', 'error');
+					return;
+				}
+				var telReg = /^1[34578]\d{9}$/
+				if(!telReg.test(call)){
+					top.artAlert("温馨提示", '手机号格式不正确', 'error');
+				}
+				$.post(thiz.attr("action"), thiz.serialize(), function(data){
+		            if(data.code == 1){
+		                top.artAlert("温馨提示", data.msg, "/jdvop/admin/website/list_fenxiao.php", 'ok');
+		            }else{
+		                top.artAlert("温馨提示", data.msg, 'error');
+		            }
+		        }, "json");
+			},
+			TipsD:function(){
+				if(this.watch==1){
+					$('span.text').text('查看分销商')
+				}
+				if(this.watch == -1){
+					$('span.text').text('编辑分销商')
+				}
+			},
+			initPage:function(){
+				var id = $('#iframePage').attr('ids');
+				var watch = $('#iframePage').attr('watch');
+				if(id){
+					this.watch = watch;
+					this.id = id;
+					this.getInitData();
+				}
+				this.TipsD();
+			},
+			getInitData:function(){
+				var _self = this;
+				$.ajax({
+					url:'/jdvop/admin/fenxiao/showUser.php',
+					type:'get',
+					data:{
+						id:_self.id
+					},
+					dataType:'json',
+					success:function(res) {
+						if(res.code == 1){
+							_self.name = res.data.userName;
+							_self.mobile = res.data.mobile;
+							_self.rankId = res.data.rankId;
+							_self.percent = res.data.percent;
+//							_self.smkPercent = res.data.smkPercent;
+							_self.secondHierarchy = res.data.secondhierarchy;
+						}
+					}
+				})
+			}
+		},
+		mounted:function(){
+
+			this.initPage();
+			this.getDengji();
+		}
+	})
+</script>
+</body>
+</html>

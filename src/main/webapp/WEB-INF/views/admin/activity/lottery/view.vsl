@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link  rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type="text/javascript" src='/jdvop/script/admin/my97/WdatePicker.js'></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript">
+    //校验非空
+    function validNull(fieldVal,msg){
+        fieldVal = $.trim(fieldVal);
+        if(fieldVal === '' || fieldVal.length < 1)
+        {
+            top.artAlert('温馨提示', msg+"不能为空",  'error');
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //校验数字整数
+    function validNumber(fieldVal,msg){
+        fieldVal = $.trim(fieldVal);
+        var ex = /^\d+$/;
+        if(fieldVal && !ex.test(fieldVal))
+        {
+            top.artAlert('温馨提示', msg+"需为整数",  'error');
+            return true;
+        }
+    }
+            //校验数字整数
+    function validPositiveNumber(fieldVal,msg){
+        fieldVal = $.trim(fieldVal);
+        var ex = /^[1-9]\d*$/;
+        if(fieldVal && !ex.test(fieldVal))
+        {
+            top.artAlert('温馨提示', msg+"需为正整数",  'error');
+            return true;
+        }
+    }
+    //校验数字double
+    function validPositiveDouble(fieldVal,msg){
+        fieldVal = $.trim(fieldVal);
+         var ex = /^([0]|([1-9]\d*)|([0-9]+\.[0-9]{1,2}))$/;
+        if(fieldVal && !ex.test(fieldVal))
+        {
+            top.artAlert('温馨提示', msg+"最多2位小数",  'error');
+            return true;
+        }
+    }
+    
+    //校验栏位长度
+    function validLength(fieldVal,msg,length){
+        if(fieldVal && fieldVal.length > length)
+        {
+            top.artAlert('温馨提示', msg+"长度不能大于"+length,  'error');
+            return true;
+        }
+    }
+    
+    var collectionData = function(){
+        var data = {};
+        data.id=$("#lotteryId").val();
+        data.lotteryName = $("[name='lotteryName']").val();
+        data.needIntegral = $("[name='needIntegral']").val();
+        data.limitPeople = $("[name='limitPeople']").val();
+        data.remark = $("[name='remark']").val();
+        data.pcPublicityImage = $("#pc_img").attr("src");
+        data.mobilePublicityImage = $("#mobile_img").attr("src");
+        var beginTimeStr = $("[name='beginTime']").val();
+        var expireTimeStr = $("[name='expireTime']").val();
+        data.beginTime = beginTimeStr.substr(0, 10)+ 'T'+ beginTimeStr.substr(11, 10)+'.000+0800';
+        data.expireTime =expireTimeStr.substr(0, 10)+ 'T'+ expireTimeStr.substr(11, 10)+'.000+0800';
+        //写入奖项集合
+        var _arr = [];var p;var fn;var fns;
+        $(".js-award-box").each(
+            function(i){
+                p = {};
+                fns = $("select", this);
+                //如果select为积分
+                if(fns.val()=='1'){
+                    fn = $("input", this);
+                    p["type"] = 'integral';
+                    p["boxIndex"]= i+1;
+                    p["image"] = $("img", this).attr("src");
+                    p["name"] = fn.eq(0).val()+"积分";
+                    p["amount"] = fn.eq(2).val();
+                    p["probability"] = fn.eq(1).val();
+                    p["ext"] = {"points": fn.eq(0).val()};
+                    _arr.push(p);
+                }
+                //如果select为自定义商品
+                if(fns.val()=='2'){
+                    fn = $("input", this);
+                    p["type"] = 'custom_award';
+                    p["boxIndex"]= i+1;
+                    p["image"] = $("img", this).attr("src");
+                    p["name"] = fn.eq(0).val();
+                    p["amount"] = fn.eq(2).val();
+                    p["probability"] = fn.eq(1).val();
+                    _arr.push(p);
+                }
+                //如果select为已上传商品
+                if(fns.val()=='3'){
+                    fn = $("input", this);
+                    p["type"] = 'exist_award';
+                    p["boxIndex"]= i+1;
+                    p["image"] = $("img", this).attr("src");
+                    p["name"] = fn.eq(0).val();
+                    p["amount"] = fn.eq(3).val();
+                    p["probability"] = fn.eq(2).val();
+                    p["ext"] = {"productId": fn.eq(1).val()};
+                    _arr.push(p);
+                }
+            }
+        );
+        data.awards = $.extend(true,[],_arr);
+        return JSON.stringify(data);
+    };
+    
+    $(function(){
+        $(".js-tabBtn li").on("click",function(){
+            var z=$(this);
+            var zIndex=z.index();
+            z.addClass('curr').siblings('li').removeClass('curr');
+            $(".js-tabWrap .js-tabCon").eq(zIndex).show().siblings(".js-tabCon").hide()
+        });
+    $(".btn-orange").click(function(){
+        $(".btn-orange").attr("disabled", true);
+            if(validNull($("[name='lotteryName']").val(),"活动名称")||
+                    validLength($("[name='lotteryName']").val(),"活动名称",30)||
+                    validNull($("[name='needIntegral']").val(),"所需积分")||
+                    validLength($("[name='needIntegral']").val(),"所需积分",9)||
+                    validNull($("[name='remark']").val(),"活动说明")||
+                    validLength($("[name='remark']").val(),"活动说明",230)||
+                    validNull($("[name='beginTime']").val(),"开始时间")||
+                    validNull($("[name='expireTime']").val(),"结束时间")){
+                $(".btn-orange").attr("disabled", false);
+                return;
+            }
+            var expireD =Date.parse($("[name='expireTime']").val().replace(/-/g, "/"));
+            var beginD =Date.parse($("[name='beginTime']").val().replace(/-/g, "/"));
+            if(beginD > expireD){
+                top.artAlert('温馨提示', '开始时间不能大于结束时间',  'error');
+                $(".btn-orange").attr("disabled", false);
+                return;
+            }
+        
+            if(validNumber($("[name='needIntegral']").val(),"所需积分")||
+               validPositiveNumber($("[name='limitPeople']").val(),"参与限制")||
+               validLength($("[name='limitPeople']").val(),"参与限制",9)){
+                $(".btn-orange").attr("disabled", false);
+                return;
+            }
+            var inp; var valid = true; var sel = false;var sum=0;var img;
+            $(".js-award-box").each(
+                function(){
+                    inp = $("input", this);
+                    if($("select", this).val()=='1'){
+                        sel = true;
+                        if(validNull(inp.eq(0).val(),"奖励积分类型 积分栏位")||
+                           validNull(inp.eq(1).val(),"奖励积分类型 概率栏位")){
+                            valid = false;
+                            return false;
+                        }
+                        if(validNumber(inp.eq(0).val(),"奖励积分类型 积分栏位")||
+                           validPositiveDouble(inp.eq(1).val(),"奖励积分类型 概率栏位")||
+                           validNumber(inp.eq(2).val(),"奖励积分类型 数量限制栏位")){
+                            valid = false;
+                            return false;
+                        }
+                        sum =sum*1 + inp.eq(1).val()*1;
+                    }
+                    if($("select", this).val()=='2'){//自定义奖品
+                        sel = true;//校验图片，奖品名称，概率
+                        img = $("img", this);
+                        if(validNull(img.attr("src"),"奖励自定义奖品类型 奖品图片")||
+                           validNull(inp.eq(0).val(),"奖励自定义奖品类型 奖品名称")||
+                           validNull(inp.eq(1).val(),"奖励自定义奖品类型 概率栏位")){
+                            valid = false;
+                            return false;
+                        }
+                        if(validPositiveDouble(inp.eq(1).val(),"奖励自定义奖品类型 概率栏位")||
+                           validNumber(inp.eq(2).val(),"奖励自定义奖品类型 数量限制栏位")){
+                            valid = false;
+                            return false;
+                        }
+                        sum =sum*1 + inp.eq(1).val()*1;
+                    }
+                    if($("select", this).val()=='3'){//已上传奖品
+                        sel = true;//校验图片，奖品名称，概率
+                        img = $("img", this);
+                        if(validNull(img.attr("src"),"奖励已上传奖品类型 奖品图片")||
+                           validNull(inp.eq(0).val(),"奖励已上传奖品类型 奖品名称")||
+                           validNull(inp.eq(2).val(),"奖励已上传奖品类型 概率栏位")){
+                            valid = false;
+                            return false;
+                        }
+                        if(validPositiveDouble(inp.eq(2).val(),"奖励已上传奖品类型 概率栏位")||
+                           validNumber(inp.eq(3).val(),"奖励已上传奖品类型 数量限制栏位")){
+                            valid = false;
+                            return false;
+                        }
+                        sum =sum*1 + inp.eq(2).val()*1;
+                    }
+                }
+            );
+            if(!sel){
+                top.artAlert('温馨提示', '奖项设置至少要有一个',  'error');
+                $(".btn-orange").attr("disabled", false);
+                return;
+            }
+            if(!valid){
+                $(".btn-orange").attr("disabled", false);
+                return;   
+            }
+            if(sum>100){
+                top.artAlert('温馨提示', '概率总和不能大于100%',  'error');
+                $(".btn-orange").attr("disabled", false);
+                return;
+            }
+            var boxCount=0; var fns;
+            $(".js-award-box").each(function(){
+                    fns = $("select", this);
+                    if(fns.val()=='1'|| fns.val()=='2'|| fns.val()=='3'){
+                        boxCount += 1;
+                    }
+                }
+            );
+            if(boxCount==8){
+                top.artAlert('温馨提示', '至少保留一个谢谢参与',  'error');
+                $(".btn-orange").attr("disabled", false);
+                return;
+            }
+                
+                $.ajax({
+                    type: 'POST',
+                    url: "/jdvop/admin/lottery/save.php",
+                    contentType : "application/json",
+                    data: collectionData(),
+                    async:false,
+                    success: function(data){
+                        var temp = JSON.parse(data);
+                        if(temp.isOk){
+                            top.artAlert('温馨提示',"数据保存成功！","/jdvop/admin/lottery/list.php",'ok');
+                        }else{
+                            top.artAlert('温馨提示',temp.message);
+                            $(".btn-orange").attr("disabled", false);
+                        }
+                    },
+                    error: function(data, xhr, type){
+                        top.artAlert('温馨提示',"系统异常","/jdvop/admin/lottery/list.php",'error');
+                        $(".btn-orange").attr("disabled", false);
+                    }
+                }, 'json');
+        });
+        
+        $('.pc-Img').click(function(){
+            $('#pc_file_upload').click();
+        });
+        $('#pc_file_upload').fileupload({
+            url: '/jdvop/admin/lottery/image-upload.php',
+            formData:{'width':780,'height':225},
+            dataType: 'json',
+            autoUpload: true,
+            done: function(e, data) {
+                if (!data.result.isOk) {
+                    top.artAlert('温馨提示', data.result.message, 'error');
+                    $(".btn-orange").attr("disabled", false);
+                } else {
+                    $('#pc_img').attr('src',data.result.message);
+                }
+            }
+        });
+        $('.js-del-pc-ima').click(function(){
+            $("#pc_img").attr('src',"");
+        });
+        
+        $('.mobile-Img').click(function(){
+            $('#mobile_file_upload').click();
+        });
+        $('#mobile_file_upload').fileupload({
+            url: '/jdvop/admin/lottery/image-upload.php',
+            formData:{'width':485,'height':200},
+            dataType: 'json',
+            autoUpload: true,
+            done: function(e, data) {
+                if (!data.result.isOk) {
+                    top.artAlert('温馨提示', data.result.message, 'error');
+                    $(".btn-orange").attr("disabled", false);
+                } else {
+                    $('#mobile_img').attr('src',data.result.message);
+                }
+            }
+        });
+        $('.js-del-mob-ima').click(function(){
+            $("#mobile_img").attr('src',"");
+        });
+        
+    });
+
+</script>
+<title>抽奖设置</title>
+</head>
+
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.back(-1)" title="品牌管理"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">抽奖设置</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix js-tabBtn">
+                <li class="curr cup">基本设置</li>
+                <li class="cup">奖项设置</li>
+            </ul>
+        </div>
+    </div>
+    <div class="js-tabWrap automatic-box clearfix highlight_e4e4e4" style="border-top:none;">
+	<div class="js-tabCon add-product">
+            <table>
+                <colgroup>
+                    <col style="width: 146px;">
+                    <col>
+                </colgroup>
+                <tr>
+                    <td class="tr"><i class="orange"> * </i>活动名称：</td>
+                    <td><input name="lotteryName" value="$!lottery.lotteryName"  type="text" class="common w260 h30" required="required"/></td>
+                </tr>
+                <tr>
+                    <td class="tr"><i class="orange"> * </i>所需积分：</td>
+                    <td><input name="needIntegral"  value="$!lottery.needIntegral" type="text" placeholder="每次参与抽奖所花费的积分" class="common w260 h30"/><span class="pl10">积分</span></td>
+                </tr>
+                <tr>
+                    <td class="tr">参与限制：</td>
+                    <td><input name="limitPeople" value="#if($!lottery.limitPeople!=0)$!lottery.limitPeople#end" type="text" placeholder="限制每人参与次数，不填则为不限制" class="common w260 h30"/></td>
+                </tr>
+                <tr>
+                    <td class="tr"><i class="orange"> * </i>开始时间：</td>
+                    <td>
+                        <div class="time-input w260">
+                            #set($sysDate=$!dateTool.format('yyyy-MM-dd HH:mm:ss',$!dateTool.getSystemDate()))
+                            <input type="text" name="beginTime" value="$!dateTool.format('yyyy-MM-dd HH:mm:ss', $lottery.beginTime)" 
+                                   class="common w260 h30" onfocus="WdatePicker({readOnly:true, minDate:'$sysDate', skin:'blueFresh', dateFmt:'yyyy-MM-dd 00:00:00'});" placeholder="起始日期"/>
+                            <span class="text h30">日期</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tr"><i class="orange"> * </i>结束时间：</td>
+                    <td>
+                        <div class="time-input w260">
+                            <input type="text" name="expireTime" value="$!dateTool.format('yyyy-MM-dd HH:mm:ss', $lottery.expireTime)" 
+                                   class="common w260 h30" onfocus="WdatePicker({readOnly:true, minDate:'$sysDate', skin:'blueFresh', dateFmt:'yyyy-MM-dd 23:59:59'});"
+                                   placeholder="结束日期"/>
+                            <span class="text h30">日期</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tr"><i class="orange"> * </i>活动说明：</td>
+                    <td><textarea name="remark" class="common w360" style="height: 160px;">$!lottery.remark</textarea></td>
+                </tr>
+                <tr>
+                    <td class="tr">pc端宣传图：</td>
+                    <td>
+                        <div class="propaganda-chart">
+                            <div class="pc-img">
+                                <p class="img"> 
+                                    <img id="pc_img" src="$!lottery.pcPublicityImage"  width="260" height="75"/> 
+                                    <span class="ico-del js-del-pc-ima"></span>
+                                </p>
+                                <span class="btn-grey2 ml4 mt6 js-upload-image pc-Img">请选择图片</span>&nbsp;&nbsp;<i class="orange">pc端：建议上传780*225px大小尺寸的图片!</i>
+                                <div style="display: none">
+                                    <input type="file" id='pc_file_upload' name = "imageFile"/>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tr">移动端宣传图：</td>
+                    <td>
+                        <div class="propaganda-chart">
+                            <div class="mobile-img">
+                                <p class="img">
+                                    <img id="mobile_img" src="$!lottery.mobilePublicityImage"  width="260" height="107"/>
+                                    <span class="ico-del js-del-mob-ima"></span>
+                                </p>
+                                <span class="btn-grey2 ml4 mt6 js-upload-image mobile-Img">请选择图片</span>&nbsp;&nbsp;<i class="orange">移动端：建议上传485*200大小尺寸的图片!</i>
+                                <div style="display: none">
+                                    <input name="mobilePublicityImage" value="$!lottery.mobilePublicityImage"/>
+                                        <input type="file" id='mobile_file_upload'  name = "imageFile"/>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+        </table>
+      </div>
+
+        <div class="js-tabCon awards-wrap clearfix" style="display: none;">
+            <div class="left-box">
+                <p class="title"></p>
+                <div class="marquee-box" id="gameContent">
+                    <table id="gameTable">
+                        <tr>
+                            <td rel='1'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                            <td rel='2'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                            <td rel='3'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td rel='4'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                            <td></td>
+                            <td rel='5'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td rel='6'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                            <td rel='7'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                            <td rel='8'>
+                                <p class="default-text">谢谢参与</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="right-box">
+                <table>
+                    <colgroup>
+                        <col style="width:60px;">
+                        <col style="width: 146px;">
+                        <col style="width: 146px;">
+                        <col style="width: 146px;">
+                        <col style="width: 146px;">
+                        <col style="width: 146px;">
+                        <col style="width: 146px;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th colspan="2">类型</th>
+                            <th>奖品图</th>
+                            <th>奖品名称</th>
+                            <th>积分</th>
+                            <th>概率</th>
+                            <th>数量限制</th>
+                        </tr>
+                    </thead>
+                    #if($lottery.getAwards())
+                        #foreach($i in [1..8])
+                            #set($has = false)
+                            #foreach($award in $lottery.getAwards())
+                                #if($award.boxIndex == $i)
+                                    #set($has = true)
+                                    <tr class="award-box js-award-box">
+                                        <td>$i</td>
+                                        <td>
+                                            <select class="common h32 w140 awards-type">
+                                                <option value="0">谢谢参与</option>
+                                                <option value="1" #if($award.type == 'integral')selected="selected"#end>奖励积分</option>
+                                                <option value="2" #if($award.type == 'custom_award')selected="selected"#end>自定义奖品</option>
+                                                <option value="3" #if($award.type == 'exist_award')selected="selected"#end>已上传商品</option>
+                                            </select>
+                                        </td>
+                                        <!--add 奖品图  奖品名称	-->
+                                        <td>
+                                            #if($award.type == 'integral')<img src='/jdvop/images/img6.png' width='45' height='45'/>
+                                            #elseif($award.type == 'custom_award')<div><img class='js-custom_img' src='$!award.image' width='45' height='45'/></div>
+                                            #elseif($award.type == 'exist_award')<div class="chooseProduct"><img src="$!award.image" width="45" height="45"/></div>
+                                            #else--#end
+                                        </td>
+                                        <td>
+                                            #if($award.type == 'custom_award')<input class="common w100 h30"  type="text" value="$!award.name"/>
+                                            #elseif($award.type == 'exist_award')<input class="common w100 h30"  type="text" value="$!award.name"/><input type="hidden" value="$!award.ext.get('productId')"/>
+                                            #else--#end
+                                        </td>
+                                        <!--add -->
+                                        <td>#if($award.type == 'integral')<input type="text" class="common w100 h30" value="$!award.ext.get('points')"/>#else--#end</td>
+                                        <td>
+                                            <div class="probability">
+                                                <input type="text" value=$numberTool.format('##0.00', $!award.probability)><i>%</i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="num">
+                                                <input type="text" value='#if($award.amount==0) #else $!award.amount #end'/><i>份</i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                #else
+                                #end
+                            #end
+                            #if($has == false)
+                                    <tr class="award-box js-award-box">
+                                        <td>$i</td>
+                                        <td>
+                                            <select class="common h32 w140 awards-type">
+                                                <option value="0">谢谢参与</option>
+                                                <option value="1">奖励积分</option>
+                                                <option value="2">自定义奖品</option>
+                                                <option value="3">已上传商品</option>
+                                            </select>
+                                        </td>
+                                        <td>--</td><td>--</td><td>--</td><td>--</td><td>--</td>
+                                    </tr>
+                            #end    
+                        #end
+                    #else
+                        #foreach($i in [1..8])
+                            <tr class="award-box js-award-box">
+                                <td>$i</td>
+                                <td>
+                                    <select class="common h32 w140 awards-type">
+                                        <option value="0">谢谢参与</option>
+                                        <option value="1">奖励积分</option>
+                                        <option value="2">自定义奖品</option>
+                                        <option value="3">已上传商品</option>
+                                    </select>
+                                </td>
+                                <td>--</td><td>--</td><td>--</td><td>--</td><td>--</td>
+                            </tr>
+                        #end
+                    #end
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="layout-footer clearfix">
+        <div class="btn-wrap">
+            <input type="submit" value="保存" class="btn-orange"/>
+        </div>
+    </div>
+     <div style="display: none">
+        <input id ="lotteryId" type="hidden" value = "$!lottery.id"/>
+        <input type="file" id='custom_img_upload' name = "imageFile" />
+     </div>
+</div>
+</body>
+<script type="text/javascript">
+    //子窗口触发
+    function callBackFunForProducts(data, boxIndex){
+        var product = data[0];
+        $(".js-award-box").eq(boxIndex).find("img").attr('src',product.thumbnailImage);//设置图片
+        $(".js-award-box").eq(boxIndex).find("input").eq(0).val(product.name);//设置奖品名称
+        $(".js-award-box").eq(boxIndex).find("input").eq(1).val(product.id);//设置产品id
+    }
+    
+    $(function(){
+        $('.chooseProduct').live("click",function(){
+            //获取当前奖品图的所在TR位置
+            var index = $(this).parents('.js-award-box').index();
+            window.open("/jdvop/admin/lottery/chooseProducts.php?openBoxIndex="+index, 'chooseWindow', 'height=760, width=1100, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no');  
+        });
+        $(".js-custom_img").live("click",function(){
+             $("#custom_img_upload").attr("boxIndex",$(this).parents('.js-award-box').index());
+            $("#custom_img_upload").click();
+        });
+        $('#custom_img_upload').fileupload({
+            url: '/jdvop/admin/lottery/image-upload.php',
+            dataType: 'json',
+            autoUpload: true,
+            done: function(e, data) {
+                boxIndex = $("#custom_img_upload").attr("boxIndex");
+                if (!data.result.isOk) {
+                    top.artAlert('温馨提示', data.result.message, 'error');
+//                    $(".btn-orange").attr("disabled", false);
+                } else {
+                    $(".js-award-box").eq(boxIndex).find("img").attr('src',data.result.message);
+                }
+            }
+        });
+        $(".awards-type").live("change", function(){
+            var selectVal = $(this).val();
+           var awardBox = $(this).parents(".js-award-box");
+           var td = awardBox.find("td").eq(0);
+           awardBox.children().remove();
+           awardBox.append("<td>"+td.html()+"</td>");//添加索引栏位
+           //添加类型select栏位
+           if(selectVal ==0){
+                awardBox.append("<td><select class='common h32 w140 awards-type'><option value='0'>谢谢参与</option><option value='1'>奖励积分</option><option value='2'>自定义奖品</option><option value='3'>已上传商品</option></select></td>");
+                awardBox.append("<td>--</td><td>--</td><td>--</td><td>--</td><td>--</td>");
+                return;
+            }
+            if(selectVal ==1){//如果为积分类型
+                awardBox.append("<td><select class='common h32 w140 awards-type'><option value='0'>谢谢参与</option><option value='1' selected='selected'>奖励积分</option><option value='2'>自定义奖品</option><option value='3'>已上传商品</option></select></td>");
+                awardBox.append("<td><img src='/jdvop/images/img6.png' width='45' height='45'/></td><td>--</td>");
+                awardBox.append("<td><input type='text' class='common w100 h30' value=''/></td>");
+            }
+            if(selectVal ==2){//如果为自定义奖品
+                awardBox.append("<td><select class='common h32 w140 awards-type'><option value='0'>谢谢参与</option><option value='1'>奖励积分</option><option value='2'  selected='selected'>自定义奖品</option><option value='3'>已上传商品</option></select></td>");
+                awardBox.append("<td><div><img class='js-custom_img' src='' width='45' height='45'/></div></td>");
+                awardBox.append("<td><input class='common w100 h30' type='text' value=''/></td>");
+                awardBox.append("<td>--</td>");
+            }
+            if(selectVal ==3){//如果为已上传商品
+                awardBox.append("<td><select class='common h32 w140 awards-type'><option value='0'>谢谢参与</option><option value='1'>奖励积分</option><option value='2'>自定义奖品</option><option value='3'  selected='selected'>已上传商品</option></select></td>");
+                awardBox.append("<td><div class='chooseProduct'><img src='' width='45' height='45'/></div></td>");
+                awardBox.append("<td><input class='common w100 h30'  type='text' value=''/><input type='hidden'/></td>");
+                awardBox.append("<td>--</td>");
+            }
+            awardBox.append("<td><div class='probability'><input type='text' value=''/><i>%</i></div></td><td><div class='num'><input type='text' value=''/><i>份</i></div></td>");
+            
+            if(selectVal ==3){
+                window.open("/jdvop/admin/lottery/chooseProducts.php?openBoxIndex="+awardBox.index(), 'chooseWindow', 'height=760, width=1100, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no');  
+            }
+            if(selectVal ==2){
+                $("#custom_img_upload").attr("boxIndex",awardBox.index());
+                $("#custom_img_upload").click();
+            }
+        });
+    });
+</script>
+</html>

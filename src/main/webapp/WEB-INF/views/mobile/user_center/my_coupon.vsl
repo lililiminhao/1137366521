@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>优惠券</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="/jdvop/css/admin/public.css">
+    <link rel="stylesheet" href="/jdvop/css/mobile/quanCenter.css">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        ;
+    </style>
+</head>
+
+<body>
+    <div id="my_quan" v-cloak>
+        <div class="tabs">
+            <ul>
+                <li :class="{active:item.active}" v-for="(item,index) in tabList" @click="changTab(item,index+1)">{{item.name}}<i></i></li>
+            </ul>
+        </div>
+        <div class="content">
+            <ul>
+                <li class="quan-item" v-for="(item,i) in quanlist" :id="currIndex==3?'overTime':''" :key="i" :class="'type'+item.type">
+                    <div class="price">
+                        <div class="type" v-html="getType(item.type)"></div>
+                        <div class="kan">￥<span>{{item.amount}}</span></div>
+                        <div class="count" v-html="getTips(item)"></div>
+                    </div>
+                    <div class="desc">
+                        <p class="quan-name">{{item.name}}</p>
+                        <p class="quan-time" v-html="getTime(item)"></p>
+                    </div>
+                    <div class="btn" :class="{status:currIndex == 2}" >
+                        <label @click="toUse(item)">去使用</label>
+                    </div>
+                </li>
+                <p class="nomore">
+                	<template v-if="quanlist.length">没有更多优惠券了</template>
+                	<template v-else>当前没有优惠券</template>
+                </p>
+            </ul>
+        </div>
+    </div>
+    <script src="/jdvop/script/mobile/vue.js"></script>
+	<script src="/jdvop/script/mobile/zepto.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#my_quan',
+            data: function () {
+                return {
+                	currIndex:1,
+                    tabList: [
+                        {
+                            name: '未使用',
+                            active: true
+                        },
+                        {
+                            name: '已使用',
+                            active: false
+                        },
+                        {
+                            name: '已过期',
+                            active: false
+                        }
+                    ],
+                    quanlist: []
+                }
+            },
+            watch:{
+            	currIndex:function(newV){
+            		if(newV == 2){
+            			this.getCoupons(0);
+            			return;
+            		}
+            		if(newV == 3){
+            			this.getCoupons(-1);
+            			return;
+            		}
+            		this.getCoupons(1);
+              	}
+            },
+            methods: {
+            	toUse:function(item){
+            		if(item.targetType == 1){
+            			location.href = '/jdvop/mobile/products.php?providerId='+item.targetId;
+            		}
+            		if(item.targetType == 2){
+            			location.href = '/jdvop/mobile/products.php?wpt='+item.targetId;
+            		}
+            		if(item.targetType == 3){
+            			location.href = '/jdvop/product/'+item.targetId+'.php'
+            		}
+            		if( item.targetType == 4){
+            			location.href = '/jdvop/specialActivity.php?id='+item.targetId;
+            		}
+            	},
+                getType: function (type) {
+                    return type == 1 ? '满减券' : type == 2 ? '直减券' : '折扣券';
+                },
+                getTips: function (item) {
+                    if (item.type == 1) {
+                        return '满' + item.usable + '元可用';
+                    }
+                    if (item.type == 2) {
+                        return '直减' + item.amount + '元';
+                    }
+                    if (item.type == 3) {
+                        return item.amount + '折';
+                    }
+
+                },
+                getTime(item){
+                	return (item.startTime+'~'+item.endTime).replace(/-/g,'.');
+                },
+                changTab: function (it,index) {
+                    if (it.active) {
+                        return;
+                    }
+                    var arr = this.tabList;
+                    arr.forEach(function (item, index) {
+                        item.active = false;
+                    });
+                    it.active = true;
+                    this.currIndex = index;
+                },
+                getCoupons:function(num){//获取未使用优惠券
+                	this.quanlist = new Array();
+                	var _self = this;
+                	$.ajax({
+                		url:'/jdvop/my/mobile/findCoupon.php',
+                		type:'get',
+                		data:{
+                			type:num
+                		},
+                		success:function(res){
+                			res = JSON.parse(res);
+                			if(res.code == 1){
+                				_self.quanlist = res.data;
+                			}
+                		}
+                	})
+                }
+            },
+            mounted:function(){
+            	this.getCoupons(1)
+            }
+        })
+        document.getElementsByTagName("html")[0].style.fontSize =
+            innerWidth * 0.1 + "px";
+
+    </script>
+</body>
+
+</html>

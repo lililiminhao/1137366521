@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta content="telephone=no" name="format-detection"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+        <script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+        <title>售后服务</title>
+    </head>
+    <body class="bgfff">
+        <header class="bar-nav js-header">
+            <a href="javascript:history.go(-1)" class="btn btn-back fl" ></a>
+            <h1 class="title">售后服务</h1>
+        </header>
+        <div class="pt44">
+            <div class="after-sale-state ok">
+                <i class="icon-ok mui-icon"></i>#if($aso.status == 'accepted')售后已完成#{else}客服已经同意您的退款申请#{end}
+            </div>
+            <ul class="refund-service state-diagram">
+                <li>
+                    <span class="dot">1</span>
+                    <p class="txt">客服审核通过</p>
+                    <p class="time">
+                    #if($aso.auditTime)
+                    	$!dateTool.format('yyyy-MM-dd HH:mm', $aso.auditTime)
+                    #else
+                    	$!dateTool.format('yyyy-MM-dd HH:mm:ss', $aso.applyTime)
+                    #end
+                    </p>
+                </li>
+                #if((!$aso.openStatus || $aso.openStatus == 'accepted') && ($aso.status == 'waiting_finance' || $aso.status == 'accepted' || $aso.status == 'processing_refund'))
+                <li>
+                    <span class="dot">2</span>
+                    <p class="txt">
+                        系统处理退款
+                    </p>
+                    <p class="time"></p>
+                </li>
+                #end
+                #if($aso.status == 'accepted')
+                <li>
+                    <span class="dot">3</span>
+                    <p class="txt">金额已到账（售后完成）</p>
+                    <p class="time"> $!dateTool.format('yyyy-MM-dd HH:mm', $aso.acceptTime)</p>
+                </li>
+                #end
+            </ul>
+        </div>
+    </body>
+</html>

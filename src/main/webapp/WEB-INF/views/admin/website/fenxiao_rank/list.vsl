@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/jquery.datetimepicker.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<script src="/jdvop/script/admin/jquery.datetimepicker.full.min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>分销等级</title>
+<style>
+	.drop-down{
+		text-align:center;
+		width:auto;
+		text-indent:0;
+	}
+	.drop-down a{
+		display:block;
+	}
+	.drop-down p{
+		float:left;
+		margin-right:6px;
+	}
+	tr.disabled{
+		text-decoration:line-through;
+		color:#999;
+	}
+	[v-cloak]{
+		display:none;
+	}
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+##    <p class="right fr">
+##    </p>
+    <span class="text">分销等级</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage" >
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+             #if($shiro.isPermitted('fenxiao_user:view'))
+                <li><a href="/jdvop/admin/website/list_fenxiao.php" title="分销商列表">分销商列表</a></li>
+                #end
+                <li class="curr"><a href="#" title="分销等级">分销等级</a></li>
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+        </div>
+        <div class="right fr p10 js-option-parents">
+			#if($shiro.isPermitted('fenxiao_rank:create'))
+           		 <a href="/jdvop/admin/website/form_fenxiao_rank.php"><span class="btn-green2">新增</span></a>
+			#end
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:80px" />
+                <col style="width:100px" />
+                <col style="width:100px" />
+                <col style="width:100px" />
+                <col style="width:150px" />
+                <col/>
+            </colgroup>
+            <tr>
+            	<th>等级名称</th>
+                <th>一级分销商佣金比例</th>
+                <th>二级分销商佣金比例</th>
+                <th>市民卡分销佣金比例</th>
+                <th>操作</th>
+            </tr>
+           	<tr v-for="(item,index) in list" :class="{disabled:item.dataFlag==-1}">
+           		<td>{{item.name}}</td>
+           		<td>{{item.percent}}%</td>
+           		<td>{{item.secondHierarchy}}%</td>
+           		<td>{{item.smkPercent}}%</td>
+           		<td >
+					<div style="position:relative;" >
+	                    <div class="drop-down js-dropDown" >
+	                        <p  class="s-inp">
+	                        #if($shiro.isPermitted('fenxiao_rank:view'))
+								<a :href="'/jdvop/admin/website/form_fenxiao_rank.php?id='+item.id+'&watch=1'">查看</a>
+								#end
+							</p>
+							<template v-if="item.dataFlag!==-1">
+								<p  class="s-inp">
+								#if($shiro.isPermitted('fenxiao_rank:edit'))
+									<a :href="'/jdvop/admin/website/form_fenxiao_rank.php?id='+item.id+'&watch=-1'">编辑</a>
+								#end
+								</p>
+								<p  class="s-inp">
+								#if($shiro.isPermitted('fenxiao_rank:delete'))
+									<a  href="javascript:;" @click="deleteItem(item.id)">删除</a>
+								#end
+								</p>
+							</template>
+	                    </div>
+                    </div>
+				</td>
+           	</tr>
+        </table>
+    </div>
+    <div class="layout-footer clearfix" v-if="pageInfo">
+        <ul class="multipage clearfix">
+            <li>共({{pageInfo.totalItems}})条</li><li style="margin:0px 20px 0px 15px;">{{position}}</li>
+            <li><span class="h-page" :class="{'no-page':pageInfo.currentPage==1}" @click="to1">首页</span></li>
+            <li><span class=" p-page" :class="{'no-page':pageInfo.currentPage==1}" @click="toPre">前一页</span></li>
+            <li><span class="current"> {{pageInfo.currentPage}} </span></li>
+            <li><span class=" p-page" :class="{'no-page':pageInfo.currentPage==pageInfo.totalPage}" @click="toNext">后一页</span></li>
+            <li><span class="e-page" :class="{'no-page':pageInfo.currentPage==pageInfo.totalPage}" @click="toLast">尾页</span></li>
+        </ul>
+    </div>
+</div>
+</div>
+<script type='text/javascript' src='/jdvop/script/mobile/vue.js'></script>
+<script type="text/javascript">
+	var app = new Vue({
+		el:'#app',
+		data:function(){
+			return {
+				page:1,
+				list:[],
+				pageInfo:null,
+				PageSize:null
+			}
+		},
+		computed:{
+			position:function(){
+				var pInfo = this.pageInfo;
+				if(pInfo){
+					var start = (pInfo.currentPage-1)*this.PageSize;
+					var end;
+					if(pInfo.totalPage == pInfo.currentPage){
+						end = pInfo.totalItems ;
+					}else{
+						end = start+this.PageSize
+					}
+					return '当前显示'+start+'~'+end+'条';
+				}else{
+					return '';
+				}
+				
+			}
+		},
+		watch:{
+			page:function(newV){
+				this.getData();
+			}
+		},
+		methods:{
+			to1:function(){
+				if(this.pageInfo.currentPage==1){
+					return;
+				}
+				this.page = 1;
+			},
+			toPre:function(){
+				if(this.pageInfo.currentPage==1){
+					return;
+				}
+				this.page--;
+			},
+			toNext:function(){
+				if(this.pageInfo.currentPage==this.pageInfo.totalPage){
+					return;
+				}
+				this.page++;
+			},
+			toLast:function(){
+				if(this.pageInfo.currentPage==this.pageInfo.totalPage){
+					return;
+				}
+				this.page = this.pageInfo.totalPage;
+			},
+			getData:function(){
+				var _self = this;
+				$.ajax({
+					url:'/jdvop/admin/fenxiao/fenxiaoRankList.php',
+					type:'get',
+					dataType:'json',
+					data:{
+						pageNum:_self.page
+					},
+					success:function(res){
+						if(res.code == 1){
+							_self.list = res.data.content;
+							_self.pageInfo = res.data.pagerSpec;
+							_self.PageSize = res.data.perPageSize;
+						}
+					}
+				})
+			},
+			deleteItem:function(id){
+				var _self = this;
+				top.artConfirm('请注意', '删除此分销等级?', function(v){
+			        if (v) {
+			           $.ajax({
+			           		type:'get',
+			           		url:'/jdvop/admin/fenxiao/delRank.php',
+			           		data:{
+			           			id:id
+			           		},
+			           		dataType:'json',
+			           		success:function(res){
+			           			if(res.code == 1){
+			           				top.artAlert("温馨提示", res.msg, 'ok');
+			           				_self.getData();
+			           			}else{
+			           				top.artAlert("温馨提示", res.msg, 'error');
+			           			}
+			           		}
+			           })
+			        }
+			    });
+			}
+		},
+		mounted:function(){
+			this.getData();
+		}
+	})
+</script>
+
+</body>
+</html>

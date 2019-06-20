@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src='/jdvop/script/admin/alert.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/dragsort-0.5.1.min.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>选择产品</title>
+<style>
+.mark_box{position: fixed;top: 0;left: 0;z-index:999;width: 100%;height: 100%;background: #000;border: 0;filter: alpha(opacity=15);opacity: .15;}
+table.other td{padding: 0 2px}
+</style>
+<script type="text/javascript">
+ function animationShow(){
+    if($(".js-showImgList li").length<=0){
+        $(".js-hideBox").animate({
+            height:'0px'
+        },"1000");
+       $(".js-hideBox .prompt").show(); 
+    }else{
+        $(".js-hideBox").animate({
+            height:'421px'
+        },"1000");
+        $(".js-hideBox .prompt").hide(); 
+    };
+ };
+$(function(){
+    animationShow();
+    $(document).on('click', '.js-selectbox li' ,function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        var paramNum = $(".js-showImgList").find("li");     // 已选择的产品数量
+        var img = thiz.find('img:first').attr('src');             // 产品图片路径
+        var id = thiz.attr('rel');                          // 产品编号ID
+        var title = thiz.find('label').attr('title');       // 获取每次点击的图片标题
+        var name  = thiz.find('p.product-title').text();
+        if (thiz.hasClass('curr')){
+            //如果已经选中则取消,并且删除选中的产品
+            thiz.removeClass('curr');
+            $(".js-showImgList li").each(function(){
+                if ($(this).attr("rel") == id) {
+                    $(this).remove();
+                }
+            });
+        } else {
+            if(paramNum.size() >= $maxSize){
+                top.artAlert("温馨提示", "本栏目最多只能选择$maxSize款产品", 'error');
+                return false;
+            }
+            var html = "<li rel='" + id + "' class='js-dragsort'>";
+            html += "<input type='hidden' name='id[]' value='" + id + "' />";
+            html += '<a href="javascript:;" class="tooltip" title="' + name + '">';
+            html += "<img src=\"" + img + "\"/>";
+            html += "</a>";
+            html += '<span class="ico-del js-del"></span>';
+            html += '</li>';
+            $(".js-showImgList").append(html);
+            thiz.addClass('curr');
+            animationShow()
+        };
+    });
+    //清空已选产品
+    $(document).on("click", ".js-clear-all", function(e){
+        e.preventDefault(); 
+        $('li.js-dragsort').each(function(){
+            var thisPicId = $(this).attr('rel');
+            $('.js-selectbox li[rel="' + thisPicId + '"]').removeClass('curr');
+            $(this).remove();
+        });
+    });
+    
+    //产品删除按钮
+     $(document).on('click','.js-dragsort .js-del', function(e){
+        e.preventDefault();
+        var thisBox = $(this).parent('.js-dragsort');
+        var thisPicId = $(thisBox).attr('rel');
+        $('.js-selectbox li[rel="' + thisPicId + '"]').removeClass('curr');
+        thisBox.remove();
+        return false;
+     });
+    //模块拖动排序
+    $('#dragsort').dragsort({
+        dragSelector: "li.js-dragsort",
+        dragEnd: function() { },
+        dragBetween: 'false',
+        dragSelectorExclude: 'span.ico-del',
+        placeHolderTemplate: '<li class="a-dashed"></li>',
+        scrollSpeed: 5
+    });
+});
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">选择产品</span>
+    <p class="right fr"><a href="javascript:history.back(-1);" title="返回"><span class="btn-grey2">返回</span></a></p>
+</div>
+<div id="iframePage">
+    <div class="automatic-box clearfix mt10 js-hideBox" style="height: 0; overflow: hidden;">
+        <p class="prompt" style=" padding: 10px;">请在下面产品库中选择需要展示的产品。</p>
+        <div class="h37 bg_grey highlight_e4e4e4">
+            <i class="pl10 fwb">已选择的产品</i>
+        </div>
+        <div class="layout-selectShow">
+            <p style=" padding: 10px 0 0 20px;">请在下面产品库中选择产品，选中的产品可直接拖动排序。<font class="red">至少选择$minSize个产品，最多可选择$maxSize产品。</font></p>
+            <ul class="js-showImgList clearfix" id="dragsort">
+                #if($selectedProducts)
+                #foreach($product in $selectedProducts)
+                <li rel="$product.id" class="js-dragsort">
+                    <input type="hidden" name="id[]" value="$product.id">
+                    <a href="javascript:;" class="tooltip" title="$product.name">
+                        #if($product.ownerType == "jingdong")
+                            <img id="pd_image" src="$!product.thumbnailImage">
+                            <img src="/jdvop/images/jd-ico.png" class="jd-ico"/> 
+                        #elseif($product.ownerType == "system")
+                            <img id="pd_image" src="$!product.thumbnailImage">
+                        #else
+                            <img id="pd_image" src="$configTool.getImageHost()/middle$!product.thumbnailImage" width="160" height="160" alt="$!product.name"/>
+                        #end
+                    </a>
+                    <span class="ico-del js-del"></span>
+                </li>
+                #end
+                #end
+            </ul>
+        </div>
+        <div class="layout-footer clearfix">
+            <div class="btn-wrap">
+                <span class="btn-red js-clear-all">清空所选</span>
+                <span class="btn-grey" id="do_save">下一步</span>
+            </div>
+        </div>
+    </div>
+    <div class="h48 bg_grey highlight_e4e4e4 clearfix overh">
+        <div class="fl">
+            <form action="/jdvop/admin/website/block/loadProducts.php" id="query_form">
+                <table class="other">
+                    <tr>
+                        <td>
+                            <select name="type" class="common ml10 h26">
+                                <option value="0">产品来源</option>
+                                #foreach($type in $ownerTypes)
+                                    <option value = "$type.name()" #if($ownerType == $type.name()) selected #end>$type.description</option>
+                                #end    
+                            </select>
+                        </td>
+                        <td>
+                            <select name="cate" class="common ml10 h26 w120">
+                                <option value="0">请选择分类</option>
+                                #foreach($cate in $cates)
+                                    <option value = "$cate.id" #if($request.getParameter('cate') == $cate.id) selected #end>$cate.name</option>
+                                #end    
+                            </select>
+                        </td>
+                        <td>
+                            <select name="brand" class="common ml10 h26 w120">
+                                <option value="0">所有品牌</option>
+                                #foreach($b in $brands)
+                                <option value="$b.id" #if($request.getParameter('brand') == $b.id) selected #end>$esc.html($b.name)</option>
+                                #end
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="minPrice" value="$!numberTool.format('#0',$!minPrice)" filter-rule="isnumber" filter-except="." class="common ml10 w80 filter-input" placeholder="最低售价"/> - 
+                            <input type="text" name="maxPrice" value="$!numberTool.format('#0',$!maxPrice)" filter-rule="isnumber" filter-except="." class="common w80 filter-input" placeholder="最高售价"/>
+                        </td>
+                        <td>
+                            <input type="text" name="kw" value="$!kw" class="common ml10 w160" placeholder="请出入关键字"/>
+                        </td>
+                        <td>
+                            <input class="btn-grey2 ml10" type="submit" value="搜索">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    	<div class="fr mr20">排序：
+            <button class="btn-grey2 js-sort-switch" rel="time" js-default="desc" js-sort-t="asc">时间<i>↓</i></button>
+            <button class="btn-grey2 js-sort-switch" rel="price" js-sort-t="desc">价格<i></i></button>
+            <button class="btn-grey2 js-sort-switch" rel="soldnum" js-sort-t="desc">销量<i></i></button>
+        </div>
+    </div>
+    </div>
+    <div class="layout-grid highlight_e4e4e4 pb20 clearfix">
+        <form id="batch_form" method="POST">
+        <ul class="clearfix js-selectbox" id="candidate_box">
+            #if($products.hasContent())
+                #foreach($product in $products)
+                #set($storage = $product.productStorage)
+                #set($sku = $skuMap.get($product.id))
+                <li rel="$product.id">
+                    <a href="#" class="tooltip" title="点击选中！O(∩_∩)O ~">
+                    <p class="text"> <label>产品型号 $!product.productCode</label></p>
+                    <p class="img">
+                        #if($product.ownerType == "jingdong")
+                            <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                            <img src="/jdvop/images/jd-ico.png" class="jd-ico"/> 
+                        #elseif($product.ownerType == "system") 
+                         <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                        #else
+                            <img src="$configTool.getImageHost()/thumbnail$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                        #end
+                    </p>
+                    <p class="text blue product-title">$!product.name</p>
+                    #if($product.ownerType == "enterprise" || $product.ownerType == "provider")
+                        <p class="text"><i class="fl">销量：$!storage.soldedNum</i> <i class="fr">库存：$!storage.getUseableNum()</i> </p>
+                    #else
+                        <p class="text">所属品牌：$!product.brand.name</p>
+                    #end
+                    <p class="tool ffa orange" style=" font-size: 12px; line-height: 36px; text-align: left; padding-left: 10px;">
+                        &yen;$!numberTool.format('#0.00', $product.retailPrice)
+                    </p>
+                    </a>
+                    <span class="ico-selected"></span>
+                    #if($product.ownerType == "enterprise")
+                        <label class="ico_own"></label>
+                    #elseif($product.ownerType == "provider")
+                        <label class="ico_gys"></label>
+                    #elseif($product.ownerType == "system")
+                        <label class="ico_xt"></label>
+                    #end
+                </li>
+                #end
+                #else
+                    <li>
+                        暂无相关产品
+                    </li>
+                #end
+         </ul>    
+        </form>    
+    </div>
+    <div class="layout-footer clearfix" id="page_box">
+        $adminPg.pager($link, $products.getPagerSpec(), 2, '_self')
+    </div>
+    <input type="hidden" id="openBoxIndex" value="$openBoxIndex">
+<script type="text/javascript">
+function highlight() {
+    var selected    = [];
+    $('#dragsort li.js-dragsort').each(function(){
+        selected.push($(this).attr('rel'));
+    });
+    if (selected.length > 0) {
+        $('#candidate_box li').each(function(){
+            var li  = $(this);
+            var id  = li.attr('rel');
+            if($.inArray(id, selected) !== -1) {
+                li.addClass('curr');
+            }
+        });
+    }
+}
+    var collectionData = function(){
+        var data    = [];
+        var type    = $('select[name="type"]').val();
+        if (type !== '0') {
+            data.push('type=' + type);
+        }
+        var cate    = $('select[name="cate"]').val();
+        if (cate !== '0') {
+            data.push('cate=' + cate);
+        }
+        var price   = parseFloat($.trim($('input[name="minPrice"]').val()));
+        if (!isNaN(price)) {
+            data.push('minPrice=' + price);
+        }
+        price   = parseFloat($.trim($('input[name="maxPrice"]').val()));
+        if (!isNaN(price)) {
+            data.push('maxPrice=' + price);
+        }
+        var brd = $('select[name="brand"]').val();
+        if (brd !== '0') {
+            data.push('brand=' + brd);
+        }
+        var kwd = $.trim($('input[name="kw"]').val());
+        if (kwd !== '') {
+            data.push('kw=' + encodeURIComponent(kwd));
+        }
+        return data;
+    };
+
+$(function(){
+    highlight();    //初始化已经选中的产品
+    $('#query_form').on('submit', function(e){
+        e.preventDefault();
+        var data = collectionData();
+        top.artProgress('数据加载中，请稍后...');
+        var url = '/jdvop/admin/website/block/loadProducts.php';
+        if (data.length > 0) {
+            url += '?';
+            url += data.join('&');
+        }
+        $.get(url, function(data){
+            $('#candidate_box').html(data['contentHtml']);
+            $('#page_box').html(data['pageHtml']);
+            highlight();
+            top.artProgress('[close]');
+        }, 'json');
+    });
+    
+    $('#do_save').on('click', function(e){
+        e.preventDefault();
+        var selected    = [];
+        $('#dragsort li.js-dragsort').each(function(){
+            selected.push('pids[]=' + $(this).attr('rel'));
+        });
+        if (selected.length < $minSize) {
+            top.artAlert('温馨提示', '您至少需要选择$minSize款产品', 'error');
+            return false;
+        }
+        location.href = "/jdvop/admin/activity/limitExchange/modifyProductView.php?"+selected.join('&');
+    });
+    
+    $(document).on('click', 'ul.multipage a.link', function(e){
+        e.preventDefault();
+        var href    = $(this).attr('href');
+        if (href !== undefined && href !== '#' && href !== '') {
+            top.artProgress('数据加载中，请稍后...');
+            $.get(href, function(data){
+                $('#candidate_box').html(data['contentHtml']);
+                $('#page_box').html(data['pageHtml']);
+                highlight();
+                top.artProgress('[close]');
+            }, 'json');
+        }
+    });
+    
+    $('button.js-sort-switch').click(function(e) {
+        e.preventDefault();
+        var url = location.pathname;
+        url = '/jdvop/admin/website/block/loadProducts.php';
+        var t = $(this);
+        url = url + '?sort=' + t.attr('rel') + '.' + t.attr('js-sort-t');
+        
+        var data = collectionData();
+        if (data.length > 0) {
+            url += '&';
+            url += data.join('&');
+        }
+        $.get(url, function(data){
+            $('#candidate_box').html(data['contentHtml']);
+            $('#page_box').html(data['pageHtml']);
+            highlight();
+            top.artProgress('[close]');
+        }, 'json');
+        if (t.attr('js-sort-t') == 'desc')
+        {
+            t.find("i").html("↓");
+            t.attr('js-sort-t', 'asc');
+        } else if (t.attr('js-sort-t') == 'asc') {
+            t.find("i").html("↑");
+            t.attr('js-sort-t', 'desc');
+        }
+    });
+});
+</script>
+</body>
+</html>

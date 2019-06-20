@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/ckeditor/ckeditor.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script src="/jdvop/script/admin/dialog-min.js"></script>
+<script src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/common.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+</head>
+<body>
+<!--主导航-->
+    <div class="mainNav borderGreen clearfix">
+        <a href="/jdvop/admin/websiteUser/list.php"><p class="right btn-grey2 fr">返回</p></a>
+        <span class="text">
+            添加会员
+        </span>
+    </div>
+    <form id="dateForm" action="/jdvop/admin/websiteUser/add.php" method="POST">
+    <div id="iframePage">
+        <div class="automatic-box clearfix highlight_e4e4e4">
+            <div class="topTitle">
+                 <span>基本信息</span>
+            </div>
+            <div class="item">
+                <div class="add-product">
+                    <table class="mb10 pb10 js-box">
+                        <colgroup>
+                            <col style="width:120px;" />
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>用户名：</td>
+                            <td class="tl">
+                                <input type="text" name="loginName" class="common h22 w220" error-label="用户名" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>密码：</td>
+                            <td class="tl">
+                                <input type="password" name="password" class="common h22 w220" error-label="密码" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">昵称：</td>
+                            <td class="tl">
+                                <input type="text" name="nickName" class="common h22 w220" error-label="昵称" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">手机号码：</td>
+                            <td class="tl">
+                                <input type="text" name="mobile" class="common h22 w220" error-label="手机号码" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">固定电话：</td>
+                            <td class="tl">
+                                <input type="text" name="phone" class="common h22 w220" error-label="固话" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">邮箱：</td>
+                            <td class="tl">
+                                <input type="text" name="email" class="common h22 w220" error-label="邮箱" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">是否启用：</td>
+                            <td class="tl">
+                                <select name="isEnabled" class="common w120 h32 mr6">
+                                    <option value = "true">是</option>
+                                    <option value = "false">否</option>
+                                </select>
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">增加积分：</td>
+                            <td class="tl">
+                                <input type="text" name="integral"  class="common h22 w220 filter-input" filter-rule="isnumber" maxlength="9" error-label="积分" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+<!--                        <tr>
+                            <td class="tr">用户分组：</td>
+                            <td class="tl">
+                                <select name="group" class="common h30 w220">
+                                    <option value="">请选择用户分组</option>
+                                    #foreach($group in $groups)
+                                        <option value="$group.id">$group.name</option>
+                                    #end
+                                </select>
+                            </td>
+                        </tr>-->
+                    </table>
+                </div>
+            </div>    
+        </div>
+        <div class="layout-footer pb30">
+            <div class="btn-wrap">
+                <input type="submit" value="保存" class="btn-orange" />
+                <a href="/jdvop/admin/websiteUser/list.php"><span class="btn-grey" />返回</span></a>
+            </div>
+        </div>
+    </div>
+    </form>
+<script type="text/javascript">
+$(function(){
+    var isOk = false;
+    function check(){
+        
+        var loginName = $('input[name="loginName"]');
+        if(loginName.val() == ''){
+            isOk = true;
+            loginName.addClass('highlight_red').siblings('label').html(loginName.attr('error-label') + '不能为空');
+            return false;
+        }else{
+            isOk = false;
+            loginName.removeClass('highlight_red').siblings('label').html('');
+        }
+        
+        var pwd   = $('input[name="password"]');
+        if (pwd.val().length < 6 || pwd.val().length > 16)
+        {
+            isOk = true;
+            pwd.addClass('highlight_red').siblings('label').html(pwd.attr('error-label') + ' 必须为 6 ~ 16 个字符');
+            return false;
+        } else {
+            isOk = false;
+            pwd.removeClass('highlight_red').siblings('label').html('');
+        }
+        var integral   = $('input[name="integral"]');
+        var ref =  /^[1-9]+[0-9]*]*$/;
+        if (integral.val() != '' && !ref.test(integral.val()))
+        {
+            isOk = true;
+            integral.addClass('highlight_red').siblings('label').html('请填写正确的数值');
+            return false;
+        } else {
+            isOk = false;
+            integral.removeClass('highlight_red').siblings('label').html('');
+        }
+        
+        var mobile = $('input[name="mobile"]');
+        if(mobile.val() !== '' && !isMobile(mobile.val())){
+            isOk = true;
+            mobile.addClass('highlight_red').siblings('label').html('请填写正确的' + mobile.attr('error-label'));
+            return false;
+        }else{
+            isOk = false;
+            mobile.removeClass('highlight_red').siblings('label').html('');
+        }
+        var phone = $('input[name="phone"]');
+        if(phone.val() !== '' && !isPhone(phone.val())){
+            isOk = true;
+            phone.addClass('highlight_red').siblings('label').html('请填写正确的' + phone.attr('error-label'));
+            return false;
+        }else{
+            isOk = false;
+            phone.removeClass('highlight_red').siblings('label').html('');
+        }
+        
+        var email = $('input[name="email"]');
+        if(email.val() !== '' && !isEmail(email.val())){
+            isOk = true;
+            email.addClass('highlight_red').siblings('label').html('请填写正确的' + email.attr('error-label'));
+            return false;
+        }else{
+            isOk = false;
+            email.removeClass('highlight_red').siblings('label').html('');
+        }
+    }
+    $('#dateForm').submit(function(e){
+        e.preventDefault();      
+        check();
+        if(isOk){
+            return false;
+        }
+        $.post($(this).attr('action'), $(this).serialize(), function(data) {
+            if (data.isOk) {
+                top.artAlert('温馨提示', '用户信息保存成功', '/jdvop/admin/websiteUser/list.php');
+            } else {
+                top.artAlert('温馨提示', data.message, 'error');
+            }
+        }, 'json');
+    });
+});
+function inputIntNum(){
+    if(event.keyCode < 48 || event.keyCode > 57){
+        event.returnValue=false;
+    }
+}
+</script>
+</body>
+</html>

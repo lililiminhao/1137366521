@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd"
+    default-lazy-init="true">
+    
+    <description>Shiro安全配置</description>
+    
+    <!-- Shiro's main business-tier object for web-enabled applications -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="shiroDbRealm" />
+        <property name="cacheManager" ref="shiroEhcacheManager" />
+    </bean>
+    
+    <bean id="credentialMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <property name="hashAlgorithmName" value="SHA-1" />
+        <property name="hashIterations" value="1024" />
+        <property name="storedCredentialsHexEncoded" value="true" />
+    </bean>
+    
+    <bean id="shiroDbRealm" class="com.lmf.integral.admin.shiro.WebsiteAdministratorShiroDbRealm">
+        <property name="credentialsMatcher" ref="credentialMatcher" />
+        <property name="cacheManager" ref="shiroEhcacheManager" />
+    </bean>
+    
+    <bean id="captchaFormAuthenticationFilter" class="com.lmf.integral.admin.shiro.security.CaptchaFormAuthenticationFilter" />
+    
+    <!-- Shiro Filter -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager" />
+        <property name="loginUrl" value="/**" />
+        <property name="successUrl" value="/admin/index.php" />
+        <property name="filters">
+            <map>
+                <entry key="authc" value-ref="captchaFormAuthenticationFilter" />
+            </map>
+        </property>
+        <property name="filterChainDefinitions">
+            <value>
+                /captcha.php                = anon
+                /logout.php                 = logout
+                /admin/login.php            = authc
+                /**                         = user
+            </value>
+        </property>
+    </bean>
+    
+    <!-- 用户授权信息Cache, 采用EhCache -->
+    <bean id="shiroEhcacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager" destroy-method="destroy">
+        <property name="cacheManagerConfigFile" value="classpath:ehcache-shiro.xml"/>
+        <property name="cacheManager">
+            <bean class="net.sf.ehcache.CacheManager" factory-method="create" destroy-method="shutdown" />
+        </property>
+    </bean>
+    
+    <!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    
+    <!-- 以下内容可以让Shiro 检查Service层函数上的权限 -->
+    <!--
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" depends-on="securityManager">
+        <property name="staticMethod" value="org.apache.shiro.SecurityUtils.setSecurityManager" />
+        <property name="arguments" ref="securityManager" />
+    </bean>
+    -->
+</beans>

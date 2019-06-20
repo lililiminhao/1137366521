@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+<style>
+	.automatic-box{
+		padding:15px;
+	}
+	h3{
+		font-size:16px;
+	}
+	li{
+		line-height:27px;
+	}
+	button,label{
+		background:#2196f8	;
+		outline:none;
+		border:0;
+		color:#fff;
+		padding:6px 12px;
+		border-radius:6px;
+		cursor:pointer;
+	}
+	label a{
+		display:inline-block;
+		color:#fff;
+	}
+	a:hover {
+	 color: #fff;
+	 text-decoration: none;
+	}
+</style>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.go(-1)"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">导入分销商</span>
+</div>
+<span style="display:none;"><input type="file" name="excelFile" class="excelFile" /></span>
+<div id="iframePage">
+    <div class="automatic-box clearfix highlight_e4e4e4" >
+        <h3>操作指引</h3>
+        <ul>
+        	<li>1：点击右侧按钮，下载批量导入模板；<button onclick="downTemplate()">下载《分销商导入模板》</button></li>
+        	<li>2：编辑上一步下载的《批量导入分销商》,完成后保存改Excel;</li>
+        	<li>3：点击右侧按钮，上传上一步保存的《批量导入分销商》Excel文件即可；<label><a class="js-upload" href="javascript:;" data-upload-url="/jdvop/admin/fenxiao/batchInsert.php"> 上传《分销商导入模板》</a></label></li>
+        </ul>
+    </div>
+	<div id="tableAjax">
+		<table class="tab-list" width="99%" style="display:none;">
+			<tbody>
+				<tr class="list-header">
+					<td width="5%">姓名</td><td width="5%">手机号</td><td width="5%">分销等级</td><td width="60%">失败原因</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<script>
+	function downTemplate(){
+		location.href = '/jdvop/excel/FENXIAO_USER.xls';
+	}
+	
+	$(document).on('click', 'a.js-upload', function(e){
+        e.preventDefault();
+        var url = $(this).attr('data-upload-url');
+        $('.excelFile').fileupload('option', 'url', url);
+        $('.excelFile').click();
+    });
+    
+    $('.excelFile').fileupload({
+        dataType    : 'json',
+        autoUpload  : true,
+        sequentialUploads   : true,
+        start       : function(e) {
+            top.artProgress('产品导入中，请稍后...');
+        },
+        always      : function(e, data) {
+            top.artProgress('[close]');
+        },
+        done        : function(e, data) {
+            top.artProgress('[close]');
+            if (data.result.isOk) {
+                top.artAlert('温馨提示', "成功导入" + data.result.message.successCount + "条分销商信息", 'ok');
+                DomWarn(data.result.message.failMsgList);
+            } else {
+                top.artAlert('温馨提示', data.result.message, 'error');
+            }
+        },
+        fail    : function(e, data){
+            top.artProgress('[close]');
+            top.artAlert('温馨提示', '因为网络原因，上传失败!', 'error');
+        }
+    });
+    function DomWarn(arr){
+    	var T = $('#tableAjax');
+    	if(arr.length){
+    		var str = '';
+    		for(var i=0,l=arr.length;i<l;i++){
+    			var item = arr[i];
+    			str+='<tr>'+'<td width="5%">'+item.name+'</td><td width="5%">'+item.mobile+'</td><td width="5%">'+item.rankName+'</td><td width="60%">'+item.msg+'</td></tr>'
+    		}
+            T.find('tbody').html('');
+    		T.find('tbody').append(str);
+    		T.find('table').show();
+    	}else{
+    		T.find('table').hide();
+    	}
+    }
+</script>
+</body>
+</html>

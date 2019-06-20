@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+<script type="text/javascript">
+$(function(){
+    // 鼠标悬浮
+    $('.js-showImgList li:not(.btn-add)').hover(function(){
+        $(this).find('.js-moveWrap').animate({'bottom': '0px'},100);
+    },function(){
+        $(this).find('.js-moveWrap').animate({'bottom': '-25px'}, 100);
+    }); 
+  
+    $(document).on("submit", "#js-data-form", function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        if($("input[name='name']").val() === ""){
+            top.artAlert("温馨提示", "请填写企业专享池名称", 'error');
+            return false;
+        }
+        $.post(thiz.attr("action"), thiz.serialize(), function(data){
+            if(data.isOk){
+                top.artAlert("温馨提示", "数据保存成功", "/jdvop/admin/enterpriseExclusiveProductPool.php", 'ok');
+            }else{
+                top.artAlert("温馨提示", data.message, 'error');
+            }
+        }, "json");
+    });
+});
+</script>
+<style>
+	#status label{
+		float:left;
+		margin-right:16px;
+	}
+</style>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="/jdvop/admin/enterpriseExclusiveProductPool.php"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">#if($productPool) 编辑企业专享池 #else 新增专享池 #end</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr js-tab"><a href="#" title="企业专享池">企业专享池</a></li>
+            </ul>
+        </div>
+    </div>
+    <form id="js-data-form" action="#if($productPool)/jdvop/admin/enterpriseExclusiveProductPool/edit.php #{else}/jdvop/admin/enterpriseExclusiveProductPool/add.php#{end}" method="POST">
+        #if($productPool)
+            <input type="hidden" name="id" value="$productPool.id"/>
+        #end
+        <div class="automatic-box clearfix highlight_e4e4e4" style="border-top: none;">
+            <div class="add-product">
+                <table>
+                    <colgroup>
+                        <col style="width: 10px;" />
+                        <col style="width: 10px;" />
+                    </colgroup>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>专享池名称：</td>
+                        <td>
+                            <input type="text" name="name" value="$!productPool.name" class="common h30 w240" maxlength="20" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>专享池状态：</td>
+                        <td>
+                            <select name="enable"class="common " >
+                                <option value="true" #if($!productPool.enable == true) selected #end>启用</option>
+                                <option value="false" #if($!productPool.enable == false) selected #end>禁用</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr"><i class="red">*</i>专享池类型：</td>
+                        <td>
+                        	<div id="status">
+		                        <label >
+	                                <input type="radio" name="type" value="1" #if($!productPool) #if($!productPool.type==1) checked #end #else checked #end>企业
+	                            </label>
+	                            <label >
+	                                <input type="radio" name="type" value="2" #if($!productPool.type==2)  checked #end >系统
+	                            </label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">备注：</td>
+                        <td>
+                            <input type="text" placeholder="100字以内" name="remark" value="$!productPool.remark" class="common h30 w240" maxlength="100" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="layout-footer pb30">
+            <div class="btn-wrap">
+                <button type="submit" class="btn-orange">确定</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

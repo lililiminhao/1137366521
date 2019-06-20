@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+    <link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+    <link rel='stylesheet'  type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+    <script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script>
+    <script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+    <script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+    <script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+    <script type='text/javascript' src='/jdvop/script/admin/dragsort-0.5.1.min.js'></script>
+    <script type="text/javascript" src='/jdvop/script/admin/my97/WdatePicker.js'></script>
+    <script type="text/javascript" src='/jdvop/script/admin/order/aftersale.js'></script>
+    <!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+    <title>售后订单</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="#if($isSystem) /jdvop/admin/order/systemOrders.php?type=$!ownerType #else /jdvop/admin/orders.php #end" title="返回"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">
+        #if($isSystem)
+            #if($ownerType=='jingdong')
+                京东售后订单列表
+            #else
+                系统售后订单列表
+            #end
+        #else
+            售后订单列表
+        #end
+            </span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+            #if($isSystem == 'true')
+                #if($shiro.isPermitted('order_after_sale:view'))
+                    <li ><a href="/jdvop/admin/order/niffers.php?isSystem=false" title="售后订单">售后订单</a></li>
+                #end
+                #if($shiro.isPermitted('system_order_after_sale:view'))
+                    <li class="curr"><a href="/jdvop/admin/order/niffers.php?isSystem=true&ownerType=$!type" title="#if($type == 'system')系统 #else 京东 #end 订单换货列表">系统售后订单</a></li>
+                #end
+            #elseif($isSystem == 'false')
+                #if($shiro.isPermitted('order_after_sale:view'))
+                    <li class="curr"><a href="/jdvop/admin/order/niffers.php?isSystem=false" title="售后订单">售后订单</a></li>
+                #end
+                #if($shiro.isPermitted('system_order_after_sale:view'))
+                    <li ><a href="/jdvop/admin/order/niffers.php?isSystem=true&ownerType=$!type" title="#if($type == 'system')系统 #else 京东 #end 订单换货列表">系统售后订单</a></li>
+                #end
+            #end
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form id="data-form" action="/jdvop/admin/order/niffers.php" method="get">
+                <!--                        <input type="hidden" name="type" value="$!request.getParameter('type')"/>-->
+                <input type="hidden" name="status" value="$!request.getParameter('status')"/>
+                <input type="hidden" name="isSystem" value="$!isSystem"/>
+                <input type="hidden" name="ownerType" value="$!ownerType"/>
+                <table>
+                    <tr>
+                        <td class="pl20">关键字：<input type="text" name="kw" value="$!request.getParameter('kw')" placeholder="订单号/收件人" class="common w140"/></td>
+                        <td>类型：
+                            <select name="type" class="common h20 w100">
+                                <option value="">所有</option>
+                                #foreach($type in $asoTypes)
+                                    <option value="$type.name()" #if($request.getParameter('type') == $type.name())selected #end)>$!type.description</option>
+                                #end
+                            </select>
+                        </td>
+                        <td class="pl20">订单状态：
+                            <select name="nifferStatus" class="common h22 w120">
+                                <option value="">请选择</option>
+                                #foreach($st in $status)
+                                    <option value="$st.name()" #if($st.name() == $nifferStatus) selected #end>$st.description</option>
+                                #end
+                            </select>
+                        </td>
+                        <td class="pl20">申请日期：<input type="text" id="st" name="st" value="$!st" class="common w140" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh', dateFmt: 'yyyy-MM-dd 00:00:00', maxDate: '#F{$dp.$D(\'et\')}'});" placeholder="起始日期"/>
+                            - <input type="text" id="et" name="et" value="$!et" class="common w140" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh', dateFmt: 'yyyy-MM-dd 23:59:59', minDate: '#F{$dp.$D(\'st\')}'});" placeholder="截至日期"/></td>
+                        <td>
+                            <button type="submit" class="btn-grey2 ml10">搜索</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:100px;" />
+                <col style="width:100px;" />
+                #if(!$isSystem  && $ownerType !='jingdong')
+                    <col style="width:120px;" />
+                #end
+                <col style="width:100px;" />
+                <col style="width:100px;" />
+                <col style="width:100px;" />
+                <col style="width:260px;" />
+                <col style="width:120px;" />
+                <col style="width:120px;" />
+                <col style="width:120px;" />
+                #if($isSystem  && $ownerType !='jingdong')
+                    <col style="width:120px;" />
+                #end
+                <col style="width:120px;" />
+                <col style="width:160px;"/>
+            </colgroup>
+            <tr>
+                <th>退换货单号</th>
+                <th>原始订单号</th>
+                #if(!$isSystem  && $ownerType !='jingdong')
+                    <th>所属供应商</th>
+                #end
+                <th>类型</th>
+                <th>退款金额</th>
+                <th>优惠券</th>
+                <th>客户姓名</th>
+                <th>联系方式</th>
+                <th>所在区域</th>
+                <th>订单状态</th>
+                #if($isSystem && $ownerType!='jingdong')
+                    <th>平台订单状态</th>
+                #end
+                <th>申请时间</th>
+                <th>操作</th>
+            </tr>
+            #if($nifferOrders.hasContent())
+                #foreach($niffer in $nifferOrders)
+                    #set($isRefund = $refundDataMap.get($niffer.id))
+                    <tr>
+                        <td class="tc"><a href="/jdvop/admin/order/niffer.php?id=$!niffer.id" title="查看详情">$!niffer.afterSaleOrderKey</a></td>
+                        <td class="tc">
+                            <a href="/jdvop/admin/order.php?id=${niffer.originalOrderId}">
+                                #set($order = $orderService.findOne($niffer.originalOrderId))
+                        		$order.key
+                            </a>
+                        </td>
+                        #if(!$isSystem  && $ownerType !='jingdong')
+                            <td class="tc">
+                                #if($order.deliveryObjectId)
+									$!providerMap.get($order.deliveryObjectId).workerName
+								#end
+                            </td>
+                        #end
+                        <td class="tc">$!niffer.type.getDescription()</td>
+                        <td class="tc">¥$!numberTool.format('#0.00',$niffer.refundAmount)#if($niffer.shipmentFee>0)+运费：¥$!numberTool.format('#0.00',$niffer.shipmentFee)#end</td>
+
+                        <td class="tc">#if($niffer.couponAmount) ￥$!niffer.couponAmount #else #end</td>
+                        <td class="tc">$!niffer.consumerName</td>
+                        <td class="tc">#if($niffer.consumerMobile && !$niffer.consumerMobile.isEmpty()) $niffer.consumerMobile #else $niffer.consumerPhone #end</td>
+                        <td class="tc">$!niffer.consumerProvince.name $!niffer.consumerCity.name $!niffer.consumerCounty.name $!niffer.consumerTown.name</td>
+                        <td class="tc">$!niffer.status.description</td>
+                        #if($isSystem  && $ownerType!='jingdong')
+                            <td class="tc">$!niffer.openStatus.description</td>
+                        #end
+                        <td class="tc">$dateTool.format('yyyy-MM-dd HH:mm:ss', $!niffer.applyTime)</td>
+                        <td class="tc js-option-parents">
+                            #if(!$isSystem )
+                                <div class="drop-down js-dropDown">
+                                    <span class="ico"></span>
+                                    <p class="s-inp">操作</p>
+                                </div>
+                                <dl class="s-option js-sOption">
+                                    #if($niffer.status == "waiting_audit")
+                                        <!--换货单才有编辑-->
+                                        #if($shiro.isPermitted('order_after_sale:audit'))
+                                            #if($niffer.type=="niffer")
+                                                <dd><a href="/jdvop/admin/order/niffer/audit.php?id=$!niffer.id">客服审核</a></dd>
+                                            #else
+                                                <dd><a href="/jdvop/admin/order/refund/audit.php?id=$!niffer.id">客服审核</a></dd>
+                                            #end
+                                            <dd><a href="#" rel="$!niffer.id" class="js-refuse">拒绝请求</a></dd>
+                                        #end
+                                    #end
+                                    <!--退货退款审核-->
+                                    #if($shiro.isPermitted('order_after_sale:confirm_refund'))
+                                        #if($niffer.status == "waiting_finance")
+                                            #if(!$niffer.isSystem || $niffer.isSystem && $niffer.openStatus=="accepted")
+                                                <dd><a href="javascript:void(0)" data-url="/jdvop/admin/order/niffer/refund.php?id=$!niffer.id" exception-refund="$!niffer.exceptionRefund" class="js-comfirm-refund">确认退款</a></dd>
+                                            #end
+                                        #end
+                                    #end
+                                    #if($shiro.isPermitted('order_after_sale:confirm_returned'))
+                                        #if(!$niffer.isSystem && $niffer.status == "waiting_accept")
+                                            <dd><a href="/jdvop/admin/order/niffer/accept.php?id=$!niffer.id" method="POST" class="ajax-request" ok-message="reload" cfm-message="是否确认收货">确认收货</a></dd>
+                                            <dd><a href="#" rel="$!niffer.id" class="js-refuse" source="">拒绝收货</a></dd>
+                                        #end
+                                    #end
+                                    <dd><a href="/jdvop/admin/order/niffer.php?id=$!niffer.id" title="查看详情">查看详情</a></dd>
+                                </dl>
+                            #else
+                                <div class="drop-down js-dropDown">
+                                    <span class="ico"></span>
+                                    <p class="s-inp">操作</p>
+                                </div>
+                                <dl class="s-option js-sOption">
+                                    #if($niffer.status == "waiting_audit")
+                                        <!--换货单才有编辑-->
+                                        #if($shiro.isPermitted('system_order_after_sale:audit'))
+                                            #if($niffer.type=="niffer")
+                                                <dd><a href="/jdvop/admin/order/niffer/audit.php?id=$!niffer.id">客服审核</a></dd>
+                                            #else
+                                                <dd><a href="/jdvop/admin/order/refund/audit.php?id=$!niffer.id">客服审核</a></dd>
+                                            #end
+                                            <dd><a href="#" rel="$!niffer.id" class="js-refuse">拒绝请求</a></dd>
+                                        #end
+                                    #end
+                                    <!--退货退款审核-->
+                                    #if($shiro.isPermitted('system_order_after_sale:confirm_refund'))
+                                        #if($niffer.status == "waiting_finance")
+                                            #if(!$niffer.isSystem || $niffer.isSystem && $niffer.openStatus=="accepted")
+                                                <dd><a href="javascript:void(0)" data-url="/jdvop/admin/order/niffer/refund.php?id=$!niffer.id" exception-refund="$!niffer.exceptionRefund" class="js-comfirm-refund">确认退款</a></dd>
+                                            #end
+                                        #end
+                                    #end
+                                    #if($shiro.isPermitted('system_order_after_sale:confirm_returned'))
+                                        #if(!$niffer.isSystem && $niffer.status == "waiting_accept")
+                                            <dd><a href="/jdvop/admin/order/niffer/accept.php?id=$!niffer.id" method="POST" class="ajax-request" ok-message="reload" cfm-message="是否确认收货">确认收货</a></dd>
+                                            <dd><a href="#" rel="$!niffer.id" class="js-refuse" source="">拒绝收货</a></dd>
+                                        #end
+                                    #end
+                                    <dd><a href="/jdvop/admin/order/niffer.php?id=$!niffer.id" title="查看详情">查看详情</a></dd>
+                                </dl>
+
+                            #end
+                        </td>
+                    </tr>
+                #end
+            #else
+                <tr>
+                    <td colspan="#if($isSystem && $ownerType!='jingdong') 11 #{else}10#{end}" class="tc fwb">暂无售后单数据</td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $nifferOrders.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+</head>
+<body class="pm56">
+    <header class="bar-nav">
+        <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+        <h1 class="title">产品详情 </h1>
+    </header>    
+    <div class="img-detail">
+        <div class="img-wrap">
+            <ul class="swiper-wrapper">
+                #if($product.ownerType == "system")
+                    <li class="swiper-slide"><img src="$!product.thumbnailImage"></li>
+                #else
+                    <li class="swiper-slide"><img src="$configTool.getImageHost()$!product.thumbnailImage"></li>
+                #end
+            </ul>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <form id="buy_form" action="/jdvop/activity/toTimeSpikeOrder.php" method="GET">
+            <input type="hidden" name="productId"  value="$flashProduct.id"/>
+            <input type="hidden" name="aid"  value="$!aid"/>
+        <input type="hidden" name="time"  value="$!todayTime"/>
+        <div class="product-name">
+            <div class="name webkitbox-h">
+                <p class="left flex2">$!product.name</p>
+            </div>
+            <div class="price webkitbox-h">
+                <div class="left  tl red fs14p">
+                    #set($nowJeFen = $flashProduct.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                    #set($startJiFen = $flashProduct.displayOriginalPrice*$websiteTool.getWebsite().getRatio())
+                    <p class="fl">
+                        积分： <i class="red fs20p">$nowJeFen</i>
+                        #if($nowJeFen != $!numberTool.format('#0.00', $product.marketPrice))
+                            <i style=" text-decoration:line-through; color:#9e9e9e;">   原价:$!numberTool.format('#0.00', $product.marketPrice)</i>
+                        #end
+                    </p>
+                    <p class="zekou fl">
+                        #set($price=$flashProduct.discountRate)    
+                        <span class="txt">$!numberTool.format('#0.0',$price)折</span>
+                        <i class="yuanjia">积分：$startJiFen</i>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="delivery-address">
+            <div class="webkitbox-h">
+            #if($isSelling)
+                #if($isStock)
+                    #if($flashProduct.remaindAmount==0)
+                    <i class="red">无货</i>
+                    #else
+                    <i class="red">有货 下单后立即发货</i>
+                    #end 
+                #else
+                    <i class="red">无货</i>
+                #end
+            #else
+                <i class="red">商品已下架</i>
+            #end
+            </div>
+            <p class="last">型号：$!product.productCode</p>
+            <p class="last">品 牌：$!product.brand.name</p>
+        </div>
+    </form>
+    <div class="text-detail mt10">
+        <h2 class="title">图文详情</h2>
+        <div class="auto-wrap">
+            <table  class="parameters">
+                <colgroup>
+                    <col />
+                </colgroup>
+                <tr>
+                    <td>$!productDescription.description</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="seckill-fixed webkitbox-h">
+        #if($isSelling)
+                #set($isOk = $!flashProduct.endTime.getTime() > $!nowDate.getTime())
+                    #if($isOk)
+                        <div class="flex1 miao_s">
+                            <input type="hidden" name="endTime" id="endTime" value="$!dateTool.format('yyyy-MM-dd HH:mm',$!flashProduct.endTime)">
+                            <em></em>
+
+                        </div>
+                        <p class="flex1 disabled"><a href="#">马上抢</a></p>
+                    #else
+                        #if($isStock)
+                            #if($flashProduct.remaindAmount==0)
+                            <p class="flex1">秒杀已結束</p>
+                            <p class="flex1 disabled"><a href="#">马上抢</a></p>
+                            #else
+                            <p class="flex1">秒杀中</p>
+                            <p class="flex1" ><a class="js-qiang">马上抢</a></p>
+                            #end
+                        #else
+                            <p class="flex1">秒杀已結束</p>
+                            <p class="flex1 disabled"><a href="#">马上抢</a></p>
+                        #end
+                    #end
+        #else
+            <p class="flex1">商品已下架</p>
+            <p class="flex1 disabled"><a href="#">马上抢</a></p>
+        #end
+    </div>
+    <script src="/jdvop/script/mobile/swiper.js"></script>
+    <script type="text/javascript">
+        var swiper = new Swiper('.img-wrap', {
+            pagination: '.swiper-pagination',
+            debugger: true
+        });
+
+        $(".js-qiang").bind("click", function(){
+            $("#buy_form").submit();
+        });    
+        //动态时间
+        function toTime(iTime, _this) {
+            var em = _this.find("em");
+            var iNowTime = new Date().getTime();
+            var iDisTime = iTime - iNowTime;
+            if (iDisTime <= 0) {
+                clearInterval(oTimer);
+                em.text("疯狂秒杀中");
+            }
+            else {
+                var iDate = parseInt(iDisTime / 86400000);
+                var iHours = parseInt((iDisTime % 86400000) / 3600000);
+                var iMin = parseInt((iDisTime % 3600000) / 60000);
+                var iSec = parseInt((iDisTime % 60000) / 1000);
+                var iMSec = iDisTime % 1000;
+                em.text("距离秒杀开始还有" + iDate + "天 " + iHours + ":" + iMin + ":" + iSec);
+                if(iDate===0&&iHours===0&&iMin===0&&iSec===0&&iMSec===0){
+                    em.text("疯狂秒杀中");
+                }
+            }
+        }
+
+        $(".miao_s").each(function (i) {
+            var _this = $(this);
+            var endTime = $("#endTime").val();
+            var iTime = new Date(endTime).getTime();
+            oTimer = setInterval(function () {
+                toTime(iTime, _this);
+            }, 14);
+        });
+    </script>
+</body>
+</html>

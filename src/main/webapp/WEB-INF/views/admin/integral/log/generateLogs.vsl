@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>积分日志</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">生成积分日志</span>
+</div>
+<div id="iframePage">
+   <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr"><a href="#" title="生成积分日志">生成积分日志</a></li>
+                <li><a href="/jdvop/admin/integral/consumeIntegralLogs.php" title="消费积分日志">消费积分日志</a></li>
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/integral/generateLogs.php" method="get">
+                <table>
+                    <tr>
+                        <td class="pl20">按用户名查询：
+                            <input type="text" name="kw"  class="common h22 w160" value="$!esc.html($request.getParameter('kw'))"  placeholder="用户名">
+                        </td>
+                        <td class="pl20">按生成时间查询：
+                            <input type="text" name="st" value="$!dateTool.format('yyyy-MM-dd 00:00:00', $st)" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh',dateFmt:'yyyy-MM-dd 00:00:00'});" class="Wdate common h22 w160"/>
+                            到&nbsp;&nbsp; 
+                            <input type="text" name="et" value="$!dateTool.format('yyyy-MM-dd 23:59:59', $et)" onfocus="WdatePicker({readOnly: true, skin: 'blueFresh',dateFmt:'yyyy-MM-dd 23:59:59'});" class="Wdate common h22 w160"/>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" /> 
+                        </td>
+                        <td class="tl">
+                            <span class="btn-grey2 ml10" id="js_do_export">导出Excel</span>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:80px"/>
+                <col style="width:200px"/>
+                <col style="width:200px"/>
+                <col style="width:200px"/>
+                <col style="width:200px"/>
+                <col style="width:250px"/>
+                <col style="width:200px"/>
+<!--                <col style="width:200px"/>-->
+                <col/>
+            </colgroup>
+            <tr>
+                <th><label><input type="checkbox" id="select_all" /></label></th>
+                <th>用户名</th>
+                <th>生成日期</th>
+                <th>积分</th>
+                <th>缘由</th>
+                <th>积分来源</th>
+                <th>操作人</th>
+<!--                <th>操作</th>-->
+            </tr>
+            #if($generateLogs.hasContent()) 
+                #foreach($log in $generateLogs)
+                <tr>
+                    <td class="tc"><label><input type="checkbox" class="select-item" name="ids[]" value="$!log.id" /></label></td>
+                    <td class="tc">$!websiteUserService.findOne($log.userId).loginName</td>
+                    <td class="tc">$!dateTool.format('yyyy-MM-dd', $log.createTime)</td>
+                    <td class="tc">$!log.deltaAmount</td>
+                    <td class="tc">$!esc.html($log.reason)</td>
+                    <td class="tc">$!esc.html($log.generateType.description)</td>
+                    <td class='tc'>
+                        #if($log.getOperationLog().get("OPERATE_WEBSITE_ADMIN_REALNAME"))
+                            $!log.getOperationLog().get("OPERATE_WEBSITE_ADMIN_REALNAME")
+                        #else
+                            #if($log.getOperationLog().get("OPERATE_WEBSITE_ADMIN_LOGIN_NAME"))
+                                $log.getOperationLog().get("OPERATE_WEBSITE_ADMIN_LOGIN_NAME")
+                            #else
+                                系统
+                            #end
+                        #end
+                    </td>
+<!--                    <td class="tc">
+                        <a href="/jdvop/admin/integral/revokeGenerateIntegral.php?ids[]=$!log.id" method="GET" class="ajax-request" ok-message="reload" cfm-message="您确定要撤回该会员的$!{log.deltaAmount}积分吗？">撤回积分</a>
+                    </td>-->
+                </tr>
+                #end
+            #else
+            <tr>
+                <td colspan="10" class="tc fwb">暂无相关积分生成日志</td>
+            </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+         <div class="btn-wrap">
+            <span class="btn-red batch-action" batch-action="revoke">撤回积分</span>
+        </div>
+        #if($generateLogs)
+            $adminPg.pager($link, $generateLogs.getPagerSpec(), 4, '_self')
+        #end
+    </div>
+</div>
+
+<script type="text/javascript">
+    
+function  revokeBatch(data) {
+    top.artConfirm('请注意', '您真的要撤回' + data.length + '条积分数据吗？', function(v){
+        if (v) {
+            top.artProgress('撤回中，请稍后...');
+            $.get('/jdvop/admin/integral/revokeGenerateIntegral.php?' + data.join('&'), function(d){
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    location.reload();
+                } else {
+                    top.artAlert('温馨提示', d.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+}    
+    
+function  doBatchAction(action) {
+    var data        = [];
+    $('input[name="ids[]"]:checked').each(function(){
+        var thiz    = $(this);
+        var id  = thiz.val();
+        if (id !== undefined) {
+            id  = parseInt(id);
+            if (id !== NaN && id > 0) {
+                data.push('ids[]=' + id);
+            }
+        }
+    });
+    if (data.length > 0) {
+        if (action === 'revoke') {
+            revokeBatch(data);
+        } 
+    } else {
+        top.artAlert('温馨提示', '您至少需要选中一条记录', 'error');
+    }
+}
+    
+$(function(){
+    $('.batch-action').on('click', function(e){
+        e.preventDefault();
+        var action  = $(this).attr('batch-action');
+        if (action !== undefined) {
+            doBatchAction(action);
+        }
+    });
+    
+    $('#js_do_export').click(function(e){
+        e.preventDefault();
+        var l   = location.href.replace('/jdvop/admin/integral/generateLogs.php', '/jdvop/admin/integral/generateIntegralExport.php');
+        $('#export_ifrm').attr('src', l);
+    });
+});
+</script>
+
+</body>
+</html>

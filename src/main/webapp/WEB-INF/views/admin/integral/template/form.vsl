@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/ckeditor/ckeditor.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/common.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+</head>
+<body>
+<!--主导航-->
+    <div class="mainNav borderGreen clearfix">
+        <a href="/jdvop/admin/integral/integralCardTemplates.php"><p class="right btn-grey2 fr">返回</p></a>
+        <span class="text">
+            #if($template)
+                编辑积分卡模版
+            #else
+                添加积分卡模版
+            #end
+        </span>
+    </div>
+    <form id="dateForm" action="#if($template) /jdvop/admin/integral/integralCardTemplate/edit.php #else /jdvop/admin/integral/integralCardTemplate/add.php #end" method="POST">
+    #if($template)
+        <input type="hidden" name="id" value = "$template.id">
+    #end
+    <div id="iframePage">
+        <div class="automatic-box clearfix highlight_e4e4e4">
+            <div class="topTitle">
+                 <span>基本信息</span>
+            </div>
+            <div class="item">
+                <div class="add-product">
+                    <table class="mb10 pb10 js-box">
+                        <colgroup>
+                            <col style="width:120px;" />
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>积分模版名称：</td>
+                            <td class="tl">
+                                <input type="text" name="name" value="$!template.templateName" class="common h22 w220" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>增加积分：</td>
+                            <td class="tl">
+                                <input type="text" name="integral"  value="$!template.integral" class="common h22 w220 filter-input" filter-rule="isnumber" maxlength="9" error-label="积分" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>    
+        </div>
+        <div class="layout-footer pb30">
+            <div class="btn-wrap">
+                <input type="submit" value="保存" class="btn-orange" />
+                <a href="/jdvop/admin/integral/integralCardTemplates.php"><span class="btn-grey" />返回</span></a>
+            </div>
+        </div>
+    </div>
+    </form>
+<script type="text/javascript">
+$(function(){
+    $('#dateForm').submit(function(e){
+        e.preventDefault();      
+        $.post($(this).attr('action'), $(this).serialize(), function(data) {
+            if (data.isOk) {
+                top.artAlert('温馨提示', '积分模版信息保存成功', '/jdvop/admin/integral/integralCardTemplates.php', 'ok');
+            } else {
+                top.artAlert('温馨提示', data.message, 'error');
+            }
+        }, 'json');
+    });
+});
+</script>
+</body>
+</html>

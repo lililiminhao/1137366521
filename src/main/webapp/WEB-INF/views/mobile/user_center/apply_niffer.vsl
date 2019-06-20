@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>申请售后</title>
+</head>
+<body class="pm56" style="background: #f0f0f0;">
+    <header class="bar-nav">
+        <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+        <h1 class="title">申请售后 </h1>
+    </header> 
+    <form id="dataForm" action="/jdvop/my/mobile/order/niffer.php" method="POST">
+        <div class="shopcart-list">
+            <input type="hidden" name="id" value="$order.id"/>
+            <h2 class="top">换货商品</h2>
+            <ul class="js-list">
+                #foreach($entry in $entryList)
+                    <!--$productTool.asProduct($entry.sourceObjectId.intValue()))只接受32位整型参数-->
+                    #set($bp = $productTool.asProduct($entry.sourceObjectId.intValue()))
+                    <li class="clearfix">
+                        <input type="hidden" name="sui[]" value="$!entry.storageUnitId"/>
+                        <input type="hidden" name="selected[]" value="true"/>
+                        <input type="hidden" name="product_id[]" value="$!bp.id"/>
+                        <p class="checked js-checked curr"></p>
+                        <p class="img"> 
+                            <a href="/jdvop/product/${bp.id}.php">
+                                #if($bp.ownerType == "jingdong" || $bp.ownerType == "system")
+                                    <img src="$!bp.thumbnailImage" alt="$!bp.name" width="80" height="80"/>
+                                #else
+                                    <img src="$configTool.getImageHost()/small$!bp.thumbnailImage" alt="$!bp.name" width="80" height="80"/>
+                                #end
+                            </a>
+                        </p> 
+                        <div class="text">
+                            <a href="/jdvop/product/${bp.id}.php"> <span class="name">$!bp.name</span></a>
+                            <em class="price">金额：<i class="red">&yen;$numberTool.format('#0.00',$math.mul($entry.soldPrice, $websiteTool.getWebsite().getRatio()))</i> </em> <br>
+                            <div class="sku-num">
+                                <span class="minus js-reduce #if($entry.amount == 1) disabled #end" rev="li_$foreach.count""></span>
+                                <input class="num js-fm-txt" name="amount[]" type="number" value="$entry.amount" max="$entry.amount"/>                         
+                                <span class="plus js-add"></span>                        
+                            </div>
+                        </div>
+                    </li>
+                #end
+            </ul>
+        </div>
+        <div class="shopcart-list mt10" style="border-top:1px solid #dedede;">
+            <h2 class="top">问题描述</h2>
+            <div class="text">
+                <textarea name="remark" placeholder="请您在此描述详细问题" class="com"></textarea>
+            </div>
+        </div>
+        <div class="editPassword">
+            <dl>
+                <dd class="webkitbox-h">
+                    <p class="tr"><i class="red">*</i>收货人：</p>
+                    <p class="flex1"><input type="text" name="consumerName" value="$!user.nickName" placeholder="请输入联系人姓名..." class="com"></p>
+                </dd>
+                <dd class="webkitbox-h">
+                    <p class="tr"><i class="red">*</i>手机号码：</p>
+                    <p class="flex1"><input type="tel" name="consumerMobile" value="$!user.mobile" placeholder="请输入联系人手机号码..." class="com"></p>
+                </dd>
+            </dl>
+        </div>
+    </form>
+    <section class="fixed-column webkitbox-h">
+        <p class="flex1 but-orange"><a href="#" class="ico-shopping fs16p">确定申请换货</a></p>
+    </section>
+    <script type="text/javascript">
+        $(function() {
+            $(document).on('touchstart', '.js-checked', function(e) {
+                e.preventDefault();
+                var thiz = $(this);
+                if (thiz.hasClass('curr')) {
+                    thiz.removeClass('curr');
+                    thiz.parents('li').find('input[name="selected[]"]').attr('value', 'false');
+                } else {
+                    thiz.addClass('curr');
+                    thiz.parents('li').find('input[name="selected[]"]').attr('value', 'true');
+                }
+            });
+            //增加数量
+            var product_count;
+            $('.js-add').on('touchstart',function(){
+                product_count = $(this).attr('rev');
+                var txtVal = $(this).siblings('.js-fm-txt');
+                var maxAmount = parseInt(txtVal.attr('max'));
+                var amount = parseInt(txtVal.val()) + 1;
+                if (amount >= maxAmount) {
+                    txtVal.val(maxAmount);
+                    $(this).parent().find(".js-reduce").removeClass('disabled');
+                } else {
+                    txtVal.val(amount);
+                }
+            });
+            //减少数量
+            $('.js-reduce').on('touchstart',function() {
+                var txtVal = $(this).siblings('.js-fm-txt');
+                var amount = parseInt(txtVal.val());
+                if (parseInt(txtVal.val()) === 1) {
+                    return false;
+                }
+                txtVal.val(amount - 1);
+                if(parseInt(txtVal.val()) === 1) {
+                    $(this).addClass('disabled');
+                }
+            });
+            $(".but-orange").click(function(e){
+                e.preventDefault();
+                var checked = $(".js-checked").hasClass('curr');
+                if (!checked) {
+                    mui.alert('您还没有选择需要换货的产品哦！', '温馨提示');
+                    return false;
+                }
+                if(checkForm()){
+                    $.post($('#dataForm').attr('action'), $('#dataForm').serialize(), function(result){
+                        var data = eval('(' + result + ')');
+                        if(data.isOk){
+                            location = '/jdvop/my/mobile/nifferOrders.php';
+                        }else{
+                            mui.alert(data.message, '温馨提示');
+                        }
+                    }, 'application/json');
+                }
+            });
+            function checkForm(){
+                if($("textarea[name='remark']").val() === ''){
+                    mui.alert('请填写换货原因,有助于客服人员更快的处理您的申请！', '温馨提示');
+                    return false;
+                }
+                if($("input[name='consumerName']").val() === ''){
+                    mui.alert('请填写联系人姓名！', '温馨提示');
+                    return false;
+                }
+                if($("input[name='consumerMobile']").val() === ''){
+                    mui.alert('请填写您的联系方式，方便客服人员联系到您！', '温馨提示');
+                    return false;
+                }
+                return true;
+            }
+        });
+    </script>
+</body>
+</html>

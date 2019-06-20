@@ -1,0 +1,564 @@
+/*!
+ * ui-dialog.css
+ * Date: 2014-07-03
+ * https://github.com/aui/artDialog
+ * (c) 2009-2014 TangBin, http://www.planeArt.cn
+ *
+ * This is licensed under the GNU LGPL, version 2.1 or later.
+ * For details, see: http://www.gnu.org/licenses/lgpl-2.1.html
+ */
+.ui-dialog {
+    *zoom:1;
+    _float: left;
+    position: relative;
+    background-color: #FFF;
+    border: 1px solid #999;
+ /*   border-radius: 6px;*/
+    outline: 0;
+    background-clip: padding-box;
+    /*font-family: Helvetica, arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.428571429;*/
+ /*   color: #333;*/
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    -webkit-transition: -webkit-transform .15s ease-in-out, opacity .15s ease-in-out;
+    transition: transform .15s ease-in-out, opacity .15s ease-in-out;
+}
+.ui-popup-show .ui-dialog {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+.ui-popup-focus .ui-dialog {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+.ui-popup-modal .ui-dialog {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1), 0 0 256px rgba(255, 255, 255, .3);
+    border-radius: 4px;
+}
+.ui-dialog-grid {
+    width: auto;
+    margin: 0;
+    border: 0 none;
+    border-collapse:collapse;
+    border-spacing: 0;
+    background: transparent;
+     /* min-width: 500px;*/
+}
+.ui-dialog-header,
+.ui-dialog-body,
+.ui-dialog-footer {
+    padding: 0;
+    border: 0 none;
+    text-align: left;
+    background: transparent;
+}
+.ui-dialog-header {
+    white-space: nowrap;
+    border-bottom: 1px solid #E5E5E5;
+    position: relative;
+}
+.ui-dialog-header:hover,
+.ui-dialog-title:hover{cursor: move!important;}
+
+.ui-dialog-close {
+  background: url('/jdvop/images/admin/sprite.png') no-repeat -142px -60px;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  border: none;
+  text-indent: -9999px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
+.ui-dialog-close:hover,
+.ui-dialog-close:focus{
+    color: #000000;
+    text-decoration: none;
+    cursor: pointer;
+    outline: 0;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+.ui-dialog-title {
+    margin: 0;
+    line-height: 1.428571429;
+    padding: 15px;
+    overflow:hidden; 
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: bold;
+    cursor: default;
+	height: 10px;
+	overflow: hidden;
+	position: relative;
+	background: #ebebeb;
+	border-radius: 4px 4px 0 0;
+    
+}
+.ui-dialog-body {
+    //padding: 20px;
+    padding-bottom: 20px;
+    text-align: center;
+}
+.tab-dialog .tab-column{border-radius: 4px 4px 0px 0px;}
+.tab-dialog .item-wrap{ padding: 10px;} 
+.ui-dialog-content {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    *zoom: 1;
+    *display: inline;
+    text-align: left;
+    font-size: 14px;
+    font-family: "microsoft yahei";
+    padding: 20px;
+    padding-bottom: 0;
+}
+.ui-dialog-content .con{ font-size: 12px!important;	position: relative;}
+.ui-dialog-footer {
+    width: 100%;
+  	height: 45px;
+  	background: #f6f7f8;
+  	border-radius: 0px 0px 4px 4px;
+}
+.ui-dialog-statusbar {
+    float: left;
+    margin-right: 20px;
+    padding: 6px 0;
+    line-height: 1.428571429;
+    font-size: 14px;
+    color: #888;
+    white-space: nowrap;
+}
+.ui-dialog-statusbar label:hover {
+    color: #333;
+}
+.ui-dialog-statusbar input,
+.ui-dialog-statusbar .label {
+    vertical-align: middle;
+}
+.ui-dialog-button {
+	outline: none;
+    float: right;
+    white-space: nowrap;
+      margin-right: 20px;
+}
+.ui-dialog-footer button+button {
+    margin-bottom: 0;
+    margin-left: 5px;
+}
+.ui-dialog-footer button {
+	outline: none;
+ 	  display: inline-block;
+	  font-weight: bold;
+	  font-size: 14px;
+	  cursor: pointer;
+	  border-radius: 4px;
+	  padding: 0 24px;
+	  height: 32px;
+	  line-height: 32px;
+	  border-top: none;
+	  border-bottom: none;
+}
+.ui-dialog-footer button:hover,
+.ui-dialog-footer button:focus {
+  color: #333333;
+  text-decoration: none;
+  outline: none;
+}
+
+.ui-dialog-footer button:active {
+  outline: 0;
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+          box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+.ui-dialog-footer button[disabled] {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+
+.ui-dialog-footer button {
+  color: #666;
+  border-left: 1px solid #cdcdcd;
+  border-right: 1px solid #cdcdcd;
+  background: url(/jdvop/images/admin/btn-spr.png) repeat-x 0 -33px;
+}
+.ui-dialog-footer button[disabled],
+.ui-dialog-footer button[disabled]:hover,
+.ui-dialog-footer button[disabled]:focus,
+.ui-dialog-footer button[disabled]:active {
+  background-color: #ffffff;
+  border-color: #cccccc;
+}
+.ui-dialog-footer button.ui-dialog-autofocus {
+   color: #fff;
+  border-left: 1px solid #e96300;
+  border-right: 1px solid #e96300;
+  background: url(/jdvop/images/admin/btn-spr.png) repeat-x 0 0;
+  margin-left: 10px;
+}
+
+.ui-dialog-footer button.ui-dialog-autofocus:hover,
+.ui-dialog-footer button.ui-dialog-autofocus:focus,
+.ui-dialog-footer button.ui-dialog-autofocus:active {
+  outline: none;
+  color: #fff;
+  border-left: 1px solid #e96300;
+  border-right: 1px solid #e96300;
+  background: url(/jdvop/images/admin/btn-spr.png) repeat-x 0 0;
+}
+.ui-popup-top-left .ui-dialog,
+.ui-popup-top .ui-dialog,
+.ui-popup-top-right .ui-dialog {
+    top: -8px;
+}
+.ui-popup-bottom-left .ui-dialog,
+.ui-popup-bottom .ui-dialog,
+.ui-popup-bottom-right .ui-dialog {
+    top: 8px;
+}
+.ui-popup-left-top .ui-dialog,
+.ui-popup-left .ui-dialog,
+.ui-popup-left-bottom .ui-dialog {
+    left: -8px;
+}
+.ui-popup-right-top .ui-dialog,
+.ui-popup-right .ui-dialog,
+.ui-popup-right-bottom .ui-dialog {
+    left: 8px;
+}
+
+.ui-dialog-arrow-a,
+.ui-dialog-arrow-b {
+    position: absolute;
+    display: none;
+    width: 0;
+    height: 0;
+    overflow:hidden;
+    _color:#FF3FFF;
+    _filter:chroma(color=#FF3FFF);
+    border:8px dashed transparent;
+}
+.ui-popup-follow .ui-dialog-arrow-a,
+.ui-popup-follow .ui-dialog-arrow-b{
+    display: block;
+}
+.ui-popup-top-left .ui-dialog-arrow-a,
+.ui-popup-top .ui-dialog-arrow-a,
+.ui-popup-top-right .ui-dialog-arrow-a {
+    bottom: -16px;
+    border-top:8px solid #7C7C7C;
+}
+.ui-popup-top-left .ui-dialog-arrow-b,
+.ui-popup-top .ui-dialog-arrow-b,
+.ui-popup-top-right .ui-dialog-arrow-b {
+    bottom: -15px;
+    border-top:8px solid #fff;
+}
+.ui-popup-top-left .ui-dialog-arrow-a,
+.ui-popup-top-left .ui-dialog-arrow-b  {
+    left: 15px;
+}
+.ui-popup-top .ui-dialog-arrow-a,
+.ui-popup-top .ui-dialog-arrow-b  {
+    left: 50%;
+    margin-left: -8px;
+}
+.ui-popup-top-right .ui-dialog-arrow-a,
+.ui-popup-top-right .ui-dialog-arrow-b {
+    right: 15px;
+}
+.ui-popup-bottom-left .ui-dialog-arrow-a,
+.ui-popup-bottom .ui-dialog-arrow-a,
+.ui-popup-bottom-right .ui-dialog-arrow-a {
+    top: -16px;
+    border-bottom:8px solid #7C7C7C;
+}
+.ui-popup-bottom-left .ui-dialog-arrow-b,
+.ui-popup-bottom .ui-dialog-arrow-b,
+.ui-popup-bottom-right .ui-dialog-arrow-b {
+    top: -15px;
+    border-bottom:8px solid #fff;
+}
+.ui-popup-bottom-left .ui-dialog-arrow-a,
+.ui-popup-bottom-left .ui-dialog-arrow-b {
+    left: 15px;
+}
+.ui-popup-bottom .ui-dialog-arrow-a,
+.ui-popup-bottom .ui-dialog-arrow-b {
+    margin-left: -8px;
+    left: 50%;
+}
+.ui-popup-bottom-right .ui-dialog-arrow-a,
+.ui-popup-bottom-right .ui-dialog-arrow-b {
+    right: 15px;
+}
+.ui-popup-left-top .ui-dialog-arrow-a,
+.ui-popup-left .ui-dialog-arrow-a,
+.ui-popup-left-bottom .ui-dialog-arrow-a {
+    right: -16px;
+    border-left:8px solid #7C7C7C;
+}
+.ui-popup-left-top .ui-dialog-arrow-b,
+.ui-popup-left .ui-dialog-arrow-b,
+.ui-popup-left-bottom .ui-dialog-arrow-b {
+    right: -15px;
+    border-left:8px solid #fff;
+}
+.ui-popup-left-top .ui-dialog-arrow-a,
+.ui-popup-left-top .ui-dialog-arrow-b {
+    top: 15px;
+}
+.ui-popup-left .ui-dialog-arrow-a,
+.ui-popup-left .ui-dialog-arrow-b {
+    margin-top: -8px;
+    top: 50%;
+}
+.ui-popup-left-bottom .ui-dialog-arrow-a,
+.ui-popup-left-bottom .ui-dialog-arrow-b {
+    bottom: 15px;
+}
+.ui-popup-right-top .ui-dialog-arrow-a,
+.ui-popup-right .ui-dialog-arrow-a,
+.ui-popup-right-bottom .ui-dialog-arrow-a {
+    left: -16px;
+    border-right:8px solid #7C7C7C;
+}
+.ui-popup-right-top .ui-dialog-arrow-b,
+.ui-popup-right .ui-dialog-arrow-b,
+.ui-popup-right-bottom .ui-dialog-arrow-b {
+    left: -15px;
+    border-right:8px solid #fff;
+}
+.ui-popup-right-top .ui-dialog-arrow-a,
+.ui-popup-right-top .ui-dialog-arrow-b {
+    top: 15px;
+}
+.ui-popup-right .ui-dialog-arrow-a,
+.ui-popup-right .ui-dialog-arrow-b {
+    margin-top: -8px;
+    top: 50%;
+}
+.ui-popup-right-bottom .ui-dialog-arrow-a,
+.ui-popup-right-bottom .ui-dialog-arrow-b {
+    bottom: 15px;
+}
+
+
+@-webkit-keyframes ui-dialog-loading {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+@keyframes ui-dialog-loading {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.ui-dialog-loading {
+    vertical-align: middle;
+    position: relative;
+    display: block;
+    *zoom: 1;
+    *display: inline;
+    overflow: hidden;
+    width: 32px;
+    height: 32px;
+    top: 50%;
+    margin: -16px auto 0 auto;
+    font-size: 0;
+    text-indent: -999em;
+    color: #666;
+}
+.ui-dialog-loading {
+    width: 100%\9;
+    text-indent: 0\9;
+    line-height: 32px\9;
+    text-align: center\9;
+    font-size: 12px\9;
+}
+
+.ui-dialog-loading::after {
+    position: absolute;
+    content: '';
+    width: 3px;
+    height: 3px;
+    margin: 14.5px 0 0 14.5px;
+    border-radius: 100%;
+    box-shadow: 0 -10px 0 1px #ccc, 10px 0px #ccc, 0 10px #ccc, -10px 0 #ccc, -7px -7px 0 0.5px #ccc, 7px -7px 0 1.5px #ccc, 7px 7px #ccc, -7px 7px #ccc;
+    -webkit-transform: rotate(360deg);
+    -webkit-animation: ui-dialog-loading 1.5s infinite linear;
+    transform: rotate(360deg);
+    animation: ui-dialog-loading 1.5s infinite linear;
+    display: none\9;
+}
+.custom-icon{ position: relative; padding: 30px 0; padding-left:50px;}
+.custom-icon em{ position: absolute;  top: 50%; left:10px; margin-top: -15px; }
+
+.custom-icon .ico-error{ 
+    background: url('/jdvop/images/admin/messagebox-icons.png') no-repeat -64px -1px;
+    width: 30px;
+    height: 31px;
+}
+.custom-icon .ico-warning{ 
+    background: url('/jdvop/images/admin/messagebox-icons.png') no-repeat -96px -1px;
+    width: 30px;
+    height: 29px;
+}
+.custom-icon .ico-ok{ 
+    background: url('/jdvop/images/admin/messagebox-icons.png') no-repeat -128px -1px;
+    width: 30px;
+    height: 32px;
+}
+.custom-icon .ico-question{ 
+    background: url('/jdvop/images/admin/messagebox-icons.png') no-repeat -33px -1px;
+    width: 30px;
+    height: 32px;
+}
+@-webkit-keyframes zoomIn {
+	0% {
+		-webkit-transform: scale3d(.3, .3, .3);
+		transform: scale3d(.3, .3, .3)
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+@keyframes zoomIn {
+	0% {
+		-webkit-transform: scale3d(.3, .3, .3);
+		-ms-transform: scale3d(.3, .3, .3);
+		transform: scale3d(.3, .3, .3)
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+._ui-popup-modal .ui-dialog  {
+        -webkit-animation-duration: 0.5s;
+	animation-duration: 0.5s;
+	-webkit-animation-fill-mode: both;
+	animation-fill-mode: both;
+	-webkit-animation-name: zoomIn;
+	animation-name: zoomIn
+            
+}
+
+@-webkit-keyframes fadeInDownBig {
+	0% {
+		opacity: 0;
+		-webkit-transform: translate3d(0, -2000px, 0);
+		transform: translate3d(0, -2000px, 0)
+	}
+	100% {
+		opacity: 1;
+		-webkit-transform: none;
+		transform: none
+	}
+}
+@keyframes fadeInDownBig {
+	0% {
+		opacity: 0;
+		-webkit-transform: translate3d(0, -2000px, 0);
+		-ms-transform: translate3d(0, -2000px, 0);
+		transform: translate3d(0, -2000px, 0)
+	}
+	100% {
+		opacity: 1;
+		-webkit-transform: none;
+		-ms-transform: none;
+		transform: none
+	}
+}
+@-webkit-keyframes zoomInDown {
+	0% {
+		opacity: 0;
+		-webkit-transform: scale3d(.1, .1, .1) translate3d(0, -1000px, 0);
+		transform: scale3d(.1, .1, .1) translate3d(0, -1000px, 0);
+		-webkit-animation-timing-function: cubic-bezier(0.55, .055, .675, .19);
+		animation-timing-function: cubic-bezier(0.55, .055, .675, .19)
+	}
+	60% {
+		opacity: 1;
+		-webkit-transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+		transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+		-webkit-animation-timing-function: cubic-bezier(0.175, .885, .32, 1);
+		animation-timing-function: cubic-bezier(0.175, .885, .32, 1)
+	}
+}
+@keyframes zoomInDown {
+	0% {
+		opacity: 0;
+		-webkit-transform: scale3d(.1, .1, .1) translate3d(0, -1000px, 0);
+		-ms-transform: scale3d(.1, .1, .1) translate3d(0, -1000px, 0);
+		transform: scale3d(.1, .1, .1) translate3d(0, -1000px, 0);
+		-webkit-animation-timing-function: cubic-bezier(0.55, .055, .675, .19);
+		animation-timing-function: cubic-bezier(0.55, .055, .675, .19)
+	}
+	60% {
+		opacity: 1;
+		-webkit-transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+		-ms-transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+		transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+		-webkit-animation-timing-function: cubic-bezier(0.175, .885, .32, 1);
+		animation-timing-function: cubic-bezier(0.175, .885, .32, 1)
+	}
+}
+._ui-popup-modal .ui-dialog{
+    -webkit-animation-duration: 0.8s;
+    animation-duration: 0.8s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    -webkit-animation-name: zoomInDown;
+    animation-name: zoomInDown
+}
+
+@-webkit-keyframes fadeInDown {
+	0% {
+		-webkit-transform: translate3d(0, -100%, 0);
+		transform: translate3d(0, -100%, 0)
+	}
+	100% {
+		-webkit-transform: none;
+		transform: none
+	}
+}
+@keyframes fadeInDown {
+	0% {
+		-webkit-transform: translate3d(0, -100%, 0);
+		-ms-transform: translate3d(0, -100%, 0);
+		transform: translate3d(0, -100%, 0)
+	}
+	100% {
+		-webkit-transform: none;
+		-ms-transform: none;
+		transform: none
+	}
+}
+
+.ui-popup-modal .ui-dialog{
+    -webkit-animation-duration: 0.8s;
+    animation-duration: 0.8s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    -webkit-animation-name: fadeInDown;
+    animation-name: fadeInDown
+}

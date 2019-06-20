@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link rel='stylesheet'  type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/dragsort-0.5.1.min.js'></script>
+<script type="text/javascript" src='/jdvop/script/admin/my97/WdatePicker.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>查看商品池商品</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+	<a href="/jdvop/admin/enterpriseExclusiveProductPool.php" title="返回"><p class="right btn-grey2 fr">返回</p></a>
+	<a href="/jdvop/admin/enterprise/pool/productEntry/batchImport.php?poolId=$productPool.id" title="批量导入"><p class="right fr btn-green2">批量导入产品</p></a>
+    <span class="text">$productPool.name</span>
+</div>
+<div id="iframePage">
+    <div class="automatic-box clearfix mt10">
+        <div class="fl">
+            <form id="search-form" action="/jdvop/admin/enterprise/pool/productEntries.php">
+                <input type="hidden" name="poolId" value="$productPool.id" />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="kwd" maxlength="30" value="$!request.getParameter('kwd')" class="common ml10 w160" placeholder="请输入关键字"/>
+                        </td>
+                        <td>
+                            <select name="cate" class="common ml10 h26">
+                                <option value="0">请选择分类</option>
+                                #foreach($cate in $cates)
+                                    <option value = "$cate.id" #if($request.getParameter('cate') == $cate.id) selected #end>$cate.name</option>
+                                #end
+                            </select>
+                        </td>
+                        <td>
+                            <input class="btn-grey2 ml10" type="submit" value="搜索"/>
+                            <input class="btn-grey2 ml10" type="button" value="添加商品" onclick="javascript:location.href='/jdvop/admin/enterpriseExclusiveProductPoolEntry/choose.php?id=$productPool.id'"/>
+                        </td>
+                    </tr>
+                </table>
+            </form>    
+        </div>
+    </div>
+    
+    <div class="table-list">
+            <form id="product_pool_entries_from" method="post">
+                <table class="common">
+                    <colgroup>
+                        <col style="width: 42px;" />
+                        <col style="width: 70px;" />
+                        <col style="width: 120px;" />
+                        <col style="width: 80px;" />
+                        <col style="width: 80px;" />
+                        <col style="width: 80px;" />
+                        <col style="width: 100px;" />
+                        <col style="width: 80px;" />
+                        <col style="width: 80px;" />
+                        <col style="width: 80px;" />
+                        <col style="width: 80px;" />
+                        <col style="width: 80px;" />
+                        <col style="width: 80px;" />
+                    </colgroup>
+                    <tr>
+                        <th>产品ID</th>
+                        <th>产品名称</th>
+                        <th>产品型号</th>
+                        <th>产品来源</th>
+                        <th>品牌</th>
+                        <th>原经销价</th>
+                        <th>原系统售价</th>
+                        <th>原扣点</th>
+						<th>专享价</th>
+                        <th>专享开单价</th>
+                        <th>专享扣点</th>
+                        <th>操作</th>
+                    </tr>
+                    #if($entries.hasContent())
+                    #foreach($entry in $entries)
+                    <tr >
+                        <td>$!entry.productId</td>
+                        <td class="tc js-pname">$!entry.productName</td>
+                        <td class="tc">$!entry.productCode</td>
+                        <td class="tc">$!entry.ownerType.description</td>
+                        <td>$!entry.brandName</td>
+                        <td class="tc js-retailPrice">&yen;$!numberTool.format('#0.00', $entry.retailPrice)</td>
+                        <td class="tc js-systemPrice">
+                    		#if($entry.ownerType == "system" || $entry.ownerType == "jingdong")
+                        		&yen;$!numberTool.format('#0.00', $entry.systemPrice)
+                    		#else
+                    			---
+                        	#end
+                    	</td>
+                        <td class="tc js-serviceChargeRatio">$!numberTool.format('#0.00', $entry.serviceChargeRatio)%</td>
+                        <td class="tc js-exclusivePrice">&yen;$!numberTool.format('#0.00', $entry.exclusivePrice)</td>
+                        <td class="tc js-exclusiveBillingPrice">&yen;$!numberTool.format('#0.00', $entry.exclusiveBillingPrice)</td>
+                        <td class="tc js-exclusiveRatio">$!numberTool.format('#0.00', $entry.exclusiveRatio)%</td>
+                        <td class="tc js-option-parents">
+                            <div class="drop-down js-dropDown">
+                                <span class="ico"></span>
+                                <p class="s-inp">操作</p>
+                            </div>
+                            <dl class="s-option js-sOption">
+                                <dd class="js-entry-edit" rel = "/jdvop/admin/enterprise/pool/productEntry/edit.php?id=$!entry.id"  exclusivePrice = "$entry.exclusivePrice" exclusiveBillingPrice = "$entry.exclusiveBillingPrice" exclusiveRatio = "$entry.exclusiveRatio" ownerType = "$entry.ownerType">编辑</dd>
+                                <dd class="js-do-delete" rel='$entry.productId' >删除</dd>
+                            </dl>
+                        </td>
+                        </tr>
+                    #end
+                    #else
+                    <tr><td class="tc" colspan="12">暂无商品数据</td></tr>
+                    #end
+                </table>
+            </form>
+        </div>
+        <div class="layout-footer clearfix">
+            $adminPg.pager($link, $entries.getPagerSpec(), 4, '_self')
+        </div>
+    </div>
+</div>
+
+<!--编辑价格-->
+<div id='model-entry' class="con hide" style="padding-left:20px;">
+    <table>
+        <colgroup>
+            <col style="width: 110px;"/>
+            <col/>
+        </colgroup>
+        <tr>
+            <td class="tr">产品名称: </td>
+            <td><span class="overflow-h js-pname" style="width: 260px; display: inline-block; vertical-align: middle;">加载中...</span></td>
+        </tr>
+        <tr>
+            <td class="tr">原经销价: </td>
+            <td><span class="js-retailPrice">0.00</span> 元</td>
+        </tr>
+        <tr>
+            <td class="tr">原系统售价: </td>
+            <td><span class="js-systemPrice">---</span></td>
+        </tr>
+        <tr>
+            <td class="tr">原扣点: </td>
+            <td><span class="js-serviceChargeRatio">0.00</span></td>
+        </tr>
+        <tr>
+            <td class="tr">专享价: </td>
+            <td><input type="input" maxlength="8" class="common pl4 w160 js-exclusivePrice" placeholder="0.00" maxlength="10" filter-rule="isnumber" filter-except="."/> 元</td>
+        </tr>
+        <tr>
+            <td class="tr">专享开单价: </td>
+            <td><input type="input" maxlength="8" class="common pl4 w160 js-exclusiveBillingPrice" placeholder="0.00" maxlength="10" filter-rule="isnumber" filter-except="."/> 元</td>
+        </tr>
+        <tr>
+            <td class="tr">专享扣点: </td>
+            <td><input type="input" maxlength="8" class="common pl4 w160 js-exclusiveRatio" placeholder="0.00" maxlength="10" filter-rule="isnumber" filter-except="."/>%</td>
+        </tr>
+    </table>
+</div>
+
+<script type="text/javascript">
+    $(function(){
+		$('.js-entry-edit').on('click', function(e){
+            e.preventDefault();
+            var thizTD = $(this).parents("td");
+            var urlLink = $(this).attr("rel");
+            $("span.js-pname").text(thizTD.siblings("td.js-pname").text());
+            $("span.js-retailPrice").text(thizTD.siblings("td.js-retailPrice").text());
+            
+            var ownerType = $(this).attr("ownerType");
+            if(ownerType == "system" || ownerType == "jingdong") {
+            	$("span.js-systemPrice").text(thizTD.siblings("td.js-systemPrice").text() + "元");
+            }
+            $("span.js-serviceChargeRatio").text(thizTD.siblings("td.js-serviceChargeRatio").text());
+            
+            var exclusivePrice = $(this).attr("exclusivePrice");
+            var exclusiveBillingPrice = $(this).attr("exclusiveBillingPrice"); 
+            var exclusiveRatio = $(this).attr("exclusiveRatio");
+            $("input.js-exclusivePrice").val(exclusivePrice);
+            $("input.js-exclusiveBillingPrice").val(exclusiveBillingPrice);
+            $("input.js-exclusiveRatio").val(exclusiveRatio);
+            var params = {};
+            window['SAVE_DIALOG']   = dialog({
+                title   : '编辑产品价格',
+                height  : 250,
+                width   : 420,
+                content : $("#model-entry"),
+                onclose : function() {
+                    this.remove();
+                },
+                okValue : '保存',
+                ok      : function() {
+                    params["exclusivePrice"] = $("input.js-exclusivePrice").val();
+                    params["exclusiveBillingPrice"] = $("input.js-exclusiveBillingPrice").val();
+                    params["exclusiveRatio"] = $("input.js-exclusiveRatio").val();
+                    if(!checkNumber(params["exclusivePrice"])){
+                        top.artAlert('温馨提示', '请输入合法的专享价', 'error');
+                        return false;
+                    }
+                    if(!checkNumber(params["exclusiveBillingPrice"])){
+                        top.artAlert('温馨提示', '请输入合法的专享开单价', 'error');
+                        return false;
+                    }
+                    if(!checkNumber(params["exclusiveRatio"]) || params["exclusiveRatio"] >= 100){
+                        top.artAlert('温馨提示', '请输入合法的专享扣点', 'error');
+                        return false;
+                    }
+                    $.post(urlLink, params, function(d){
+                        if (d.isOk) {
+                            location.reload();
+                        } else {
+                            top.artAlert('温馨提示', d.message, 'error');
+                            return false;
+                        }
+                    }, 'json');
+                }
+            });
+            window['SAVE_DIALOG'].showModal();
+        });
+
+        $(".js-do-delete").on("click", function(e){
+            e.preventDefault();
+            var productId = $(this).attr("rel");
+			var poolId = $("input[name='poolId']").val();
+            top.artConfirm("温馨提示", "是否确认删除此商品，如活动进行中将会影响到用户?", function(result){
+                if(result){
+                    $.post("/jdvop/admin/enterprise/pool/productEntry/delete.php", {'poolId' : poolId, 'productIds[]' : productId}, function(data){
+                        if(data.isOk){
+                            location.reload();
+                        }else{
+                            top.artAlert("温馨提示", data.message, 'error');
+                        }
+                    }, "json");
+                    
+                }
+            });
+        });
+		
+    });
+	
+	function checkNumber(number) {
+		if(number == "" || number == undefined || isNaN(number)) {
+			return false;
+		}
+		return true;
+	}
+	
+</script>
+
+</body>
+</html>

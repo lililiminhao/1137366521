@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>批量上传专项池产品</title>
+    <style>
+        #uploadResult{
+                display: block;
+                margin-left: 15px;
+                margin-top: 5px;
+                margin-bottom: 30px;
+        }
+        #uploadTableList{
+            width: 80%;
+        }
+        .upload-count{
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        $(function () {
+            $("#uploadResult").hide();
+            $(document).on('click', 'input.js-upload', function (e) {
+                e.preventDefault();
+                $('.excelFile').click();
+
+            });
+            var data_upload = null;
+
+            var productPoolId = null;
+
+            $(".js-submit").click(function () {
+                if (data_upload ==null) {
+                    top.artAlert('温馨提示', "请添加EXCEL文件", 'error');
+                    return;
+                }
+                var url = $("input.js-upload").attr('data-upload-url');
+                $('.excelFile').fileupload('option', 'url', url);
+                data_upload.submit();
+            })
+
+            $('.excelFile').fileupload({
+                dataType: 'json',
+                autoUpload: true,
+                sequentialUploads: true,
+                add: function (e, data) {
+                    data_upload = data;
+                    $("#uploadFileName").html(data.files[0].name);
+                },
+                start: function (e) {
+                    $("#uploadResult").hide();
+                    top.artProgress('商品单导入中，请稍后...');
+                },
+                always: function (e, data) {
+                    top.artProgress('[close]');
+                },
+                done: function (e, data) {
+                    if (data.result.isOk) {
+                        data_upload = null;
+                        $("#uploadFileName").html("");
+                        var uploadTableList = $("#uploadTableList");
+                        $("#uploadTableList tr:gt(0)").remove()
+                        var resultData = data.result.message;
+                        $("#totalCount").html(resultData.totalCount);
+                        $("#successCount").html(resultData.successCount);
+                        $("#failCount").html(resultData.failCount);
+                        
+						$(resultData["errorList"]).each(function(idnex,item){
+                           uploadTableList.append("<tr><td class=\"tc\">"+item.productId+"</td><td class=\"tc\">"+item.productName+"</td><td class=\"tc\">"+item.brandName+"</td><td class=\"tc\">"+item.productCode+"</td><td class=\"tc\">失败，数值错误，请检查专享价、专享开单价、专享扣点</td></tr>")
+                        })
+						
+						$(resultData["notFoundProductList"]).each(function(idnex,item){
+                           uploadTableList.append("<tr><td class=\"tc\">"+item.productId+"</td><td class=\"tc\">"+item.productName+"</td><td class=\"tc\">"+item.brandName+"</td><td class=\"tc\">"+item.productCode+"</td><td class=\"tc\">失败，产品不存在</td></tr>")
+                        })
+						
+                        $("#uploadResult").show();
+                        top.artProgress('[close]');
+                    } else {
+                        top.artAlert('温馨提示', data.result.message, 'error');
+                    }
+                },
+                fail: function (e, data) {
+                    top.artProgress('[close]');
+                    top.artAlert('温馨提示', '因为网络原因，上传失败!', 'error');
+                }
+            });
+            
+            $("#export-products").click(function(e){
+            	e.preventDefault();
+            	window.location.href = $(this).attr("href");
+            });
+        });
+    </script>
+</head>
+<body>
+    <!--主导航-->
+    <div class="mainNav borderGreen clearfix">
+        <a href="/jdvop/admin/enterprise/pool/productEntries.php?poolId=$!productPool.id" ><p class="right fr btn-grey2">返回</p></a>
+        <span class="text">
+    		批量上传产品-->（专享池：$productPool.name）
+        </span>
+    </div>
+    <div id="iframePage">
+        <div class="tab-column">
+            <div class="con">
+                <ul class="clearfix">
+                    <li class="curr">
+                		批量上传产品
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="automatic-box clearfix highlight_e4e4e4 pt30 pb30" style="border-top: none; ">
+            <p class="pl10 fs16p fwb">操作指引</p>
+            <p class="pl10 fs16p pt16"> 1. 点击右侧按钮，导出“$productPool.name”原有产品。
+                <a class="btn-blue2" title="下载文件" href="/jdvop/admin/enterprise/pool/productEntry/export.php?poolId=$productPool.id" id="export-products">导出原有产品</a>
+                <a class="btn-blue2" title="下载文件" href="/jdvop/admin/enterprise/pool/productEntry/exportProducts.php?poolId=$productPool.id&ownerType=jingdong" id="export-products">导出京东产品</a>
+                <a class="btn-blue2" title="下载文件" href="/jdvop/admin/enterprise/pool/productEntry/exportProducts.php?poolId=$productPool.id&ownerType=system" id="export-products">导出系统产品</a>
+                <a class="btn-blue2" title="下载文件" href="/jdvop/admin/enterprise/pool/productEntry/exportProducts.php?poolId=$productPool.id&ownerType=provider" id="export-products">导出供应商产品</a>
+                <a class="btn-blue2" title="下载文件" href="/jdvop/admin/enterprise/pool/productEntry/exportProducts.php?poolId=$productPool.id" id="export-products">导出全部产品</a>
+            </p>
+            <p class="pl10 fs16p pt16">2.在您下载的Excel中编辑相应产品信息，当编辑完成后保存Excel，点击“上传EXCEL文件”，将编辑好的表格上传系统。
+            <p class="pl10 fs16p pt16">3.点击“上传”，即可将表格中商品批量添加到专享池：“$productPool.name”。产品资料上传成功后，在 <a href="/jdvop/admin/enterprise/pool/productEntries.php?poolId=$productPool.id" class="blue">$productPool.name</a>  中查看相应商品池内的产品。
+            </p>
+        </div>
+        <table>
+            <colgroup>
+                <col style="width: 200px;" />
+                <col style="width: 600px;"  />
+            </colgroup>
+            <tr>
+                <td class="tr"><i class="red">*</i>上传产品信息：</td>
+                <td><input type="button" class="btn-blue2 js-upload" data-upload-url="/jdvop/admin/enterprise/pool/productEntry/batchImport.php?poolId=$productPool.id" title="选择文件" value="上传EXCEL文件"/><a href="javascript:void(0)" class="blue" id="uploadFileName"></a></td>
+            </tr>
+            <tr>
+                <td class="tr">  <input type="button" value="上传" class="btn-orange js-submit" /></td>
+                <td> <span class="btn-grey" onclick="javascript:history.go(-1);">取消</span></td>
+            </tr>
+        </table>
+        <span style="display:none;"><input type="file" name="excelFile" class="excelFile" /></span>
+    </div>
+    <div id="uploadResult">
+        <div class="tab-column">
+            <div class="con">
+                <ul class="clearfix">
+                    <li class="curr">上传结果</li>
+                </ul>
+            </div>
+        </div>
+        <div class="upload-count">上传总商品数 <span id="totalCount"></span> 个。成功上传 <span id="successCount"></span>个，失败 <span id="failCount"></span> 个。</div>
+        <div class="table-list">
+            <table id="uploadTableList" class="common">
+                <colgroup>
+					<col style="width: 80px;" />
+                    <col style="width: 200px;" />
+                    <col style="width: 80px;" />
+                    <col style="width: 80px;" />
+                    <col style="width: 100px;" />
+                </colgroup>
+                <tr>
+                    <th>产品ID</th>
+                    <th>产品名称</th>
+                    <th>品牌</th>
+                    <th>产品型号</th>
+                    <th>上传状态</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

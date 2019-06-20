@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>我的商品</title>
+    <link rel="stylesheet" href="/jdvop/css/admin/public.css">
+    <link rel="stylesheet" href="/jdvop/css/mobile/vant/index.css">
+    <link rel="stylesheet" href="/jdvop/css/mobile/f-product.css">
+    <style>
+    	[v-cloak]{
+    		display:none;
+    	}
+    	.guide-layer{
+    		position:fixed;
+    		left:0;
+    		right:0;
+    		top:0;
+    		bottom:0;
+    		background:rgba(0,0,0,.7) url('/jdvop/images/mobile/share_smk.png') no-repeat 1.81333rem top;
+    		background-size:7.5rem auto;
+    		z-index:2;
+    		font-size:16px;
+    		box-sizing:border-box;
+    	}
+    </style>
+    
+    <script>
+    	window.onload = function(){
+    		document.getElementsByTagName('html')[0].style.fontSize = window.innerWidth*0.1+'px';
+    	}
+    </script>
+</head>
+
+<body>
+	
+ <div id="app" v-cloak>
+ 		<div class="guide-layer" @click="back" v-show="list"></div>
+        <ul>
+            <li v-for="item in list">
+                <div class="img-wrapper">
+                	<img :src="'https://cdnweb05.96225.com/jdvop/opt/data/image/middle'+item.thumbnailImage" />
+                </div>
+                <div class="info" @click="toDetail(item)">
+                    <p>{{item.name}}</p>
+                    <p>原价：￥{{item.retailPrice.toFixed(2)}}</p>
+                    <p>可获佣金￥{{item.fenxiaoMoney}}</p>
+                    <i class="shareItem" @click.stop="shareItem(item)"></i>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <script src="/jdvop/script/jquery-1.8.3.min.js"></script>
+    <script src="/jdvop/script/mobile/vue.js"></script>
+    <script src="/jdvop/script/mobile/vant.js"></script>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: function () {
+                return {
+					list:null
+                }
+            },
+            methods: {
+            	back(){
+            		history.go(-1);
+            	},
+				getProducts:function(){
+					var _self = this;
+					$.ajax({
+						url:'/jdvop/mobile/fenxiao/products.php',
+						dataType:'json',
+						data:{
+							userId:$!{currentUser.userId},
+							pageNum:1
+						},
+						success:function(res){
+							if(res.code == 1){
+								_self.list = res.data.content;
+							}
+						}
+					})
+				},
+				shareItem:function(item){
+		    		location.href = '/jdvop/product/'+item.id+'.php?fid='+item.fenxiaoUserId+'&bitch=1'
+		    	},
+		    	toDetail:function(item){
+		    		location.href = '/jdvop/product/'+item.id+'.php';
+		    	}
+            },
+            mounted:function() {
+                document.getElementsByTagName("html")[0].style.fontSize =
+                    innerWidth * 0.1 + "px";
+                    this.getProducts();
+            }
+        })
+    </script>
+</body>
+
+</html>

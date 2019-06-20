@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta content="telephone=no" name="format-detection"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+        <script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+        <title>售后服务</title>
+    </head>
+    <body class="bgfff">
+        <header class="bar-nav">
+            <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+            <h1 class="title">售后服务 </h1>
+        </header>
+        <!--售后服务  需要判断  判断是 换货 还是退款和退货退款 -->
+        <div class="pt44">
+            <div class="after-sale-state ok">
+                <i class="icon-ok mui-icon"></i>您的申请已提交,等待客服审核处理
+            </div>
+            <ul class="customer-service-list view">
+                <li class="webkitbox-h">
+                    <p class="txt">申请服务：</p>
+                    <div class="flex1">#if($aso.type=='niffer') 换货单 #elseif($aso.type=='returned') 退款单 #else $aso.type.name() #end</div>
+                </li>
+                <li class="webkitbox-h return-policy">
+                    <p class="txt">申请原因：</p>
+                    <p class="flex1" style="font-size: 13px;">$!esc.html($!aso.reason)</p>
+                </li>
+                <li class="webkitbox-h return-policy">
+                    <p class="txt">问题描述：</p>
+                    <p  class="flex1" style="font-size: 13px; ">#if($aso.remark && $aso.remark.length()>0)$esc.html($!aso.remark)#else无#end</p>
+                </li>
+                <li class="webkitbox-h">
+                    <p class="txt">申请时间：</p>
+                    <div class="flex1">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $aso.applyTime)</div>
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>

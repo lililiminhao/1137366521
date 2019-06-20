@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>
+<script type="text/javascript" src="/jdvop/script/date.js"></script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>	
+</head>
+<body class="pm56">
+<header class="bar-nav">
+    <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+    <h1 class="title">我的奖品 </h1>
+</header>
+<div class="winning-list">
+    <ul id="winningList">
+        #if($myAwards.hasContent())
+        #foreach($award in $myAwards.content)
+        <li>
+            <div class="cont">
+                <div class="clearfix">
+                    <p class="img"><img src="$!award.awardImage" alt="..." width="80" height="80"></p>
+                    <div class="text">
+                        <p class="line-clamp2">
+                            $!award.awardName
+                        </p>
+                        <span class="time">
+                            $!dateTool.format('yyyy/MM/dd HH:mm', $!award.createTime)
+                        </span>
+                    </div>
+                    #if($!award.awardStatus =='no_receive')<a href="/jdvop/activity/lottery/order.php?id=$!award.logId" class="btn">立即领奖</a>
+                    #else<a href="javascript:;"  class="btn disable"></a>#end
+                </div>
+            </div>
+            <p class="info">
+                <em class="overflow-h">来源：$!award.lotteryName</em> 
+                #if($!award.awardStatus =='no_receive')
+                #elseif($!award.awardStatus =='no_sent')<i class="red">未发货</i>
+                #elseif($!award.awardStatus =='has_sent' || $!award.awardStatus =='enter_account')<i class="green">已发货</i>
+                #elseif($!award.awardStatus =='enter_order_process')
+                    #if($!orderStatus.get($!award.ext.get('orderId')) == 'waiting_confirmed' || 
+                        $!orderStatus.get($!award.ext.get('orderId')) == 'waiting_shipment' ||
+                        $!orderStatus.get($!award.ext.get('orderId')) == 'completed')<i class="green">已发货</i>
+                    #else<i class="red">未发货</i>
+                    #end
+                #else
+                #end
+            </p>
+        </li>
+        #end
+        #else
+        <div class="shopcart-none"> 
+            <i class="icon"></i>
+            <p class="title" style="padding-bottom: 20px;">您尚未获得过任何奖品哦，再接再厉吧！</p>
+        </div>
+        #end
+    </ul>
+    <div id="loaddin_status" class="tc hide">已到页面最底部</div>
+</div>
+<script type="text/javascript">
+    var LOADDING    = false;
+    var CURRENT_PAGE    = 1;
+    var REACH_END       = false;
+    var SORT_FIELD      = "create_time.desc";
+    var STATUS          = "$!status";
+    var RATIO           = $websiteTool.getWebsite().getRatio();
+    function  doLoaddingMore() {
+        ++ CURRENT_PAGE;
+        var data    = {'ajax': true};
+        data['page']    = CURRENT_PAGE;
+        $.get('/jdvop/my/lottery/mobile/myAwards.php', data, function(result) {
+            var rsdata = eval('(' + result + ')');
+            d = rsdata['page'];
+            orderStatus = rsdata['orderStatus'];
+            LOADDING    = false;
+            if (CURRENT_PAGE > d['pagerSpec']['totalPage']) {
+                REACH_END   = true;
+                return false;
+            } 
+            var cnct    = d['content'];
+            if ('object' === typeof cnct && cnct.length > 0) {
+                var html    = '';
+                for(var i = 0; i < cnct.length; ++ i){
+                    html += '<li>';
+                    html += '<div class="cont"><div class="clearfix">';
+                       html += '<p class="img"><img src='+ cnct[i]['awardImage']+' alt="..." width="80" height="80"></p>'; 
+                       html += '<div class="text"><p class="line-clamp2">'+ cnct[i]['awardName'] +'</p>';
+                       html += '<span class="time">'+  new Date(cnct[i]['createTime']).format("yyyy-MM-dd hh:mm")+'</span>';   
+                       html += '</div>';
+                    if(cnct[i]['awardStatus'] == 'no_receive'){
+                        html += '<a href="/jdvop/activity/lottery/order.php?id='+cnct[i]['logId'] +'" class="btn">立即领奖</a>';
+                    }else{
+                        html += '<a href="javascript:;"  class="btn disable"></a>';
+                    }
+                    html += '</div></div>';
+                    html += '<p class="info"><em class="overflow-h">来源：'+cnct[i]['lotteryName']+'</em> ';
+                    if(cnct[i]['awardStatus'] == 'no_sent')
+                        html += '<i class="red">未发货</i>';
+                    else if(cnct[i]['awardStatus'] == 'has_sent' || cnct[i]['awardStatus'] == 'enter_account')
+                        html += '<i class="green">已发货</i>';
+                    else if(cnct[i]['awardStatus'] == 'enter_order_process'){
+                        if(orderStatus[cnct[i]['ext']['orderId']] == 'waiting_confirmed')
+                                html += '<i class="green">已发货</i>';
+                        else 
+                                html += '<i class="red">未发货</i>';
+                    }else{}
+                     html += '</p></li>';
+                }
+             $('#winningList').append(html);
+            }
+        }, 'application/json');
+    }   
+    $(function(){
+        $(window).on('scroll', function(){
+            if (!REACH_END) {
+                var tth = parseFloat($(window).height()) + parseFloat($(window).scrollTop());
+                if ($(document).height() <= (tth + 5)) {
+                    if (!LOADDING) {
+                        LOADDING    = true;
+                        $('#loaddin_status').html('正在加载内容...').show();
+                        doLoaddingMore();
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

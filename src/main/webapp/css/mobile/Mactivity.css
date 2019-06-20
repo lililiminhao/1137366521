@@ -1,0 +1,272 @@
+/*---------------------------------------CSS开始------------------------------------------*/
+html{ width: 100%; height: 100%; }
+body{max-width: 640px; margin: 0 auto; background: #49a9bf; overflow: hidden;}
+/*@font-face {
+	font-family: Muiicons;
+	font-style: normal;
+	font-weight: 400;
+	src: url(../jdvop/fonts/mui.ttf) format("truetype");
+}*/
+@-webkit-keyframes loading-spinner {
+	0% {
+		-webkit-transform: rotate(0deg);
+		-moz-transform: rotate(0deg);
+		-ms-transform: rotate(0deg);
+		-o-transform: rotate(0deg);
+		transform: rotate(0deg)
+	}
+	100% {
+		-webkit-transform: rotate(360deg);
+		-moz-transform: rotate(360deg);
+		-ms-transform: rotate(360deg);
+		-o-transform: rotate(360deg);
+		transform: rotate(360deg)
+	}
+}
+
+@keyframes loading-spinner {
+	0% {
+		-webkit-transform: rotate(0deg);
+		-moz-transform: rotate(0deg);
+		-ms-transform: rotate(0deg);
+		-o-transform: rotate(0deg);
+		transform: rotate(0deg)
+	}
+	100% {
+		-webkit-transform: rotate(360deg);
+		-moz-transform: rotate(360deg);
+		-ms-transform: rotate(360deg);
+		-o-transform: rotate(360deg);
+		transform: rotate(360deg)
+	}
+}
+/*转圈圈*/
+.loading-spinner{
+	-webkit-animation: loading-spinner 2s infinite linear;
+  	animation: loading-spinner 2s infinite linear;
+}
+@-webkit-keyframes bounceInDown {
+	0%, 100%, 60%, 75%, 90% {
+		-webkit-transition-timing-function: cubic-bezier(0.215, .61, .355, 1);
+		transition-timing-function: cubic-bezier(0.215, .61, .355, 1)
+	}
+	0% {
+		opacity: 0;
+		-webkit-transform: translate3d(0, -3000px, 0);
+		transform: translate3d(0, -3000px, 0)
+	}
+	60% {
+		opacity: 1;
+		-webkit-transform: translate3d(0, 25px, 0);
+		transform: translate3d(0, 25px, 0)
+	}
+	75% {
+		-webkit-transform: translate3d(0, -10px, 0);
+		transform: translate3d(0, -10px, 0)
+	}
+	90% {
+		-webkit-transform: translate3d(0, 5px, 0);
+		transform: translate3d(0, 5px, 0)
+	}
+	100% {
+		-webkit-transform: none;
+		transform: none
+	}
+}
+@keyframes bounceInDown {
+	0%, 100%, 60%, 75%, 90% {
+		-webkit-transition-timing-function: cubic-bezier(0.215, .61, .355, 1);
+		transition-timing-function: cubic-bezier(0.215, .61, .355, 1)
+	}
+	0% {
+		opacity: 0;
+		-webkit-transform: translate3d(0, -3000px, 0);
+		-ms-transform: translate3d(0, -3000px, 0);
+		transform: translate3d(0, -3000px, 0)
+	}
+	60% {
+		opacity: 1;
+		-webkit-transform: translate3d(0, 25px, 0);
+		-ms-transform: translate3d(0, 25px, 0);
+		transform: translate3d(0, 25px, 0)
+	}
+	75% {
+		-webkit-transform: translate3d(0, -10px, 0);
+		-ms-transform: translate3d(0, -10px, 0);
+		transform: translate3d(0, -10px, 0)
+	}
+	90% {
+		-webkit-transform: translate3d(0, 5px, 0);
+		-ms-transform: translate3d(0, 5px, 0);
+		transform: translate3d(0, 5px, 0)
+	}
+	100% {
+		-webkit-transform: none;
+		-ms-transform: none;
+		transform: none
+	}
+}
+.bounceInDown {
+	/*animation-delay:2s;
+	-webkit-animation-delay:2s; */
+	-webkit-animation-duration: 2.5s;
+	animation-duration: 2.5s;
+	-webkit-animation-fill-mode: both;
+	animation-fill-mode: both;
+	-webkit-animation-name: bounceInDown;
+	animation-name: bounceInDown;
+}
+@-webkit-keyframes lightSpeedIn {
+	0% {
+		-webkit-transform: translate3d(100%, 0, 0) skewX(-30deg);
+		transform: translate3d(100%, 0, 0) skewX(-30deg);
+		opacity: 0
+	}
+	60% {
+		-webkit-transform: skewX(20deg);
+		transform: skewX(20deg);
+		opacity: 1
+	}
+	80% {
+		-webkit-transform: skewX(-5deg);
+		transform: skewX(-5deg);
+		opacity: 1
+	}
+	100% {
+		-webkit-transform: none;
+		transform: none;
+		opacity: 1
+	}
+}
+@keyframes lightSpeedIn {
+	0% {
+		-webkit-transform: translate3d(100%, 0, 0) skewX(-30deg);
+		-ms-transform: translate3d(100%, 0, 0) skewX(-30deg);
+		transform: translate3d(100%, 0, 0) skewX(-30deg);
+		opacity: 0
+	}
+	60% {
+		-webkit-transform: skewX(20deg);
+		-ms-transform: skewX(20deg);
+		transform: skewX(20deg);
+		opacity: 1
+	}
+	80% {
+		-webkit-transform: skewX(-5deg);
+		-ms-transform: skewX(-5deg);
+		transform: skewX(-5deg);
+		opacity: 1
+	}
+	100% {
+		-webkit-transform: none;
+		-ms-transform: none;
+		transform: none;
+		opacity: 1
+	}
+}
+.lightSpeedIn {
+	animation-delay:2.5s;
+	-webkit-animation-delay:2.5s; /* Safari 和 Chrome */
+	-webkit-animation-duration: 1.5s;
+	animation-duration: 1.5s;
+	-webkit-animation-fill-mode: both;
+	animation-fill-mode: both;
+	-webkit-animation-name: lightSpeedIn;
+	animation-name: lightSpeedIn;
+	-webkit-animation-timing-function: ease-out;
+	animation-timing-function: ease-out
+}
+
+@-webkit-keyframes zoomIn {
+	0% {
+		opacity: 0;
+		-webkit-transform: scale3d(.3, .3, .3);
+		transform: scale3d(.3, .3, .3)
+	}
+	50% {
+		opacity: 1
+	}
+}
+@keyframes zoomIn {
+	0% {
+		opacity: 0;
+		-webkit-transform: scale3d(.3, .3, .3);
+		-ms-transform: scale3d(.3, .3, .3);
+		transform: scale3d(.3, .3, .3)
+	}
+	50% {
+		opacity: 1
+	}
+}
+.zoomIn {
+	animation-delay:4s;
+	-webkit-animation-delay:4s; /* Safari 和 Chrome */
+	-webkit-animation-duration: 1s;
+	animation-duration: 1s;
+	-webkit-animation-fill-mode: both;
+	animation-fill-mode: both;
+	-webkit-animation-name: zoomIn;
+	animation-name: zoomIn;
+}
+
+
+
+.end-bg{ text-align: center; position: relative; width: 100%;  background: url(/jdvop/images/mobile/activity/bg2.jpg) no-repeat;  background-size: cover; background-position: 50% 50%; background-color: #49a9bf;}
+.main-bg{ position: relative; width: 100%;  background: url(/jdvop/images/mobile/activity/bg1.jpg) no-repeat;  background-size: cover; background-position: 50% 50%; background-color: #49a9bf;}
+.logo{ width:18rem; height: auto;}
+.logo img{ width: 100%; height: auto; margin-top: 0.5rem;} 
+.index-bg .ico-1{position: absolute; top: 54%; right: 3%; width: 5.85rem; height: auto;}
+.index-bg .text{ position: absolute; top: 66%; width: 100%; color: #333; text-align: center; font-size: 1.2rem;}
+.index-bg .text i{ color: #FFF; font-size: 1.6rem;}
+.index-bg .num{ width: 45%;position: absolute; left: 28%; top: 22%;  }
+.index-bg .num img{width: 100%;  height: auto;}
+.index-bg .num i{font-size: 4.5rem; color: #fff; position: absolute; left: 0; bottom: 20%; text-align: center; width: 100%;}
+.index-bg .num span{ font-size: 1.4rem; color: #fff; position: absolute;left: 0; bottom: 4%; text-align: center; width: 100%;}
+
+
+.btn-white{ position: absolute; bottom: 14%; left: 50%; margin-left:-5.5rem; width: 11.9rem; height: 4.2rem; background: #fff; color: #ff0008;  text-align:center; line-height: 4.2rem; font-size:1.4rem; box-shadow:3px 2px 6px #077791; -webkit-box-shadow: 3px 2px 6px #077791;}
+.btn-white a{ width: 100%; height: 100%; display: block; color: #ff0008;}
+.btn-white:active,.btn-white:hover { opacity: 0.6;} 
+
+.end-bg .img-end{
+	width: 59.3%; 
+	/*padding-top: 45%;*/
+	padding-top: 26%;
+	-webkit-animation-duration: 1s;
+	animation-duration: 1s;
+	-webkit-animation-fill-mode: both;
+	animation-fill-mode: both;
+	-webkit-animation-name: zoomIn;
+	animation-name: zoomIn;
+}
+.text-link{ text-align: center; color: #ff0008; position: absolute; width: 100%; bottom: 16%; left: 0;
+	animation-delay:2.5s;
+	-webkit-animation-delay:2.5s; /* Safari 和 Chrome */
+	-webkit-animation-duration: 1.5s;
+	animation-duration: 1.5s;
+	-webkit-animation-fill-mode: both;
+	animation-fill-mode: both;
+	-webkit-animation-name: lightSpeedIn;
+	animation-name: lightSpeedIn;
+	-webkit-animation-timing-function: ease-out;
+	animation-timing-function: ease-out
+
+}
+.end-bg .text-link{
+	animation-delay:1s;
+	-webkit-animation-delay:1s; /* Safari 和 Chrome */
+}
+.text-link a{ color: #fff; font-size: 14px; border-bottom: 1px solid #fff; padding-bottom: 3px;}
+
+
+.prompt-wx{
+  text-align: center;
+  position: relative;
+  width: 100%;
+  background: url(/jdvop/images/mobile/activity/prompt-wx.jpg) no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+  background-color: #49a9bf;
+}
+
+

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+</head>
+<body>
+ #parse('header.vsl')  
+<div class="user-personal">
+    #include('user_center/sider_bar.vsl')
+    <div class="user-content-wrap">
+        <h3 class="user-title"><a href="/jdvop/logout.php" class="blue fr">退出登录</a><a href="/jdvop/my/profile.php" class="blue fr mr10p">个人信息</a>  我的积分</h3>
+        <div class="delivery-address fs14p" style="padding:10px 0px; width:1000px; border:1px solid #ddd; margin-bottom:20px;">
+            <table>
+                <colgroup>
+                    <col style="width:130px;">
+                    <col style="width:120px;">
+                    <col style="width:100px;">
+                    <col style="width:220px;">
+                    <col style="width:100px;">
+                    <col style="width:120px;">
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td class="tar">我的剩余积分：</td>
+                        <td><i class="red ffa">$!user.integral</i> 分</td>
+                        <td class="tar">注册时间：</td>
+                        <td>$!dateTool.format('yyyy-MM-dd', $user.createTime)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="integral_tab">
+        <h2>
+        <span class="curr">新增积分</span>   
+        <a href="/jdvop/my/consume/integrals.php"><span>消费积分</span></a>
+        </h2>
+    </div>
+    <!--新增积分-->
+    <div class="user-content-wrap clearfix  mb30p">
+        <table class="user-return">
+            <colgroup>
+                <col style="width:176px"/>
+                <col style="width:120px"/>
+                <col style="width:176px"/>
+                <col style="width:176px"/>
+            </colgroup>
+            <tbody>
+                <tr>
+                    <th>新增时间</th>
+                    <th>新增积分</th>
+                    <th>新增类型</th>
+                    <th>备注</th>
+                </tr>
+                #set($allIntegral = 0)
+                #if($generateLogs.hasContent())
+                    #foreach($log in $generateLogs)
+                    #set($allIntegral = $allIntegral + $!log.deltaAmount)
+                    <tr>
+                        <td class="pl45p">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $log.createTime)</td>
+                        <td class="pl20p">$!log.deltaAmount</td>
+                        <td class="pl45p">$!log.generateType.description</td>
+                        <td class="pl45p">$!log.reason</td>
+                    </tr>
+                    #end
+                #else
+                    <tr>
+                        <td colspan="5" class="tac">暂无新增积分记录</td>
+                    </tr>
+                #end
+            </tbody>
+        </table>
+        <div class="pages" style="padding:10px 10px;  border:1px solid #dddddd; ">
+           <div class="fl">合计:<i class="red ffa fwb">$!allIntegral</i>  分</div>
+            $pg.pager($link, $generateLogs.getPagerSpec(), 6, '_self')
+        </div>
+    </div>
+</div>
+<!--内容框 end -->
+<!--footer-->
+#parse('footer.vsl')   
+<!--footer  end-->
+</body>
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>  
+</html>

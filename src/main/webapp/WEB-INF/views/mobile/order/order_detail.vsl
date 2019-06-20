@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script  type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script  type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+</head>
+<body class="pm56">
+    <div class="order-list">
+        <ul>
+            <li>
+                <h2 class="top"><em>订单信息</em></h2>
+                <p class="info">
+                    <span>订单编号：<i>$!order.key</i></span><br/>
+                    <span>下单时间：<i>$!dateTool.format('yyyy-MM-dd', $order.createTime) $dateTool.format('HH:mm:ss', $order.createTime)</i></span><br/>
+                    <span>订单状态：<i class="color999">$!order.getStatus().getDescription()</i></span>
+                </p>
+            </li>
+            <li>
+                #if($order.deliveryObjectType == "provider" || $order.deliveryObjectType == "enterprise")
+                <h2 class="top">
+                    <em>物流信息</em>
+                </h2>
+                #if($shipmentLog)
+                <table class="ml16">
+                    <tr>
+                        <td>快递公司：$shipmentLog.shipmentCompany.name</td>
+                    </tr>
+                    <tr>
+                        <td>快递单号：$shipmentLog.shipmentOrder</td>
+                        <td style="padding-left: 20px;"><a href="http://www.kuaidi100.com/" class="blue" target="_blank">点击查询</a></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+                #else
+                <span class="ml16">暂无物流信息，请耐心等候！</span>
+                #end
+                #else
+                <a #if($sod) href="/jdvop/my/mobile/order/orderTrack.php?id=$!order.id" style="display: block;" #end>
+                    <h2 class="top">
+                        <em>物流信息</em>
+                    </h2>
+                    #if($sod)
+                    <div class="con logistics" onclick="location.href = 'logistics-detail.html'">
+                        <div class="txt-wrap">
+                            #foreach($entry in $sod.contents)
+                            #if($order.deliveryObjectType == "jingdong")
+                            #if($velocityCount == $sod.contents.size())
+                            <p class="txt">$!entry.description</p>
+                            <p class="time">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $entry.time)</p>
+                            #end
+                            #else
+                            #if($velocityCount == 1)
+                            <p class="txt">$!entry.description</p>
+                            <p class="time">$!dateTool.format('yyyy-MM-dd HH:mm:ss', $entry.time)</p>
+                            #end
+                            #end
+                            #end
+                        </div>
+                        <span class="ico-arrow"></span>
+                    </div>
+                    #else
+                    <div class="con logistics">
+                        <div class="txt-wrap">
+                            <p class="txt">暂无物流信息</p>
+                        </div>
+                    </div>
+                    #end
+                </a>
+                #end
+            </li>
+            <li>
+                <h2 class="top"><em>收货人信息</em></h2>
+                <div class="info" style="padding: 4% 0 6% 0;">
+                    <table class="">
+                        <colgroup>
+                            <col style="width:70px;" />
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <td class="color999">&nbsp;&nbsp;收货人</td>
+                            <td>$order.getReceiverName()</td>
+                        </tr>
+                        <tr>
+                            <td class="color999">手机号码</td>
+                            <td>#if ($order.getReceiverMobile())
+                                $!order.getReceiverMobile()
+                                #else
+                                $!order.getReceiverPhone()
+                                #end
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="color999">收货地址</td>
+                            <td>
+                                <span class="dz">
+                                    $!order.province.name $!order.city.name $!order.county.name #if($order.town && $order.town.id > 0)$!order.town.name#{end}
+                                    $!order.getReceiverAddr()
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </li>
+            <li>
+                <h2 class="top">
+                    <em>商品信息</em>
+                     #if(!$order.isDeprecated() && !$order.isNiffer())
+                         #if(!$orderIdAndnifferOrderMap.containsKey($order.id))
+                            <!--自有的和供应商的产品看在未发货之前可以申请售后-->
+                            #if(($!order.deliveryObjectType == "provider" || $!order.deliveryObjectType == "enterprise") && ($!order.status=='waiting_audit' || $!order.status=='waiting_shipment'))
+                                <a href="/jdvop/mobile/order/applyRefund.php?order_id=$order.id" style="float: right;margin-right: 10px;">
+                                    <span class="order-refund-btn">
+										申请售后
+                                    </span>
+                                </a>
+                            #end
+                        #else
+                            #set($nifferOrder = $orderIdAndnifferOrderMap.get($order.id))
+                            #set($status = $nifferOrder.getStatus())
+                                #if($nifferOrder.getType()=='returned') 
+                                    <a href="/jdvop/mobile/order/afterSale/result.php?originalOrderId=$!order.id" style="float: right;margin-right: 10px;">
+                                #else
+                                    <a href="javascript:void(0)" style="float: right;margin-right: 10px;">
+                                #end
+                                    <span class="order-refund-btn">
+                                #if($status == 'canceld')
+                                                                售后已撤销
+                                #elseif($status == 'waiting_audit')
+                                                                售后处理中
+                                #elseif($status == 'declined')
+                                                                商家拒绝申请
+                                #elseif($status == 'waiting_finance')
+                                                                售后处理中
+                                #elseif($status == 'processing_refund')
+                                                                售后处理中
+                                #elseif($status == 'accepted')
+                                                                售后处理完成
+                                #end
+                            </span></a>       
+                        #end
+                    #end
+                </h2>
+                #foreach($entry in $entries)
+                #set($storageUnit = $storageUnitMap.get($entry.getStorageUnitId()))
+                #set($product = $productMap.get($storageUnit.getProductId()))
+                <div class="con clearfix">
+                    <p class="img">
+                        <a href="/jdvop/product/$!{product.id}.php">
+                            #if($!product.ownerType == "jingdong" || $!product.ownerType == "system")
+                            <img src="$!product.getThumbnailImage()" />
+                            #else
+                            <img src="$configTool.getImageHost()/middle$!product.getThumbnailImage()" />
+                            #end
+                        </a>
+                    </p>
+                    <p class="text">
+                        <span class="overflow-h"><i class="fwb">$!product.name</i></span>
+                        <span>
+                            <i></i>数量：<i class="fwb">$!entry.getAmount()</i> 
+                        </span>
+                        <span>
+                            <i></i>单价：<i class="fwb">&yen;$!numberTool.format('#0.00', $entry.soldPrice)</i>
+                        </span>
+                    </p>
+                        #if(!$order.isDeprecated())
+                            <!--||$order.getStatus() == 'waiting_audit'||$order.getStatus()=='waiting_shipment'-->
+                            #if($order.getStatus() == 'waiting_confirmed'||$order.getStatus()=='completed')
+                                #if(!$order.isNiffer() && $returnOrNifferMap.get($product.id))
+                                    <a href="/jdvop/mobile/order/niffer.php?entry_id=$entry.id">
+                                        <span class="btn">
+											申请售后
+                                        </span>
+                                    </a>
+                                #elseif(!$order.isNiffer())
+                                    #set($nifferOrder = $nifferOrderMap.get($product.id))
+                                    #if($nifferOrder)
+                                        #set($openStatus = $nifferOrder.getOpenStatus())
+                                        #if($openStatus == 'canceld')
+                                            <a href="javascript:void(0)">
+                                        #elseif($nifferOrder.getType()=='returned') 
+                                            <a href="/jdvop/mobile/order/afterSale/result.php?originalOrderId=$!order.id&originalProductId=$!product.id" >
+                                        #else
+                                            <a href="/jdvop/my/mobile/order/niffer${nifferOrder.id}.php">
+                                        #end
+                                            <span class="btn">
+                                                #set($status = $nifferOrder.getStatus())
+                                                #if($status == 'canceld' || $openStatus == 'canceld')
+                                                                售后已撤销
+                                                #elseif($status == 'waiting_audit')
+                                                                售后处理中
+                                                #elseif($status == 'declined' || $openStatus=='declined')
+                                                                商家拒绝申请
+                                                #elseif($status == 'waiting_accept')
+                                                                售后处理中
+                                                #elseif($status == 'waiting_audit_shipment_neworder')
+                                                                售后处理中
+                                                #elseif($status == 'waiting_user_confirmed')
+                                                                等待收货
+                                                #elseif($status == 'waiting_finance')
+                                                                售后处理中
+                                                #elseif($status == 'processing_refund')
+                                                                售后处理中
+                                                #elseif($status == 'accepted')
+                                                                售后处理完成
+                                                #elseif($status == 'after_sale_service')
+                                                                售后处理中
+                                                #end
+                                        </span></a>
+                                    #end
+                                #end
+                            #end
+                        #end
+                </div>
+                #end
+            </li>
+            #if($!order.status != 'cancled_before_pay' && $!order.status != 'canceld')
+            <li>
+                <h2 class="top"><em>支付信息</em></h2>
+                <div class="info">
+                    #if($order.getStatus() != 'waiting_pay')
+                    <div class="webkitbox-h ">
+                        <p class="w72 tr color999">支付方式：</p>
+                        <p class="flex1 tr pr5 color666">
+                            $!orderPayLog.payType.description
+                        </p>
+                    </div>
+                    #end
+                    <div class="webkitbox-h ">
+                        <p class="w72 tr color999">商品总额：#set($productPrice = $!order.getTotalCost())</p>
+                        <p class="flex1 tr pr5 color666">¥$!numberTool.format('#0.00', $productPrice)</p>
+                    </div>
+
+                    <div class="webkitbox-h ">
+                    	<p class="w72 tr color999">优惠券：</p>
+                        <p class="flex1 tr pr5 color666">
+                        	#if($!order.coupon)
+                        		#if($!order.coupon.type ==3) 
+                        			$!order.coupon.amount 折 
+                        		#else 
+                        			-¥$!order.couponAmount
+								#end
+							#else
+								-¥$!order.couponMoney
+							#end
+								
+                        	
+                        	
+						</p>
+                    </div>
+
+                    #if($!order.shipmentFee != 0)
+                        <div class="webkitbox-h ">
+                            <p class="w72 tr color999">运费：</p>
+                            <p class="flex1 tr pr5 color666">&yen;$!numberTool.format('#0.00', $!order.shipmentFee)</p>
+                        </div>
+                    #end
+                    <div class="webkitbox-h ">
+                        <p class="w72 tr color999">#if($order.getStatus() == 'waiting_pay') 待付款：#{else} 实付款：#{end}</p>
+                        <p class="flex1 tr pr5 color666">&yen;$!numberTool.format('#0.00', $!order.getNeedPay())
+                        </p>
+                    </div>
+                    
+                </div>
+            </li>
+            #end
+            <li>
+                <h2 class="top"><em>买家留言</em></h2>
+                <div class="txt-message">
+                    #if($!order.remark == "")
+                        暂无内容
+                    #else
+                        $!order.remark
+                    #end
+                </div>
+            </li>
+        </ul>
+    </div>
+    #if($order.status == 'waiting_pay')
+    <div class="fixed-bottom2">
+        <p class="txt">订单金额：<i class="maincolor">&yen;$!numberTool.format('#0.00', $order.needPay)</i></p>
+        <p class="txt">请在<i class="maincolor" id="haveHour">24</i>小时<i class="maincolor" id="haveMinute">00</i>分<i class="maincolor" id="haveSecond">00</i>秒内完成付款</p>
+        <!-- 修改于20190228，chenhongluan，选过选择支付方式页面，直接跳转到市民卡支付 -->
+        <!-- <a href="/jdvop/my/order/choosePay.php?id=$!{order.id}"><input class="btn-maincolor js_topay"  type="button" data-id=""  value="去付款"  style=" display: block; width:80%; margin: 0 auto 6% auto;"/></a> -->
+    	<a id="jumpToPay" href="javascript:void(0)" data-href="/jdvop/my/order/shiminkaPay/topay.php?id=$!{order.id}"><input class="btn-maincolor js_topay"  type="button" data-id=""  value="去付款"  style=" display: block; width:80%; margin: 0 auto 6% auto;"/></a>
+    </div>
+    #else
+    <div class="fixed-bottom2" style="height:56px; padding-top: 8px; ">
+        #if($order.getStatus() == 'waiting_confirmed')
+        <div class="webkitbox-h">
+<!--                #if($order.deliveryObjectType == "provider" || $order.deliveryObjectType == "enterprise")
+            #if(!$order.isNiffer() && $returnOrNifferOrderMap.get($order.id))
+            <p class="flex1 tc">
+                <a href="/jdvop/my/order/niffer.php?id=$order.id"><span class="btn btn-orange">申请售后</span></a>
+            </p>
+            #end
+            #end-->
+            <p class="flex1 tc">
+                <span class="btn btn-orange js_confirm_receipt" data-url="/jdvop/my/confirmReceipt/${order.getId()}.php">确认收货</span>
+            </p>
+        </div>
+        #else
+        <p class="txt">订单金额：<i class="maincolor">&yen;$!numberTool.format('#0.00', $order.needPay)
+        #if($order.voucherNum && $order.voucherNum>0)
+        	&nbsp;&nbsp;(使用提货券)
+        #end
+        </i></p>
+        <p class="txt">订单状态：$!order.status.description</p>
+        #end
+    </div>
+    #end
+    <script type="text/javascript" src="/jdvop/script/mobile/shopping-order/shopping-order.js"></script>
+    <script type="text/javascript">
+          //修改于20190228，chenhongluan，选过选择支付方式页面，直接跳转到市民卡支付
+     $("#jumpToPay").click(function(e){
+            e.preventDefault();
+            $.post($(this).attr("data-href"), function(d){
+                var data = eval('(' + d + ')');
+                if (data.isOk) {
+                    location = data.message;
+                }  else {
+                    mui.alert(data.message, '温馨提示');
+                }
+            }, 'application/json');
+        });
+    $(function() {
+        #if ($order.status == 'waiting_pay')
+            //支付倒计时
+            clock();
+            countDown();
+        #end
+        shopping_order.confirm_receipt();
+    });
+        //订单过期时间=订单创建时间+24h
+        var expiredTime = "$expiredTime";
+        //获取服务器当前时间
+        var currentTime = $dateTool.getSystemTime();
+        //刷新间隔
+        var intervalTime = 1000;
+        //24h
+        var oneDay = 60 * 1000 * 60 * 24;
+        //intervalId
+        var intervalId = null;
+        function countDown() {
+        intervalId = setInterval("clock()", intervalTime);
+        }
+        function clock() {
+        if (intervalId !== null){
+            currentTime += intervalTime;
+        }
+        var haveTime = expiredTime - currentTime;
+        if (haveTime <= 0){
+            window.clearInterval(intervalId);
+            //倒计时结束后 关闭订单
+            $.post('/jdvop/my/order/closeOrder.php?id=${order.id}', '', function(d){
+                var data = eval('(' + d + ')');
+                if (data.isOk) {
+                    location = "/jdvop/my/mobile/order/list.php";
+                }
+            }, 'application/json');
+            return;
+        }
+
+        if (haveTime > oneDay){
+            currentTime += (haveTime - oneDay);
+            haveTime = oneDay;
+        }
+
+        var haveHour = Math.floor(haveTime / (60 * 1000 * 60)); //小时
+        var laveTime1 = haveTime % (60 * 1000 * 60); //计算小时后剩余的毫秒数
+        var haveMinute = Math.floor(laveTime1 / (60 * 1000)); //分钟
+        var laveTime2 = laveTime1 % (60 * 1000); //计算分钟后剩余毫秒数
+        var haveSecond = Math.floor(laveTime2 / 1000); //秒
+
+        $("#haveHour").html(haveHour);
+        $("#haveMinute").html(haveMinute);
+        $("#haveSecond").html(haveSecond);
+    }
+    </script>
+</body>
+</html>

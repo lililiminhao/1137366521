@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+<script type="text/javascript" src="/jdvop/script/checkinput.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+</head>
+<body>
+ #parse('header.vsl')   
+    <div class="main">
+        <!--内容框 str -->
+        <div class="content-tab clearfix">
+            <div class="content-wrap-bd" style="margin-top: 10px;">
+                <div class="shopping-process-pic2"></div>
+                <h3 class="process-title mt10p">收货地址</h3>
+                <div class="information">
+                    <ul class="choose-information">
+                        #foreach($item in $addressList)
+                        <li #if($loopCounter == 1) class="curr" #end>
+                            <label>
+                                <input type="radio" name="selectedAddressId" value="$item.id" #if($velocityCount == 1) checked="checked" #end class="check_box mr10p" />
+                                <span class="mr5p">$!item.receiverName</span>
+                                <span class="my_address_info">$!item.province.name$!item.city.name$!item.county.name$!item.town.name</span><span class="mr5p">$!item.address</span>
+                                <span class="mr5p">$!item.phone &nbsp;&nbsp;$!item.mobile</span>
+                                <a class="blue ml10p mr10p address_edit cup">编辑</a><a class="blue ml10p mr10p address_delete cup">删除</a>
+                            </label>
+                        </li>
+                        #end
+                        <div id="address_info" style="padding: 0px;margin: 0px;"></div>
+                        <li><label><input type="radio" name="selectedAddressId" rel="add" class="check_box mr5p" #if($addressList.isEmpty()) checked="checked" #end/>使用新地址</li>
+                    </ul>
+                    <form id="add_address_form" method="POST">
+                        <table width="100%" class="process-tab add-tab" id="address_box" #if($addressList && $addressList.size() > 0 ) style="display: none;" #end>
+                            <tr>
+                                <td align="right" width="100"><span class="orange mr5p">*</span>收货人:</td>
+                                <td>
+                                    <input type="hidden" name="addressId" class="input-text1"/>
+                                    <input type="text" name="name" class="input-text1"/>
+                                </td>
+                            </tr>
+                                <tr>
+                                <td align="right"><span class="orange mr5p">*</span>所在地区:</td>
+                                <td>
+                                <div id="choose_address">
+                                    <select name="regions[]" id="js-provience" class="select-choose com_input">
+                                        <option value="0">请选择</option>
+                                        #foreach($prov in $provinces)
+                                        <option value="$prov.getId()">$prov.getName()</option>
+                                        #end
+                                    </select>
+                                </div>
+                            </td>
+                            </tr>
+                            <tr>
+                                <td align="right"><span class="orange mr5p">*</span>详细地址:</td>
+                                <td>
+                                    <span id="sel_addr">
+                                    </span><input type="text" name="address" class="input-text1"  style="width: 220px;"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right"><span class="orange mr5p">*</span>手机号码:</td>
+                                <td>
+                                    <input type="text" name="mobile" class="input-text1" onkeypress="check_input(event, is_number, 11)"/>
+                                    <span class="ml5p mr5p">或</span>
+                                    固定电话：<input type="text" name="phone" class="input-text1" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><input type="button" class="input-btn1" value="保存收货人地址"/></td>
+                            </tr>
+                            <tr>
+                                <td height="10" colspan="2"></td>
+                            </tr>
+                        </table>
+                    </form>
+                    
+                    <h4 class="delivery-address-title">购物清单</h4>
+                    <form id="submit_order_form" action="/jdvop/activity/submitOrder.php" method="post">
+                            <input type="hidden" name="fpid" value="$flashProduct.id" />
+                            <input type="hidden" name="myAddressId"/>
+                            <input type="hidden" name="amount"  value="$amount"/>
+                            <input type="hidden" name="activityId"  value="$activityId"/>
+                            <table class="user-tabs">
+                                <tr>
+                                    <th>商品名称</th>
+                                    <th>所需积分</th>
+                                    <th>数量</th>
+                                    <th>总积分</th>
+                                    <th>操作</th>
+                                </tr>
+                                <tr>
+                                    <td width="300">
+                                        <img class="beaeaea fl" src="$!product.thumbnailImage" width="58" height="58"/>
+                                        <span class="fl ml10p w230p overflow-h mt20p tal"> <a href="/jdvop/product/${product.id}.php" target="_blank">$!product.name</a></span>
+                                    </td>
+                                    <td>
+                                        #set($discountPrice = $flashProduct.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                                        $!numberTool.format('#0', $discountPrice)
+                                    </td>
+                                    <td>$amount</td>
+                                    <td>
+                                        #set($allPrice = $amount * $discountPrice)
+                                        $math.ceil($!allPrice)
+                                    </td>
+                                    <td><div class='del-row cp'><a href="javascript:history.back(-1);" target="_blank">查看详情</a></div></td>
+                                </tr>
+                               </table>
+                    </form>
+                    <!--<div class="pt10p pl20p pb10p"><a href="/jdvop/shoppingCart/myCart.php" class="blue">返回修改购物车信息</a></div>-->
+                </div>
+                <div class="order-sub">
+                    您购买了<span class="orange ffa">$amount</span>件商品,共需支付积分
+                    <span class="orange ffa" id="js-orderFee" rel='$resultMap.get("TOTALPRICE")'>$!numberTool.format('#,####,####',$allPrice)</span>分<a class="submit-order"></a>
+                </div>
+            </div>
+        </div>
+        <!--内容框 end -->
+    </div>
+<!--footer-->
+#parse('footer.vsl')
+<!--footer  end-->
+<script type="text/javascript">
+$(function(){
+    //选择省市
+    $('select.select-choose').live('change', function(e){
+       var selObj  = $(this);
+       selObj.nextAll().remove();//删除后面所有的框
+       reloadSelectedAddrPrefix();
+       var cid = parseInt($(this).val());
+       if (cid > 0)
+       {
+           if ($('select.select-choose').size() >= 4)
+           {
+               return false;
+           }
+           $.get('/jdvop/region/ajax.php', {parentId : cid}, function(d){
+               var len = d.length;
+               if (len <= 0)
+               {
+                   return false;
+               }
+               var html = '<select name="regions[]" class="select-choose com_input"><option value="0">请选择</option>';
+               var i = 0;
+               for (; i < len; ++ i)
+               {
+                   html    += '<option value="' + d[i].id + '">' + d[i].name + "</option>";
+               }
+               html    += '</select>';
+               selObj.after(html);
+           }, 'json');
+       }
+    });
+
+    function reloadSelectedAddrPrefix()
+    {
+        var txt = '';
+        $('select.select-choose').each(function(){
+            if (this.options[this.selectedIndex].value !== '0')
+            {
+                txt += this.options[this.selectedIndex].innerHTML + '&nbsp;';
+            }
+        });
+        $('#sel_addr').html(txt);
+    }
+
+    //使用新地址
+    $("input[name='selectedAddressId']").live("click", function(){
+        $('input[name="addressId"]').val('');
+        if($(this).attr("rel") === "add"){
+            $("#address_box").show();
+        }else{
+            $("#address_box").hide();
+        }
+    });
+
+    //编辑收货人信息
+    var _editRmoveBox;
+    $(".address_edit").live("click", function(e){
+        e.preventDefault();
+        _editRmoveBox   = $(this).parents("li");
+        var myAddressInfo = $(this).siblings("span.my_address_info").html();
+        var removeId    = $(this).siblings("input[name='selectedAddressId']").val();
+        if(parseInt(removeId) < 1){
+            return false;
+        }
+        $.get("/jdvop/my/address/view.php", {id : removeId}, function(data){
+            if(data.isOk){
+                var citys       = data.message['citys'];
+                var countys     = data.message['countys'];
+                var towns       = data.message['towns'];
+                var address     = data.message['address'];
+
+                $('input[rel="add"]').attr("checked", true);
+                $('input[name="addressId"]').val(address.id);
+                $('input[name="name"]').val(address.receiverName);
+                $('input[name="address"]').val(address.address);
+                $('input[name="mobile"]').val(address.mobile);
+                $('input[name="phone"]').val(address.phone);
+                $('#sel_addr').html(myAddressInfo);
+                if($("#address_box").is(':hidden')){
+                    $("#address_box").show();
+                }
+
+                //还原省市信息
+                var geoRegionHtml = '<select name="regions[]" class="select-choose com_input"><option value="0">请选择</option>';
+                $.each(citys, function (i, item) {  
+                    if(address.city.id === item.id){
+                        geoRegionHtml    += '<option value="' + item.id + '" selected>' + item.name + "</option>";
+                    }else{
+                        geoRegionHtml    += '<option value="' + item.id + '">' + item.name + "</option>";
+                    }
+                }); 
+                geoRegionHtml   += '</select>';
+                geoRegionHtml   += '<select name="regions[]" class="select-choose com_input"><option value="0">请选择</option>';
+                $.each(countys, function (i, item) {  
+                    if(address.county.id === item.id){
+                        geoRegionHtml    += '<option value="' + item.id + '" selected>' + item.name + "</option>";
+                    }else{
+                        geoRegionHtml    += '<option value="' + item.id + '">' + item.name + "</option>";
+                    }
+                }); 
+                geoRegionHtml    += '</select>';
+                if(towns != null) {
+                    geoRegionHtml += '<select name="regions[]" class="select-choose com_input"><option value="0">请选择</option>';
+                    $.each(towns, function (i, item) {  
+                        if(address.town.id === item.id){
+                            geoRegionHtml    += '<option value="' + item.id + '" selected>' + item.name + "</option>";
+                        }else{
+                            geoRegionHtml    += '<option value="' + item.id + '">' + item.name + "</option>";
+                        }
+                    }); 
+                    geoRegionHtml    += '</select>';
+                }
+                var provienceObj = $('#js-provience');
+                provienceObj.nextAll().remove();//删除后面所有的框
+                provienceObj.val(address.province.id);
+                provienceObj.after(geoRegionHtml);
+            }
+        }, "json");
+    });
+
+    $(".address_delete").live("click", function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        messageBox("question", "提示信息", "删除后不可回复,您确定要删除此收货地址信息吗", true, function(){
+            var _delUserAddressBox = thiz.parents("li");
+            var removeId = _delUserAddressBox.find('input[name="selectedAddressId"]').val();
+            if(parseInt(removeId) < 1){
+                return false;
+            }
+            $.post("/jdvop/my/address/delete.php", {id:removeId}, function(data){
+                if(data.isOk){
+                    _delUserAddressBox.remove();
+                    //选中第一个地址
+                    var firstAddress = $('input[name="selectedAddressId"]:first');
+                    firstAddress.attr("checked", "checked");
+                    if(firstAddress.attr("rel") === "add"){
+                        $("#address_box").show();
+                        $('input[name="myAddressId"]').val(0);
+                    }else{
+                        $('input[name="myAddressId"]').val(firstAddress.val());
+                    }
+                }else{
+                   messageBox("error", "错误提示", data.message); 
+                   return false;
+                }
+            }, "json");
+        });
+    });
+
+    //保存收货人地址
+    $('.input-btn1').bind("click",function(){
+        if($('input[name="name"]').val() == ""){
+            messageBox("warning", "提示信息", "请填写收货人姓名");
+            return false;
+        }
+        if($('select[name="regions[]"]').size() <= 2){
+            messageBox("warning", "提示信息", "请选择详细的省市信息");
+            return false;
+        }
+        var flag = false;
+        $('select[name="regions[]"]').each(function(i, item){
+            if($(item).val() == '' || $(item).val() == '0'){
+                flag = true;
+            }
+        });
+        if(flag){
+            messageBox("warning", "提示信息", "请选择详细的省市信息");
+            return false;  
+        }
+        if($('input[name="address"]').val() == ""){
+            messageBox("warning", "提示信息", "请填写详细的收货地址");
+            return false;
+        }
+        var mobile = $('input[name="mobile"]').val();
+        var phone  = $('input[name="phone"]').val();
+        if(mobile == "" && phone == ""){
+            messageBox("warning", "提示信息", "请填写收货人联系方式");
+            return false; 
+        }
+
+        var myreg = /^\d{11}$/;
+        if(mobile != '' && (mobile.length !== 11 || !myreg.test(mobile)))
+        {
+           messageBox("warning", "提示信息", "请填写正确的手机号码");
+           return false;  
+        }
+
+        myreg = /^[0-9_-]+$/;
+        if(phone != '' && (phone.length <= 5 || !myreg.test(phone)))
+        {
+           messageBox("warning", "提示信息", "请填写正确的座机号码");
+           return false;  
+        }
+
+        var URL = "/jdvop/my/address/add.php";
+        if(parseInt($('input[name="addressId"]').val()) > 0){
+            URL = "/jdvop/my/address/edit.php";
+        }
+        $.post(URL, $("#add_address_form").serialize(), function(data){
+            if(data.isOk){
+                //新增收货人信息
+                var userAddress = data.message['address'];
+                var newAddress = '<li class="curr">';
+                newAddress += '<label> ';  
+                newAddress += '<input type="radio" name="selectedAddressId" value="' + userAddress.id + '" checked="checked" class="check_box mr5p" />';  
+                newAddress += '<span class="mr5p">' + userAddress.receiverName + '</span>'; 
+                newAddress += '<span>' + userAddress.province.name + userAddress.city.name + userAddress.county.name;
+                if(userAddress.town != null) {
+                    newAddress +=   userAddress.town.name;
+                }
+                newAddress += '</span><span class="mr10p">'+ userAddress.address + '</span>'; 
+                newAddress += '<span class="mr5p">' + userAddress.phone +'&nbsp;&nbsp;'+ userAddress.mobile + '</span>'; 
+                newAddress += '<a class="blue ml10p mr10p address_edit cup">编辑</a><a class="blue ml10p mr10p address_delete cup">删除</a>'; 
+                newAddress += '</label>'; 
+                newAddress += '</li>'; 
+                $("#address_info").append(newAddress);
+                $("#address_box").hide();
+                if(_editRmoveBox !== undefined && _editRmoveBox !== null){
+                    _editRmoveBox.remove();
+                }
+            }else{
+                messageBox("error", "错误信息", data.message);
+            }
+        }, "json");
+    });
+    
+    //提交订单
+    var isRepetition = false;
+    $('.submit-order').bind("click", function(){
+        var temp = $('input[type="radio"]:checked');
+        if(temp.attr("rel") === "add"){
+            messageBox("warning", "提示信息", "请选择收货地址");
+            return false;
+        }
+        var addr = parseInt(temp.val());
+        if(addr == NaN || addr == '' || addr < 1){
+            messageBox("warning", "提示信息", "请选择收货地址");
+            return false;
+        }
+        $('input[name="myAddressId"]').val(addr);
+        
+        if(!isRepetition) {
+            $.post("/jdvop/activity/submitOrder.php", $("#submit_order_form").serialize(), function(data){
+                if(data.isOk){
+                    location.href = "/jdvop/shoppingCart/success.php?id=" + data.message;
+                }else{
+                    messageBox("error", "错误信息", data.message);
+                    return false;
+                }
+                isRepetition = true;
+            }, "json");
+        }
+    });
+});
+</script>
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>  
+</body>
+</html>

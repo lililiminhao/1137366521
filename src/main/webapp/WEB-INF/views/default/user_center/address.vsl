@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+<script type="text/javascript" src="/jdvop/script/common.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+<script type="text/javascript">
+$(function(){
+    $('select.ajax-change').live('change', function(e){
+        var selObj  = $(this);
+        selObj.parent('label.mr5p').nextAll().remove();//删除后面所有的框
+        var cid = parseInt($(this).val());
+        if (cid > 0)
+        {
+            if ($('label.mr5p select').size() >= 4)
+            {
+                return;
+            }
+            $.get('/jdvop/region/ajax.php', {parentId : cid}, function(d){
+                var len = d.length;
+                if (len <= 0)
+                {
+                    return;
+                }
+                var html = '<label class="mr5p"><select name="regions[]" class="ajax-change  com_input"><option value="0">请选择</option>';
+                var i = 0;
+                for (; i < len; ++ i)
+                {
+                    html    += '<option value="' + d[i].id + '">' + d[i].name + "</option>";
+                }
+                html    += '</select></label>';
+                selObj.parent('label.mr5p').after(html);
+            }, 'json');
+        }
+    });
+    $('#addr_form').submit(function(e){
+        e.preventDefault();
+        //开始提交
+        $.post($(this).attr('action'), $(this).serialize(), function(d){
+            if (d.isOk) {
+                window.location = "/jdvop/my/address.php";
+            } else {
+                messageBox("error", "错误信息", d.message);
+            }
+        }, 'json');
+    });
+    
+    $('a.addr-del').live('click', function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        messageBox("question", "提示信息", "删除后不可回复,是否确认删除", true, function(){
+            $.post(thiz.attr('href'), {'id':thiz.attr('rev')}, function(d){
+                if (d.isOk)
+                {
+                    window.location = "/jdvop/my/address.php";
+                }else{
+                    messageBox("error", "错误提示", d.message);
+                }
+            }, 'json');
+        });
+    });
+});
+</script>
+</head>
+<body>
+ #parse('header.vsl')   
+<div class="user-personal">
+    #include('user_center/sider_bar.vsl')
+    <div class="user-content-wrap">
+        <div class="delivery-address">
+            <div id="showAddNewAddress">
+                <h4 class="delivery-address-title">新增地址</h4>
+                <form action="/jdvop/my/address/add.php" id="addr_form" method="POST">
+                <table width="100%" class="process-tab add-tab">
+                    <tbody>
+                    <tr>
+                        <td align="right" width="100"><span class="orange mr5p">*</span>收货人:</td>
+                        <td><input type="text" name="name" class="input-text1"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right"><span class="orange mr5p">*</span>所在地区:</td>
+                        <td>
+                            <label class="mr5p">
+                                <select name="regions[]" class="ajax-change com_input">
+                                    <option value="0">请选择</option>
+                                    #foreach($prov in $provinces)
+                                    <option value="$prov.getId()">$prov.getName()</option>
+                                    #end
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right"><span class="orange mr5p">*</span>详细地址:</td>
+                        <td><input type="text" name="address" class="input-text1"/><label class="null" style="margin-right: 309px; border: none;background: none;height: 20px;line-height: 25px;"><span></span></label> </td>
+                    </tr>
+                    <tr>
+                        <td align="right" valign="top"><span class="orange mr5p">*</span>手机号码:</td>
+                        <td><input type="text" name="mobile" class="input-text1"/><span class="ml5p mr5p">或</span>固定电话：<input type="text" name="phone" class="input-text1"> <em style="color:#999;">电话号码、手机号码必填一项</em>
+                            <label class="null" style="display: block;*margin-top: 6px; margin-right: 474px;background: none;border: none;"><span></span></label></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="submit" class="input-btn" value="保存"/><label><span></span></label> </td>
+                    </tr>
+                    <tr>
+                        <td height="10" colspan="2"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                </form>
+            </div>
+            #set($displayStyle = 'style="display:none;"')
+            #if($addressList && !$addressList.isEmpty())
+            #foreach($addr in $addressList)
+            <h4 class="delivery-address-title"><a href="/jdvop/my/address/delete.php" rev="$addr.getId()" class="addr-del" rel="tbl_$foreach.count">删除</a>地址$foreach.count</h4>
+            <table width="100%" id="tbl_1" class="process-tab">
+               <tbody>
+                     <tr>
+                        <td align="right" width="70">收货人:</td>
+                        <td>$esc.html($addr.getReceiverName())</td>
+                    </tr>
+                    <tr>
+                        <td align="right">收货地址:</td>
+                        <td>$!esc.html($addr.province.name)$!esc.html($addr.city.name)$!esc.html($addr.county.name)$!esc.html($addr.town.name)$!esc.html($addr.getAddress())</td>
+                    </tr>
+                    <tr>
+                        <td align="right">联系电话:</td>
+                        <td>
+                            #if ($addr.getMobile() && $addr.getMobile()!="")
+                                $esc.html($addr.getMobile())
+                            #end
+                            #if($addr.getPhone() && $addr.getPhone()!="")
+                                $esc.html($addr.getPhone())
+                            #end
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="10" colspan="2"></td>
+                    </tr>
+                </tbody>
+            </table>
+            #end
+            #else  
+                 #set($displayStyle = 'style="display:block;"')
+            #end
+    </div>
+</div>
+</div>
+<!--内容框 end -->
+ <!--footer-->
+#parse('footer.vsl')   
+<!--footer  end-->
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>      
+</body>
+</html>

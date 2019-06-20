@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css"/>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css"/>   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+</head>
+<body>
+ #parse('header.vsl')  
+ <div class="main" style="width: 1200px;">
+    <!--内容框 str -->
+    <div class="products-list-tab">
+        <div class="topnav"><img src="/jdvop/images/TopNav.jpg" class="bgShadow"></div>
+        <div class="product-list">
+            <form id="products_search" action="/jdvop/products.php" method="GET">
+                #if($!request.getParameter('k')) <input type="hidden" name="k" value="$!request.getParameter('k')"/> #end
+                <input type="hidden" name="s" value="#if($!request.getParameter('s'))$!request.getParameter('s')#{end}"/>
+                <input type="hidden" name="m" value="#if($!request.getParameter('m'))$!request.getParameter('m')#{end}"/>
+                <input type="hidden" name="wpt" value="#if($request.getParameter('wpt'))$request.getParameter('wpt')#{else}0#{end}"/>
+                <input type="hidden" name="sort"/>
+            </form>
+            <div class="site-nav" style="overflow: hidden;">
+                <div class="top clearfix">
+                    <!--<p class="top"><em class="ico_up" title="兑换量">兑换量</em></p>-->
+                    <p class="top"><em class="ico_up sort_info" title="最新上架" id='sort_time' rel="time.desc">最新上架 </em></p>
+                    <p class="top"><em class="ico_up sort_info" title="积分值"  id='sort_price' rel="price.desc">积分值 </em></p>
+                    <input name='sort_info' type="hidden" value="$!request.getParameter('sort')"/>
+                    <form  action="/jdvop/products.php" method="GET" style="display: inline-block;">
+                    <input type="text" name="s" onkeyup="existsNumber(this)"  value="$!request.getParameter('s')" class="input-price js-minIntegral"/> — <input type="text" name="m" onkeyup="existsNumber(this)"  value="$!request.getParameter('m')" class="input-price  js-maxIntegral"/> 
+                    自定义积分范围&nbsp&nbsp&nbsp&nbsp
+                    <input type="submit" value="搜索" class="ok"/>
+                    </form>
+                </div>
+
+            </div>
+            <ul class="clearfix product-list-ul">
+                 #if($products.hasContent())
+                    #foreach($product in $products)
+                    #set($soldPrice = $!productTool.getProductSoldPrice($product))
+                    #set($hrefProduct= '/jdvop/product/'+${product.id}+'.php')
+                        #if($fps)
+                            #foreach($fp in $fps)
+                                #if($fp.productId == $product.id)
+                                    #set($soldPrice = $fp.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                                    #break
+                                #end
+                            #end
+                        #end
+                        <li>
+                            <p class="img">
+                                <a class="visited_product" title="$!product.name" target="_blank"  href="$hrefProduct">
+                                    #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                        <img src="$!product.thumbnailImage" alt="$!product.name"/>
+                                        #if($product.ownerType == "jingdong" )
+                                            <img src="/jdvop/images/jd-ico.png" class="jd-ico"/>
+                                        #end
+                                    #else
+                                        <img src="$configTool.getImageHost()/middle$!product.thumbnailImage" alt="$!product.name"/>
+                                    #end
+                                </a>
+                            </p>
+                            <p class="name overflow-h">
+                                <a class="visited_product" title="$!product.name" target="_blank"  href="$hrefProduct">$!product.name</a>
+                            </p>
+                            <p class="integral">积分价：<i class='ffa red fwb'>
+                                $!numberTool.format("#0.00", $soldPrice)
+                            </i></p>
+                        </li>
+                    #end
+                #else
+                    <p style="font-size: 13px;text-align: center; padding: 20px; font-weight: bold;">没有搜索到您想要的商品,可以尝试输入其他关键字试试哦...</p>
+                #end
+            </ul>
+            <div class="pages">$pg.pager($productLink, $products.getPagerSpec(), 4, '_self')</div>
+        </div>
+   </div>
+    <!--内容框 end -->
+</div>
+<!--footer-->
+#parse('footer.vsl')   
+<!--footer  end-->
+<script type="text/javascript">
+    $(function(){
+        $(".product-categories").show();
+        //初始化排序条件
+        var sort = $("input[name='sort_info']").val();
+        if(sort !== null && sort !== "" && sort !== undefined){
+            var shorInfo = sort.split(".");
+            if(shorInfo[0] === "time"){
+                if(shorInfo[1] === "desc"){
+                    $("#sort_time").attr("rel", "time.asc");
+                    $("#sort_time").removeClass("ico_up").addClass("ico_drop");
+                }else{
+                    $("#sort_time").attr("rel", "time.desc");
+                    $("#sort_time").removeClass("ico_drop").addClass("ico_up");
+                }
+            }else if(shorInfo[0] === "price"){
+                if(shorInfo[1] === "desc"){
+                    $("#sort_price").attr("rel", "price.asc");
+                    $("#sort_price").removeClass("ico_up").addClass("ico_drop");
+                }else{
+                    $("#sort_price").attr("rel", "price.desc");
+                    $("#sort_price").removeClass("ico_drop").addClass("ico_up");
+                } 
+            }
+        }
+        
+        /*商品分类*/
+        $('.cat-menu-bd ul li').click(function(){
+            $(this).addClass('curr').siblings().removeClass('curr');
+        });
+        
+        /*筛选条件*/
+        $('.last a').click(function(e){
+            e.preventDefault();
+            $(this).addClass("curr").siblings().removeClass("curr");
+            var strPrice = $(this).attr("rel");
+            if(strPrice != null){
+                var rangePrice = strPrice.split("-");
+                $('input[name="s"]').val(rangePrice[0]);
+                $('input[name="m"]').val(rangePrice[1]);
+            }
+            $("#products_search").submit();
+        });
+        
+        $('.brand_li a').click(function(e){
+            e.preventDefault();
+            $('input[name="b"]').val($(this).attr("rel"));
+            $(this).addClass("curr").siblings().removeClass("curr");
+            $("#products_search").submit();
+        });
+        
+         $(".promotion-list #g_b a").each(function(){ 
+            var bb = $('input[name="b"]').val();
+            if(bb !== null && bb !== ""){
+                var relBB = $(this).attr("rel");
+                if(parseInt(relBB) === parseInt(bb)){
+                    $(this).addClass("curr").siblings().removeClass("curr");
+                }
+            }   
+        }); 
+        
+        $('#g_p a').each(function(){ 
+            var pp = $('input[name="s"]').val();
+            var price = $(this).attr("rel");
+            var rP = price.split("-");
+            if(pp !== null && pp !== ""){
+                var relPP = rP[0];
+                if(parseInt(pp) == parseInt(relPP)){
+                    $(this).addClass("curr").siblings().removeClass("curr");
+                }
+            }   
+        }); 
+        
+        //排序
+        $(".sort_info").click(function(){
+            var thiz = $(this);
+            $('input[name="sort"]').val(thiz.attr("rel"));
+            $('input[name="s"]').val($('.js-minIntegral').val());
+            $('input[name="m"]').val($('.js-maxIntegral').val());
+            $("#products_search").submit();
+        });
+    });
+    
+    function existsNumber(object){
+        var amount = object.value.replace(/^[0-9]\d*$/ ,'');
+        if(amount.length > 0)
+        {
+           object.value = "";
+        }
+    }
+    
+</script>
+<script type="text/javascript" src="/jdvop/script/tj.js"></script>      
+</body>
+</html>

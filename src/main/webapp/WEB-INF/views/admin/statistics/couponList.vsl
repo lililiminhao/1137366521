@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css' />
+    <link rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css' />
+    <link rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css" />
+    <link rel='stylesheet' type='text/css' href='/jdvop/css/admin/jquery.datetimepicker.css' />
+    <script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script>
+    <script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+    <script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+    <script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+    <script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+    <script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+    <script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+    <script src="/jdvop/script/admin/jquery.datetimepicker.full.min.js"></script>
+    <!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+    <title>账号管理</title>
+    <style>
+        tr.disabled{
+		text-decoration:line-through;
+		color:#bdb8b8;
+	}
+	
+	
+</style>
+</head>
+
+<body>
+    <iframe style="display:none;" name="hiden_frm"></iframe>
+    <!--主导航-->
+    <div class="mainNav borderGreen clearfix">
+        <p class="right fr">
+        </p>
+        <span class="text">优惠券列表</span>
+    </div>
+    <div id="iframePage">
+        <div class="automatic-box clearfix mt10">
+            <div class="fl mt4">
+                <form action="/jdvop/admin/statistics/couponList.php" method="get">
+                    <table>
+                        <tr>
+                            <td>
+                                <input type="text" name="key" value="$!key" class="common ml10 w160" placeholder="优惠券名称/优惠券编码" />
+                            </td>
+                            <td>
+                                
+                                <select name="status" class="common">
+                                    
+
+                                    <option value="">优惠券状态</option>
+                                    <option value="已过期" #if($!status=='已过期') selected #end>已过期</option>
+                                    <option value="未开始" #if($!status=='未开始') selected #end>未开始</option>
+                                    <option value="生效中" #if($!status=='生效中') selected #end>生效中</option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <select name="targetType" class="common">
+                                    <option value="">优惠券分类</option>
+                                    <option value="1" #if($!targetType==1) selected #end>商家</option>
+                                    <option value="2" #if($!targetType==2) selected #end>分类</option>
+                                    <option value="3" #if($!targetType==3) selected #end>商品</option>
+                                    <option value="4" #if($!targetType==4) selected #end>专题</option>
+                                </select>
+                            </td>
+
+                            <td style="margin-left:20px;">
+                                <input type="text" class="startTime common" name="startTime" value="$!startTime"
+                                    placeholder="开始时间" />&emsp; - &emsp;
+                                <input type="text" class="endTime common" name="endTime" value="$!endTime" placeholder="结束时间" />
+                            </td>
+                            <td>
+                                <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+
+            </div>
+            <div class="right fr p10 js-option-parents">
+                #if($shiro.isPermitted('coupon:create'))
+                    <a href="/jdvop/admin/statistics/addCoupon.php"><span class="btn-green2">添加优惠券</span></a> </div>
+                #end
+        </div>
+        <div class="table-list">
+            <table class="common">
+                <colgroup>
+                    <col style="width:60px" />
+                    <col style="width:150px" />
+                    <col style="width:150px" />
+                    <col style="width:150px" />
+                    <col style="width:150px" />
+                    <col style="width:150px" />
+                    <col style="width:120px" />
+                    <col style="width:120px" />
+                    <col style="width:120px" />
+                    <col style="width:100px" />
+                    <col />
+                </colgroup>
+                <tr>
+                    <th>优惠券编码</th>
+                    <th>优惠券名称</th>
+                    <th>优惠券类型</th>
+                    <th>使用范围</th>
+                    <th>优惠券状态</th>
+                    <th>有效时间</th>
+                    <th>操作</th>
+                </tr>
+                <tr>
+                    #if($coupons && $coupons.hasContent())
+                    #foreach($coupon in $coupons)
+                <tr #if($coupon.dataFlag==-1) class="disabled" #end>
+                    <td $fontStyle class="tc">$!coupon.couponCode</td>
+                    <td $fontStyle class="tc">$!coupon.name</td>
+
+                    #if($coupon.type == 1)
+                    #set($type = '满减')
+                    #elseif($coupon.type == 2)
+                    #set($type = '直减')
+                    #elseif($coupon.type == 3)
+                    #set($type = '折扣')
+                    #else
+                    #set($type = '')
+                    #end
+
+                    <td $fontStyle class="tc">$!type</td>
+                    #if($coupon.targetType == 1)
+                    #set($targetType = '商家')
+                    #elseif($coupon.targetType == 2)
+                    #set($targetType = '分类')
+                    #elseif($coupon.targetType == 3)
+                    #set($targetType = '商品')
+                    #elseif($coupon.targetType == 4)
+                    #set($targetType = '专题')
+                    #else
+                    #set($targetType = '')
+                    #end
+                    <td $fontStyle class="tc">$!targetType</td>
+                    <td $fontStyle class="tc">$!coupon.status</td>
+                    <td $fontStyle class="tc">$!date.format('yyyy-MM-dd
+                        HH:mm:ss',$coupon.startTime)~$!date.format('yyyy-MM-dd HH:mm:ss',$coupon.endTime)</td>
+                    <td class="tc js-option-parents">
+                        <div #if($coupon.dataFlag==-1) style="display:none" #end>
+                            <div class="drop-down js-dropDown">
+                                <span class="ico"></span>
+                                <p class="s-inp">操作</p>
+                            </div>
+                            <dl class="s-option js-sOption">
+                                #if($coupon.status == '未开始')
+                                    #if($shiro.isPermitted('coupon:edit'))
+                                        <dd><a href="/jdvop/admin/statistics/showCoupon.php?id=$!coupon.id&watch=-1">编辑</a></dd>
+                                    #end
+                                #end
+                                    #if($shiro.isPermitted('coupon:view'))
+                                        <dd><a href="/jdvop/admin/statistics/showCoupon.php?id=$!coupon.id&watch=1">查看</a></dd>
+                                    #end
+                                #if($coupon.status != '生效中')
+                                    #if($shiro.isPermitted('coupon:delete'))
+                                        <dd><a onclick="delCoupon($!coupon.id)" href="javascript:;">删除</a></dd>
+                                    #end
+                                #end
+                            </dl>
+                        </div>
+
+                    </td>
+                </tr>
+                #end
+                #end
+
+                </tr>
+
+            </table>
+
+        </div>
+        <div class="layout-footer clearfix">
+            $adminPg.pager($link, $coupons.getPagerSpec(), 4, '_self')
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+    $("#statusdefault").val("")
+        $.datetimepicker.setLocale('ch');
+        $('.startTime').datetimepicker({
+            format: "Y-m-d H:i"
+        });
+        $('.endTime').datetimepicker({
+            format: "Y-m-d H:i"
+        });
+        function delCoupon(id) {//删除优惠券二次提示
+            top.artConfirm('温馨提示', '确认删除此优惠券?', function (v) {
+                if (v) {
+                    $.ajax({
+                        url: '/jdvop/admin/coupon/del.php?id=' + id,
+                        type: 'get',
+                        success: function (res) {
+                            res = JSON.parse(res);
+
+                            top.artAlert('温馨提示', res.msg);
+                            if (res.code == 1) {
+
+                                location.href = "/jdvop/admin/statistics/couponList.php";
+                            }
+                        }
+                    })
+                }
+            });
+        }
+
+
+        function disableBatch(data) {
+            top.artConfirm('请注意', '您真的要禁用这' + data.length + '位账号么?', function (v) {
+                if (v) {
+                    top.artProgress('禁用中，请稍后...');
+                    $.get('/jdvop/admin/website/administrator/setEnabled.php?' + data.join('&'), { enabled: false }, function (d) {
+                        top.artProgress('[close]');
+                        if (d.isOk) {
+                            location.reload();
+                        } else {
+                            top.artAlert('温馨提示', d.message, 'error');
+                        }
+                    }, 'json');
+                }
+            });
+        }
+        function restoreBatch(data) {
+            top.artProgress('启用中，请稍后...');
+            $.get('/jdvop/admin/website/administrator/setEnabled.php?' + data.join('&'), { enabled: true }, function (d) {
+                top.artProgress('[close]');
+                if (d.isOk) {
+                    location.reload();
+                } else {
+                    top.artAlert('出错啦', d.message);
+                }
+            }, 'json');
+        }
+        function doBatchAction(action) {
+            var data = [];
+            $('input[name="ids[]"]:checked').each(function () {
+                var thiz = $(this);
+                var id = thiz.val();
+                if (id !== undefined) {
+                    id = parseInt(id);
+                    if (id !== NaN && id > 0) {
+                        data.push('ids[]=' + id);
+                    }
+                }
+            });
+            if (data.length > 0) {
+                if (action === 'disable') {
+                    disableBatch(data);
+                } else if (action === 'restore') {
+                    restoreBatch(data);
+                }
+            } else {
+                top.artAlert('温馨提示', '您必须选中一些账号才可以执行此操作!');
+            }
+        }
+
+        $(function () {
+
+            $(document).on('click', '#js_do_export', function (e) {
+                e.preventDefault();
+                var l = location.href.replace('/jdvop/admin/websiteUser/list.php', '/jdvop/admin/websiteUser/export.php');
+                $('#export_ifrm').attr('src', l);
+            });
+
+            $('.batch-action').on('click', function (e) {
+                e.preventDefault();
+                var action = $(this).attr('batch-action');
+                if (action !== undefined) {
+                    doBatchAction(action);
+                }
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>会员详情</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+     <a href="javascript:history.back(-1)" title="返回"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">会员详情</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <span class="btn-grey2 fr mt4 mr20 js-add-integral" rel="$!websiteUser.id">充值</span>
+            <p class="text fwb">基本信息</p>
+        </div>
+    </div>
+    <div class="automatic-box clearfix">
+        <table class="product-details">
+            <colgroup>
+                <col style="width: 360px;"/>
+            </colgroup>
+            <tr>
+                <td valign="top">
+                    <div class="table-list p20">
+                        <table class="common">
+                            <colgroup>
+                                <col style="width: 80px;" />
+                                <col style="width: 300px;" />
+                                <col style="width: 80px;" />
+                                <col style="width: 300px;" />
+                            </colgroup>
+                            <tr>
+                                <td class="tr">用户名：</td>
+                                <td>$!websiteUser.loginName</td>
+                                <td class="tr">昵称：</td>
+                                <td>$!websiteUser.nickName</td>
+                            </tr>
+                            <tr>
+                                <td class="tr">手机：</td>
+                                <td>$!websiteUser.mobile</td>
+                                <td class="tr ">电话：</td>
+                                <td>$!websiteUser.phone</td>
+                            </tr>
+                            <tr>
+                                <td class="tr">性别：</td>
+                                <td>$!websiteUser.gender.description</td>
+                                <td class="tr ">生日：</td>
+                                <td>$!dateTool.format("yyyy-MM-dd",$websiteUser.date1)</td>
+                            </tr>
+                            <tr>
+                                <td class="tr">Email：</td>
+                                <td>$!websiteUser.email</td>
+                                <td class="tr">住址：</td>
+                                <td>$!websiteUserAddress.getProvince().getName() $!city $!websiteUserAddress.getArea().getName() $!websiteUserAddress.address</td>
+                           </tr>
+                            <tr>
+                                <td class="tr">是否开通：</td>
+                                <td>
+                                    #if($websiteUser.enabled)
+                                        <span style="color: green">是</span>
+                                    #else
+                                        <span style="color: red">否</span>
+                                    #end
+                                </td>
+                                <td class="tr">已消费积分：</td>
+                                <td>$!websiteIntegralService.getConsunmeIntegral($websiteUser)</td>
+                           </tr>
+                           <tr>
+                                <td class="tr">剩余积分：</td>
+                                <td>$!websiteUser.integral</td>
+                                <td class="tr">注册日期：</td>
+                                <td>$!dateTool.format('yyyy-MM-dd',$websiteUser.createTime)</td>
+                           </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="tab-column mt20">
+        <div class="con">
+            <ul class="clearfix js-tabList">
+                <li class="curr"><a href="javascript:;" title="新增积分">新增积分</a></li>
+                <li><a href="javascript:;" title="消费积分">消费积分</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box  js-tabContent" style="border: 1px solid #dedede; margin-top: 0; border-top:none;">
+        <!--商品明细-->
+        <div class="item p20">
+            <table class="common js-searchGenerateLog">
+                <colgroup>
+                    <col style="width:200px"/>
+                    <col style="width:200px"/>
+                    <col style="width:250px"/>
+                    <col style="width:200px"/>
+                    <col style="width:200px"/>
+                    <col/>
+                </colgroup>
+                <tr>
+                    <th>生成日期</th>
+                    <th>积分</th>
+                    <th>缘由</th>
+                    <th>积分来源</th>
+                    <th>操作人</th>
+                    <th>操作</th>
+                </tr>
+                #set($allIntegral = 0)
+                #if($generateIntegralLogs && $generateIntegralLogs.hasContent())
+                    #foreach($log in $generateIntegralLogs)
+                    #set($allIntegral = $allIntegral + $!log.deltaAmount)
+                    <tr>
+                        <td class="tc">$!dateTool.format('yyyy-MM-dd', $log.createTime)</td>
+                        <td class="tr">$!log.deltaAmount</td>
+                        <td class="tc">$!esc.html($log.reason)</td>
+                        <td class="tc">$!esc.html($log.generateType.description)</td>
+                        <td class='tc'>
+                            #if($log.getOperationLog().get("OPERATE_WEBSITE_ADMIN_REALNAME"))
+                                $!log.getOperationLog().get("OPERATE_WEBSITE_ADMIN_REALNAME")
+                            #else
+                                #if($log.getOperationLog().get("OPERATE_WEBSITE_ADMIN_LOGIN_NAME"))
+                                    $log.getOperationLog().get("OPERATE_WEBSITE_ADMIN_LOGIN_NAME")
+                                #else
+                                    系统
+                                #end
+                            #end
+                        </td>
+                        <td class="tc">
+                            <a href="/jdvop/admin/integral/revokeGenerateIntegral.php?ids[]=$!log.id" method="GET" class="ajax-request" ok-message="reload" cfm-message="您确定要撤回该会员的$!{log.deltaAmount}积分吗？">撤回积分</a>
+                        </td>
+                    </tr>
+                    #end
+                #else
+                    <tr>
+                        <td colspan="6" class="tc">暂无新增积分记录</td>
+                    </tr>
+                #end
+                <tr>
+                    <td colspan="6" class="fs18p tr pr20">合计:<i class="red ffa fwb">$!allIntegral</i>分</td>
+                <tr>
+            </table>
+            <div class="layout-footer clearfix" id="searchGenerateLog">
+                #set($url = "/jdvop/admin/websiteUser/search/ajaxGenerateLogs.php?id=" + $websiteUser.id + "&page=[:page]")
+                $adminPg.pager($url, $generateIntegralLogs.getPagerSpec(), 4, '_self')
+            </div>
+        </div>
+        <div class="item p20 hide">
+            <table class="common js-searchConsumeIntegral">
+                <colgroup>
+                    <col style="width:300px"/>
+                    <col style="width:300px"/>
+                    <col/>
+                    <col style="width:300px"/>
+                </colgroup>
+                <tr>
+                    <th>消费类型</th>
+                    <th>消费来源</th>
+                    <th>日期</th>
+                    <th>积分</th>
+                </tr>
+                #set($allIntegral = 0)
+                #if($consumeIntegralLogs && $consumeIntegralLogs.hasContent())
+                    #foreach($log in $consumeIntegralLogs)
+                    #set($allIntegral = $allIntegral + $!log.deltaAmount)
+                    <tr>
+                        <td class="tc">$!log.consumeType.description</td>
+                        #if($!log.consumeType == 'orders')
+                            <td class="tc"><a href="/jdvop/admin/order.php?id=${log.consumeId}">$!orderService.findOne($log.consumeId).getKey()</a></td>
+                        #elseif($log.consumeType == 'lottery')
+                            <td class="tc">
+                                #if($lotteryService.findOne($log.consumeId))
+                                    $!lotteryService.findOne($log.consumeId).lotteryName
+                                #else
+                                    抽奖活动
+                                #end
+                            </td>
+                        #end
+                        <td class="tc">$dateTool.format('yyyy-MM-dd', $log.consumeTime)</td>
+                        <td class="tc">$!log.deltaAmount</td>
+                    </tr>
+                    #end
+                #else
+                    <tr>
+                        <td colspan="4" class="tc">暂无消费积分记录</td>
+                    </tr>
+                #end
+                <tr>
+                    <td colspan="4" class="fs18p tr pr20">合计:<i class="red ffa fwb">$!allIntegral</i>  分</td>
+                <tr>
+            </table>
+            <div class="layout-footer clearfix" id="searchConsumeIntegral">
+                #set($url = "/jdvop/admin/websiteUser/search/ajaxConsumeIntegralLogs.php?id=" + $websiteUser.id + "&page=[:page]")
+                $adminPg.pager($url, $consumeIntegralLogs.getPagerSpec(), 4, '_self')
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $(".js-tabList li").click(function(){
+        var oIndex=$(this).index();
+        $(this).addClass("curr").siblings().removeClass('curr');
+        $(".js-tabContent .item").eq(oIndex).show().siblings().hide();
+    });
+    
+    $(document).on("click",".js-add-integral",function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        top.dialog({
+            width: 400,
+            title: '填写充值信息',
+            content:'<div class="con">'
+                    +   '<table>'
+                    +   '<colgroup>'
+                    +   '<col style="width: 100px;">'
+                    +   '<col />'
+                    +   '</colgroup>'
+                    +   '<tr><td class="tr"><i class="orange">*</i>充值：</td><td><input type="text" name="integral" class="common w180 filter-input" filter-rule="isnumber" /> &nbsp分</td></tr>'
+                    +   '<tr><td class="tr">缘由：</td><td><input type="text" name="reason" class="common w180"/></td></tr>'
+                    +   '</table>'
+                    +'</div>',
+            okValue: '确定',
+            ok: function (){
+                var id  = thiz.attr("rel");
+                var integral = top.$('input[name="integral"]').val();
+                if(integral == ''){
+                    top.artAlert('温馨提示', '请输入需要添加的积分数量!');
+                    return false;
+                }
+                var reason = top.$('input[name="reason"]').val();
+                $.post('/jdvop/admin/integral/addIntegral.php', {id : id, integral : integral, reason : reason}, function(data){
+                    if (data.isOk) {
+                        location.reload();
+                    } else {
+                        top.artAlert('温馨提示', data.message, 'error');
+                        return;
+                    }
+                }, 'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            },
+            
+        }).showModal();
+    });
+    
+    $(document).on('click', '#searchGenerateLog ul.multipage a.link', function(e) {
+        e.preventDefault();
+        $('.js-searchGenerateLog tr:not(:first)').remove("tr");
+        var href = $(this).attr('href');
+        $.get(href, {}, function(d) {
+            $('.js-searchGenerateLog tr:last').after(d.content);
+            $('#searchGenerateLog').html(d.link);
+        }, 'json');
+    }); 
+    
+    $(document).on('click', '#searchConsumeIntegral ul.multipage a.link', function(e) {
+        e.preventDefault();
+        $('.js-searchConsumeIntegral tr:not(:first)').remove("tr");
+        var href = $(this).attr('href');
+        $.get(href, {}, function(d) {
+            $('.js-searchConsumeIntegral tr:last').after(d.content);
+            $('#searchConsumeIntegral').html(d.link);
+        }, 'json');
+    }); 
+    
+    
+});
+</script>
+
+</body>
+</html>

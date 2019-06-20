@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/admin/idangerous.swiper.css"/>
+<link rel="stylesheet" type="text/css" href="/jdvop/script/cloud-zoom/cloud-zoom.css" />
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/ckeditor/ckeditor.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="../jdvop/script/html5.js"></script><![endif]-->
+<script type='text/javascript' src='/jdvop/script/admin/idangerous.swiper-1.9.1.min.js'></script>
+<script type='text/javascript' src='/jdvop/script/cloud-zoom/cloud-zoom.1.0.3.min.js'></script>
+<title>产品详情</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.back(-1)" title="品牌管理"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">产品详情</span>
+</div>
+<div id="iframePage">
+    <div class="automatic-box clearfix">
+        <table class="product-details">
+            <colgroup>
+                <col style="width: 360px;"/>
+            </colgroup>
+            <tr>
+                <td valign="top">
+                    <div class="tb-gallery">
+                        <a href="#" class="cloud-zoom" id="zoom1" rel="adjustX:5, adjustY:-1, zoomWidth:360, zoomHeight:360">
+                            #if($product.ownerType == "jingdong" || $product.ownerType == "system")    
+                                <img src="$!product.thumbnailImage" width="360" height="360" alt="$!product.name"/>
+                            #else
+                                <img src="$configTool.getImageHost()$!product.thumbnailImage" width="360" height="360" alt="$!product.name"/>
+                            #end
+                        </a>
+                        <div id='thumb_list' class="tb-thumb">
+                            <span class="prev">上一个</span>
+                            <div class="tb-pic">
+                                <ul>
+                                    #if ($images && !$images.isEmpty())
+                                        #foreach($img in $images)
+                                            <li class=" #if($velocityCount == 1) curr #end js-silderImage">
+                                                #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                                    <img  src="$img.imageUrl" width="58" height="58" href="$!img.imageUrl" class="cloud-zoom-gallery" rel="useZoom:'zoom1', smallImage:'$!img.imageUrl'" />
+                                                #else
+                                                    <img src="$configTool.getImageHost()$img.imageUrl" width="58" height="58" href="$configTool.getImageHost()$!img.imageUrl" class="cloud-zoom-gallery" rel="useZoom:'zoom1', smallImage:'$configTool.getImageHost()$!img.imageUrl'" />
+                                                #end
+                                            </li>
+                                        #end
+                                    #else
+                                        <li class="curr"> <img src="/noimage.png" width="58" height="58"/> </li>
+                                    #end
+                                </ul>
+                            </div>
+                            <span class="next">下一个</span>
+                        </div>
+                    </div>
+                </td>
+                <td valign="top">
+                    <div class="name">
+                        <!--<span class="fr btn-grey2 mt8 mr10"><a href="/jdvop/admin/product/edit.php?id=$!product.id">编辑产品</a></span>-->
+                        <p class="text fwb pl10 w360 overflow-h">$!product.name</p>     
+                    </div>
+                    <div class="table-list p20">
+                        <table class="common">
+                            <colgroup>
+                                <col style="width: 100px;" />
+                                <col style="width: 300px;" />
+                                <col style="width: 100px;" />
+                                <col style="width: 300px;" />
+                            </colgroup>
+                            <tr>
+                               <td class="tr">产品ID：</td>
+                               <td>$!product.id</td>
+                               <td class="tr">产品名称：</td>
+                               <td>$!product.name</td>
+                            </tr>
+                            <tr>
+                               <td class="tr">产品型号：</td>
+                               <td>$!esc.html($product.productCode)</td>
+                               <td class="tr">所属品牌：</td>
+                               <td>$!product.brand.name</td>
+                            </tr>
+                            <tr>
+                                <td class="tr">所属分类：</td>
+                                <td>
+                                    #foreach($cate in $parentCates)
+                                        $cate.name 
+                                        #if (!$foreach.last)
+                                        > 
+                                        #end
+                                    #end
+                                </td>
+                                #if($product.ownerType == "jingdong")
+                                
+                                #else
+                                    <td class="tr">产品卖点：</td>
+                                    <td>$!esc.html($product.features)</td>
+                                #end
+                            </tr>
+                            <tr>
+                                <td class="tr">市场价：</td>
+                                <td>&yen;$!numberTool.format('#0.00', $product.marketPrice)</td>
+                                <td class="tr">经销价：</td>
+                                <td>&yen;$!numberTool.format('#0.00', $product.retailPrice)</td>
+                            </tr>
+                            <!--只自有产品和供应商产品展示 -->
+                            #if($product.ownerType.name() == "provider")
+                            <tr>
+                                <td class="tr">是否境外：</td>
+                                <td>
+                                    #if($!product.enableOverseas)
+                                        是
+                                    #else
+                                        否
+                                    #end
+                                </td>
+                                <td class="tr">税率：</td>
+                                <td>$!product.taxRate%</td>
+                            </tr>
+                            #end
+                            <tr>
+                                #if($product.ownerType.name() == "jingdong" || $product.ownerType.name() == "system")
+                                    <td class="tr">系统售价：</td>
+                                    <td>&yen;$!numberTool.format('#0.00', $product.systemPrice)</td>
+                                #end
+                                <td class="tr">扣点：</td>
+                                <td>$!numberTool.format('#0.00', $product.serviceChargeRatio)%</td>
+                                #if($product.ownerType.name() == "provider")
+                                    <td class="tr">是否限定区域：</td>
+                                    <td>
+                                        #if($product.enableLimitedArea)
+                                            是
+                                        #else
+                                            否
+                                        #end
+                                    </td>
+                                #end
+                            </tr>
+                            #if($product.ownerType.name() == "provider")
+                            <tr>
+                                <td class="tr">所属供应商：</td>
+                                <td>$!provider.workerName</td>
+                                <td class="tr">供应商市场价：</td>
+                                <td>$!product.provider_marketPrice</td>
+                            </tr>
+                            <tr>
+                                <td class="tr">供应商零售价：</td>
+                                <td>$!product.provider_retailPrice</td>
+                            </tr>
+                            #end
+                             <tr>
+                                <td class="tr">是否为严选产品：</td>
+                                <td>
+                                	#if($!product.subOwnerType=='wangyi')
+                                		是
+                                	#else
+                                		否
+                                	#end
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="automatic-box highlight_e4e4e4 mt20">
+        <div class="topTitle">
+             <span>详细内容</span>
+        </div>
+         <div style="width:790px;" class="p20">
+            $!description.description
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    //选中
+    $('li.js-silderImage img').click(function(e) {
+        e.preventDefault();
+        $(this).parent().addClass('curr').siblings().removeClass('curr');
+    });
+});
+</script>
+
+</body>
+</html>

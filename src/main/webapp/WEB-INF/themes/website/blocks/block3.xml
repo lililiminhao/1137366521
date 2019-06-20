@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<theme description="风格三" key="block3" type="block" default="true">
+    <blocks>
+        <block id="block_1" type="image">
+            <layout>
+                <width value="1200" />
+                <height value="100" />
+            </layout>  
+        </block> 
+    </blocks>
+    <template>
+    <![CDATA[
+        <div class="a-mod4 w1200 templet-js-image" width = "1200" height = "100" key = "block_1">
+            <p class="img"><img src="/jdvop/images/admin/img1_04.jpg" width="1200" height="100" /> </a></p>
+        </div>
+    ]]>
+    </template>
+    <velocity>
+    <![CDATA[
+    <div class="a-mod4 w1200 module-3 templet-js-image" width="1200" height="100" key="block_1">
+        <img src="$!configTool.getImageHost()$!block_1.url" width="1200" height="100"/>
+    </div>
+    ]]>
+    </velocity>
+    <preview><![CDATA[/jdvop/images/admin/img1_04.jpg]]></preview>
+</theme>

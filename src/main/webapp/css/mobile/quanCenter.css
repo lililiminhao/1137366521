@@ -1,0 +1,154 @@
+html,
+body {
+  background: #efefef; }
+
+.tabs {
+  padding: 0 15px;
+  background: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-bottom: 1px solid #d7d7d7; }
+  .tabs ul {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-size: 14px;
+    text-align: center;
+    color: #999; }
+  .tabs li {
+    height: 45px;
+    line-height: 45px;
+    width: 33%;
+    position: relative; }
+    .tabs li i {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 50px;
+      background: #fff;
+      height: 2px;
+      -webkit-transform: translateX(-50%);
+              transform: translateX(-50%); }
+    .tabs li.active {
+      color: #333; }
+      .tabs li.active i {
+        background: #333; }
+  .tabs li:nth-child(2):before {
+    content: "";
+    display: block;
+    height: 31px;
+    background: #d7d7d7;
+    width: 1px;
+    position: absolute;
+    left: 0;
+    top: 7px; }
+  .tabs li:nth-child(2):after {
+    content: "";
+    display: block;
+    height: 31px;
+    background: #d7d7d7;
+    width: 1px;
+    position: absolute;
+    right: 0;
+    top: 7px; }
+
+.content {
+  padding: 3%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  margin-top: 45px; }
+  .content li {
+    height: 2.667rem;
+    width: 100%;
+    background: #fff;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    text-align: center; }
+    .content li.type1 {
+      background: url(/jdvop/images/mobile/icon_lvdi@2x.png) no-repeat center;
+      background-size: cover; }
+      .content li.type1 label {
+        border-color: #2fa76b;
+        color: #2fa76b; }
+    .content li.type2 {
+      background: url(/jdvop/images/mobile/icon_huangdi@2x.png) no-repeat center;
+      background-size: cover; }
+      .content li.type2 label {
+        border-color: #d7983e;
+        color: #d7983e; }
+    .content li.type3 {
+      background: url(/jdvop/images/mobile/icon_hongdi2@2x.png) no-repeat center;
+      background-size: cover; }
+      .content li.type3 label {
+        border-color: #c25640;
+        color: #c25640; }
+    .content li .price {
+      width: 34%;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center; }
+      .content li .price .kan span {
+        font-size: 25px; }
+    .content li .desc {
+      -webkit-box-flex: 1;
+          -ms-flex: 1;
+              flex: 1;
+      text-align: left;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center;
+      padding-left: 12px; }
+    .content li .btn {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center; }
+      .content li .btn.status {
+        margin-right: 6px;
+        width: 1.493rem;
+        background: url(/jdvop/images/mobile/icon_shiyong@2x.png) no-repeat center;
+        background-size: 1.44rem 0.8rem; }
+      .content li .btn.status label {
+        display: none; }
+    .content li label {
+      margin-right: 12px;
+      line-height: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 12px; }
+  .content #overTime {
+    background: url(/jdvop/images/mobile/icon_huidi@2x.png) no-repeat center;
+    background-size: cover;
+    color: #999; }
+    .content #overTime .btn {
+      display: none; }
+  .content .nomore {
+    color: #999;
+    text-align: center;
+    line-height: 36px; }

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>积分卡模版管理</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <span class="text">积分卡模板管理</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr"><a href="#" title="积分卡模板列表">积分卡模板列表</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/integral/integralCardTemplates.php" method="get">
+                <input type="hidden" name="enabled" value="#if(!$enabled || $enabled == 'false') false #{else} true #{end}" />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w160" placeholder="模版名称"/>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+            <a href="/jdvop/admin/integral/integralCardTemplate/add.php"><span class="btn-green2">添加积分卡模版</span></a>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+            </colgroup>
+            <tr>
+                <th>编号</th>
+                <th>模版名称</th>
+                <th>积分值</th>
+                <th>积分卡数</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            #if($templates.hasContent())
+                #foreach($template in $templates)
+                <tr>
+                    <td class="tc">$template.id</td>
+                    <td class="tc"><a href="/jdvop/admin/integral/integralCardTemplate/view.php?id=$template.id" class="blue">$!esc.html($template.templateName)</a></td>
+                    <td class="tc">$!esc.html($template.integral)</td>
+                    <td class="tc">
+                        #set($getIntegralCardStatics = $integralCardTemplateService.getIntegralCardStatics())
+                        #if($getIntegralCardStatics.get($template))
+                            $getIntegralCardStatics.get($template)
+                        #else
+                            0
+                        #end
+                    </td>
+                    <td class="tc">$!date.format('yyyy-MM-dd HH:mm:ss', $template.createTime)</td>
+                    <td class="tc js-option-parents">
+                        <div class="drop-down js-dropDown">
+                            <span class="ico"></span>
+                            <p class="s-inp">操作</p>
+                        </div>
+                        <dl class="s-option js-sOption">
+                            <dd><a href = "" class="js-create-integralCard" rel="$!template.id">创建积分卡</a></dd>
+                            <dd><a href = "/jdvop/admin/integral/integralCardTemplate/edit.php?id=$!template.id">编辑</a></dd>
+                            #if($integralCardTemplateService.isDeleteable($template))
+                                <dd><a href="/jdvop/admin/integral/integralCardTemplate/delete.php?id=$!template.id"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要删除这个积分卡模版么?一旦删除将无法恢复!">删除</a></dd>
+                            #end
+                            <dd><a href="/jdvop/admin/integral/integralCardTemplate/view.php?id=$!template.id">详情</a></dd>
+                        </dl>
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关积分卡模版
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        $adminPg.pager($link, $templates.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+
+<script type="text/javascript">
+
+$(function(){
+    
+    $(document).on("click",".js-create-integralCard",function(e){
+        e.preventDefault();
+        var thiz = $(this);
+        top.dialog({
+            width: 500,
+            title: '创建积分卡',
+            content:'<div class="con">'
+                    +   '<table>'
+                    +   '<colgroup>'
+                    +   '<col style="width: 100px;">'
+                    +   '<col>'
+                    +   '</colgroup>'
+                    +   '<tr><td class="tr"><i class="orange"> *</i>积分卡数量：</td><td><input type="text" name="amount" class="common w180"/></td></tr>'
+                    +   '<tr><td class="t"><i class="orange"> *</i>是否立即激活：</td><td class="tr"><select name="isActive"  class="common h22 w180"><option value="true">是</option><option value="false">否</option></select></td></tr>'
+                    +   '<tr><td class="tr"><i class="orange"> *</i>过期时间：</td><td><input type="text" name="expireTime"  onfocus="WdatePicker({readOnly: true, skin: \'blueFresh\',minDate:\'%y-%M-%d\',dateFmt:\'yyyy-MM-dd 23:59:59\'});"  class="Wdate common h22 w180" /> </td></tr>'
+                    +   '</table>'
+                    +'</div>',
+            okValue: '确定',
+            ok: function (){
+                var templateId  = thiz.attr("rel");
+                var amount      = top.$('input[name="amount"]').val();
+                if(amount == '') {
+                    top.artAlert('温馨提示', '请输入创建数量', 'error');
+                    return false;
+                }
+                var isActive    = top.$('select[name="isActive"]').val();
+                var expireTime  = top.$('input[name="expireTime"]').val();
+                if(expireTime == '') {
+                    top.artAlert('温馨提示', '请选择过期时间', 'error');
+                    return false;
+                }
+                $.post('/jdvop/admin/integral/card/batchAdd.php', {templateId : templateId, amount : amount, isActive : isActive, expireTime : expireTime}, function(data){
+                    if (data.isOk) {
+                        top.artAlert('温馨提示', data.message, '/jdvop/admin/integral/integralCardTemplates.php','ok');
+                        location.reload();
+                    } else {
+                        top.artAlert('温馨提示', data.message, 'error');
+                        return;
+                    }
+                }, 'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            }
+            
+        }).showModal();
+    });
+    
+});
+</script>
+
+</body>
+</html>

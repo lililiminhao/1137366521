@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>售后单详情</title>
+<script type="text/javascript">
+$(function(){
+    $(".js-tabList li").click(function(){
+        var oIndex=$(this).index();
+        $(this).addClass("curr").siblings().removeClass('curr');
+        $(".js-tabContent .item").eq(oIndex).show().siblings().hide();
+    });
+});
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+     <a href="javascript:history.back(-1)"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">售后单详情</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <p class="text fwb">基本信息</p>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width: 80px;" />
+                <col style="width: 220px;" />
+                <col style="width: 80px;" />
+                <col style="width: 220px;" />
+                <col style="width: 80px;" />
+                <col style="width: 220px;" />
+            </colgroup>
+            <tr>
+                <td class="tr">退换货单号：</td>
+                <td>$!nifferOrder.afterSaleOrderKey</td>
+                <td class="tr">原始订单号：</td>
+                <td>$!order.key</td>
+                <td class="tr">发货日期：</td>
+                <td>
+                    #if ($shipmentLog)
+                        $!dateTool.format('yyyy-MM-dd HH:mm:ss', $shipmentLog.shipmentTime)
+                    #else
+                        订单未发货
+                    #end
+                </td>
+                
+            </tr>
+            <tr>
+                <td class="tr">退货人：</td>
+                <td>$!esc.html($!nifferOrder.consumerName)</td>
+                <td class="tr">退货人手机：</td>
+                <td> $!esc.html($!nifferOrder.consumerMobile)</td>
+<!--                <td class="tr">退货人电话：</td>
+                <td>$!esc.html($!nifferOrder.consumerPhone)</td>-->
+                <td class="tr">地区：</td>
+                <td>$!nifferOrder.consumerProvince.name $!nifferOrder.consumerCity.name $!nifferOrder.consumerCounty.name $!nifferOrder.consumerTown.name</td>
+            </tr>
+            <tr>
+                <td class="tr">详细地址：</td>
+                <td>$!esc.html($order.receiverAddr)</td>
+                <td class="tr">申请日期：</td>
+                <td>
+                    $!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.applyTime)
+                </td>
+                <td class="tr">退款金额：</td>
+                <td>
+                   ¥$numberTool.format('#,##0.00', $nifferOrder.refundAmount)#if($nifferOrder.shipmentFee>0)+运费：¥$numberTool.format('#,##0.00', $nifferOrder.shipmentFee)#end
+                </td>
+            </tr>
+            #if($shipmentLog)
+                <tr>
+                    <td class="tr">退货物流公司:</td>
+                    <td>$!shipmentLog.shipmentCompany.name</td>
+                    <td class="tr">退件单号：</td>
+                    <td colspan="3">$!shipmentLog.shipmentOrder</td>
+                </tr>
+            #end
+            <tr>
+                <td class="tr">支付方式:</td>
+                <td>
+                    #if ($payLog && $payLog.paied)
+                    $payLog.payType.description
+                    #else
+                    <span style="color:red;">该订单没有支付信息</span>
+                    #end
+                </td>
+                <td class="tr">支付金额:</td>
+                <td>
+                    #if ($payLog && $payLog.paied)
+                    ¥$numberTool.format('#,##0.00', $order.needPay)
+                    #else
+                    <span style="color:red;">该订单没有支付信息</span>
+                    #end
+                </td>
+                <td class="tr">支付时间：</td>
+                <td>
+                    #if ($payLog && $payLog.paied)
+                    $!dateTool.format('yyyy-MM-dd HH:mm:ss', $payLog.paiedTime)
+                    #else
+                    <span style="color:red;">该订单没有支付信息</span>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <td class="tr">客服备注:</td>
+                <td colspan="5">$!esc.html($nifferOrder.remarkByWorker)</td>
+            </tr>
+            <tr>
+                <td class="tr">申请原因:</td>
+                <td>$!esc.html($nifferOrder.reason)</td>
+                <td class="tr">客户备注:</td>
+                <td colspan="3">$!esc.html($nifferOrder.remark)</td>
+            </tr>
+        </table>
+        <div class="tab-column mt20">
+            <div class="con">
+                <ul class="clearfix js-tabList">
+                    <li class="curr"><a href="javascript:;" title="商品明细">商品明细</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="js-box empty_box ">
+            <table class="common" id="candidateBox">
+                <colgroup>
+                    <col style="width:66px;" />
+                    <col />
+                    <col style="width:120px;" />
+                    <col style="width:160px;" />
+                    <col style="width:120px;" />
+                    <col style="width:120px;" />
+                    <col style="width:160px;" />
+                </colgroup>
+                <tr>
+                    <th>商品图片</th>
+                    <th>商品名称</th>
+                    <th>商品品牌</th>
+                    <th>商品单价</th>
+                    <th>订购数量</th>
+                    <th>商品总价</th>
+                </tr>
+                #foreach($entry in $entries)
+                #set($sku   = $storageUnitMap.get($entry.storageUnitId))
+                #set($product   = $productMap.get($sku.productId))
+                <tr data-sku-id="$sku.id">
+                    <td>
+                        <a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">
+                            #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                <img src="$product.getThumbnailImage()" width="60" height="60" />
+                            #else
+                                <img src="$configTool.getImageHost()/thumbnail$product.getThumbnailImage()" width="60" height="60" />
+                            #end
+                        </a>
+                    </td>
+                    <td><a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">$product.name</a></td>
+                    <td>$product.brand.name</td>
+                    #set($price = $math.mul($entry.soldPrice, $websiteTool.getWebsite().getRatio()))
+                    <td class="tr">¥$numberTool.format('#,####,####0.00',$price)</td>
+                    <td class="tr">$entry.amount</td>
+                    <td class="tr">
+                        #set($total = $price * $entry.amount)
+                        ¥$numberTool.format('#,####,####0.00', $total)
+                    </td>
+                </tr>
+                #end
+            </table>
+        </div>
+        <div class="tab-column mt20">
+            <div class="con">
+                <ul class="clearfix js-tabList">
+                    <li class="curr"><a href="javascript:;" title="退入商品">退入商品</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="js-box empty_box ">
+            <table class="common" id="selectedInBox">
+                <colgroup>
+                    <col style="width:66px;" />
+                    <col />
+                    <col style="width:170px;" />
+                    <col style="width:170px;" />
+                    <col style="width:170px;" />
+                </colgroup>
+                <tr>
+                    <th>商品图片</th>
+                    <th>商品名称</th>
+                    <th>商品品牌</th>
+                    <th>订单数量</th>
+                    <th>退货数量</th>
+                </tr>
+                #if($inEntries && $inEntries.size() > 0)
+                    #foreach($entry in $inEntries)
+                    #set($sku   = $storageUnitService.findOne($entry.storageUnitId))
+                    #set($product   = $productService.findOne($sku.productId))
+                    <tr data-sku-id="$sku.id">
+                        <input type="hidden" name="storageUnitId[]" value="$sku.id"/>
+                        <input type="hidden" name="entryType[]" value="out" />
+                        <td>
+                            <a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">
+                                #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                    <img src="$product.getThumbnailImage()" width="60" height="60" />
+                                #else
+                                    <img src="$configTool.getImageHost()/thumbnail$product.getThumbnailImage()" width="60" height="60" />
+                                #end
+                            </a>
+                        </td>
+                        <td><a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">$product.name</a></td>
+                        <td>$product.brand.name</td>
+                        <td class="tr">$entry.amount</td>
+                        <td class="tc">$!entry.amount</td>
+                    </tr>
+                    #end
+                #else
+                    <tr class="js-message-box">
+                        <td colspan="7" class="tc h34 fs12p fwb red">暂无退入商品</td>
+                    </tr>
+                #end
+            </table>
+            <!--只有换货记录才显示换出商品-->
+            #if($nifferOrder.type=='niffer')
+                <div class="tab-column mt20">
+                    <div class="con">
+                        <ul class="clearfix js-tabList">
+                            <li class="curr"><a href="javascript:;" title="换出商品">换出商品</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <table class="common" id="selectedOutBox">
+                    <colgroup>
+                        <col style="width:66px;" />
+                        <col />
+                        <col style="width:170px;" />
+                        <col style="width:170px;" />
+                        <col style="width:170px;" />
+                    </colgroup>
+                    <tr>
+                        <th>商品图片</th>
+                        <th>商品名称</th>
+                        <th>商品品牌</th>
+                        <th>订单数量</th>
+                        <th>换货数量</th>
+                    </tr>
+                    #if($outEntries && $outEntries.size() > 0)
+                        #foreach($entry in $outEntries)
+                        #set($sku   = $storageUnitService.findOne($entry.storageUnitId))
+                        #set($product   = $productService.findOne($sku.productId))
+                        <tr data-sku-id="$sku.id">
+                            <input type="hidden" name="storageUnitId[]" value="$sku.id"/>
+                            <input type="hidden" name="entryType[]" value="in" />
+                            <td>
+                                <a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">
+                                    #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                        <img src="$product.getThumbnailImage()" width="60" height="60" />
+                                    #else
+                                        <img src="$configTool.getImageHost()/thumbnail$product.getThumbnailImage()" width="60" height="60" />
+                                    #end
+                                </a>
+                            </td>
+                            <td><a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">$product.name</a></td>
+                            <td>$product.brand.name</td>
+                            <td class="tr">$entry.amount</td>
+                            <td class="tc">$!entry.amount</td>
+                        </tr>
+                        #end
+                    #else
+                        <tr class="js-message-box">
+                            <td colspan="7" class="tc h34 fs12p fwb red">请选择换出商品</td>
+                        </tr>
+                    #end
+                </table>
+            #end
+        </div>
+    </div>
+</div>
+</body>
+</html>

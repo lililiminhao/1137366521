@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+                        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+    
+    <mvc:view-controller path="/admin/index.php" view-name="/admin/index" />
+    
+    <!-- 自动扫描且只扫描注册@Controller -->
+    <context:component-scan base-package="com.lmf.integral" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+    </context:component-scan>
+    
+    <context:annotation-config />
+    
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:argument-resolvers>
+            <bean class="com.lmf.common.PagerSpecArgumentResolver" />
+            <bean class="com.lmf.integral.argresolver.UserDetailArgumentResolver" />
+            <bean class="com.lmf.integral.argresolver.WebsiteUserArgumentResolver" />
+            <bean class="com.lmf.integral.argresolver.ShoppingCartArgumentResolver" />
+            <bean class="com.lmf.integral.argresolver.VisitLogArgumentResolver" />
+            <bean class="com.lmf.integral.argresolver.WebsiteArgumentResolver" />
+            <bean class="com.lmf.integral.admin.WebsiteAdministratorArgumentResolver" />
+        </mvc:argument-resolvers>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8" />
+            </bean>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html</value>
+                        <value>application/json</value>
+                    </list>
+                </property>
+                <!-- 处理responseBody 里面日期类型 -->
+                <property name="objectMapper">  
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">  
+                        <property name="dateFormat">  
+                            <bean class="java.text.SimpleDateFormat">  
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />  
+                            </bean>  
+                        </property>  
+                    </bean>  
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    
+    <bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+    
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="838860800" /> <!-- 800M 最大上传尺寸 -->
+    </bean>
+    
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="com.lmf.common.enums.convertor.StringToGenderConvertor" />
+                <bean class="com.lmf.common.enums.convertor.StringToShoppingCartSourceEntryTypeConvertor" />
+                <bean class="com.lmf.common.enums.convertor.StringToDateConvertor" />
+                
+                <bean class="com.lmf.product.enums.convertor.StringToProductStatusConvertor" />
+                <bean class="com.lmf.product.enums.convertor.StringToStorageUnitEffectBarTypeConvertor" />
+                <bean class="com.lmf.product.enums.convertor.StringToStorageUnitStatusConvertor" />
+                <bean class="com.lmf.product.convertor.StringToBrandConvertor" />
+                <bean class="com.lmf.product.convertor.StringToProductCateConvertor" />
+                
+                <bean class="com.lmf.order.enums.convertor.StringToDeliveryDateTypeConvertor" />
+                <bean class="com.lmf.order.enums.convertor.StringToOrderStatusConvertor" />
+                <bean class="com.lmf.order.enums.convertor.StringToNifferOrderStatusConvertor" />
+
+                <bean class="com.lmf.sys.convertor.StringToGeoRegionConvertor" />
+                <bean class="com.lmf.sys.convertor.StringToShipmentCompanyConvertor" />
+                
+                <bean class="com.lmf.website.enums.convertor.StringToIntegralGenerateTypeConvertor" />
+                <bean class="com.lmf.order.enums.convertor.StringToOrderPayTypeConvertor" />
+                
+                <bean class="com.lmf.website.enums.convertor.StringToSpecialActivityTypeConvertor"/>
+                
+            </set>
+        </property>
+    </bean>
+    
+    <bean id="velocityConfigurer" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+        <property name="resourceLoaderPath" value="/WEB-INF/views/" />
+        <property name="velocityProperties">
+            <props>
+                <prop key="input.encoding">UTF-8</prop>
+                <prop key="output.encoding">UTF-8</prop>
+                <prop key="runtime.interpolate.string.literals">false</prop>
+                <prop key="eventhandler.include.class">com.lmf.integral.velocity.event.MobileSupportThemeAwareInclueEventHandler</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <!-- 定义vsl文件的位置 --> 
+    <bean class="com.lmf.integral.velocity.MobileSupportThemeAwareViewResolver">
+        <property name="suffix" value=".vsl" />
+        <property name="dateToolAttribute" value="dateTool" />
+        <property name="numberToolAttribute" value="numberTool" />
+        <property name="contentType" value="text/html;charset=utf-8" />
+        <property name="toolboxConfigLocation" value="/WEB-INF/toolbox.xml" />
+        <property name="cacheUnresolved" value="false" />
+        <property name="order" value="0" />
+    </bean>
+    
+    <bean
+            class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.apache.shiro.authz.UnauthorizedException">redirect:/admin/noPermission.php</prop>
+            </props>
+        </property>
+	</bean>
+    
+    <!-- 支持 Shiro对Controller的方法级AOP安全控制  begin-->
+    <bean id="annotationProxy" class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor">
+        <property name="proxyTargetClass" value="true" />
+    </bean>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager" />
+    </bean>
+    
+</beans>

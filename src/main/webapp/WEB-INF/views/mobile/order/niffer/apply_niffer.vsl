@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta content="telephone=no" name="format-detection"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+        <script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+        <script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+        <script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>
+        <script src="/jdvop/script/mobile/order/system_niffer.js" type="text/javascript"></script>
+        <script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+        <title>申请售后</title>
+    </head>
+    <body class="pm56" style="background: #f0f0f0;">
+        <header class="bar-nav">
+            <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+            <h1 class="title">申请售后</h1>
+        </header> 
+        <form id="dataForm" action="/jdvop/mobile/order/niffer.php" method="POST">
+            <div class="shopcart-list">
+                #set($bp = $product)
+                <input type="hidden" name="orderId" value="$entry.orderId"/>
+                <input type="hidden" id="ownerType" value="$bp.ownerType"/>
+                <h2 class="top" id="pageTitle">换货商品</h2>
+                <ul class="js-list">
+                    <li class="clearfix">
+                        <input type="hidden" name="sui" value="$!entry.storageUnitId"/>
+                        <input type="hidden" name="afterSaleType" value="#if($bp.ownerType=='jingdong' || !$isCanNiffer) returned #else niffer #end"/>
+                        <input type="hidden" name="productId" value="$!bp.id"/>
+                        <p class="checked js-checked curr hide"></p>
+                        <p class="img"> 
+                            <a href="/jdvop/product/${bp.id}.php">
+                                #if($!bp.ownerType == "jingdong" || $!bp.ownerType == "system")
+                                    <img src="$!bp.thumbnailImage" alt="$!bp.name" width="80" height="80"/>
+                                #else
+                                    <img src="$configTool.getImageHost()$!bp.getThumbnailImage()" alt="$!bp.name" width="80" height="80" />
+                                #end
+                            </a>
+                        </p> 
+                        <div class="text">
+                            <a href="/jdvop/product/${bp.id}.php"> <span class="name">$!bp.name</span></a>
+                            <em class="price">金额：<i class="red">&yen;$!numberTool.format('#0.00', $math.mul($entry.soldPrice, $websiteTool.getWebsite().getRatio()))</i> </em> <br>
+                            <div class="sku-num">
+                                <span class="minus js-reduce #if($entry.amount == 1) disabled #end" rev="li_0""></span>
+                                <input class="num js-fm-txt" readonly="readonly"  name="amount" type="number" value="$entry.amount" max="$entry.amount"/>                         
+                                <span class="plus js-add"></span>                        
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="shopcart-list mt10" style="border-top:1px solid #dedede;">
+                <h2 class="top">选择售后</h2>
+                <div class="text" style='padding-bottom: 10px;'>
+                    <select class="common js-btn-service">
+                        #if($!bp.ownerType!="jingdong" && $isCanNiffer)
+                        <option value="niffer">换货</option>
+                        #end
+                        <option value="returned">退款</option>
+                    </select>
+                </div>
+            </div>
+            <div class="shopcart-list mt10" style="border-top:1px solid #dedede;">
+                <h2 class="top">退换货原因</h2>
+                <div class="text" style='padding-bottom: 10px;'>
+                   
+                        <!--换货原因-->
+                        <select name="reason" class="common js-niffer-reason  #if($!bp.ownerType=='jingdong'  || $isCanNiffer) hide #end">
+                            #foreach($reason in $nifferReasons)
+                            <option>$reason.description</option>
+                            #end
+                        </select>
+            
+                    <!--退货原因-->
+                    <select name="reason_hide" class="common js-return-reason #if($!bp.ownerType!='jingdong' && !$isCanNiffer) hide #end">
+                        #foreach($reason in $returnReasons)
+                        <option>$reason.description</option>
+                        #end
+                    </select>
+                </div>
+            </div>
+
+
+            <div class="shopcart-list mt10" style="border-top:1px solid #dedede;">
+                <h2 class="top">问题描述</h2>
+                <div class="text">
+                    <textarea name="remark" maxlength="200" placeholder="请您在此描述详细问题" class="com"></textarea>
+                </div>
+            </div>
+            
+            <div class="editPassword #if($!bp.ownerType=='jingdong'  || !$isCanNiffer) hide #end" id="consumerInfo">
+                <dl>
+                    <dd class="webkitbox-h">
+                        <p class="tr"><i class="red">*</i>收货人：</p>
+                        <p class="flex1"><input type="text" name="consumerName" value="$!user.nickName" placeholder="请输入联系人姓名..." class="com"></p>
+                    </dd>
+                    <dd class="webkitbox-h">
+                        <p class="tr"><i class="red">*</i>手机号码：</p>
+                        <p class="flex1"><input type="tel" name="consumerMobile" value="$!user.mobile" placeholder="请输入联系人手机号码..." class="com"></p>
+                    </dd>
+                </dl>
+            </div>
+        </form>
+          #if($bp.ownerType=='jingdong')
+           #parse('service_dialog.vsl')
+          #end
+        <section class="fixed-column webkitbox-h">
+            <p class="flex1 but-orange"><a href="#" class="ico-shopping fs16p">确定申请售后</a></p>
+        </section>
+        <script type="text/javascript">
+            apply_niffer.init();
+        </script>
+    </body>
+</html>

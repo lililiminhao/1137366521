@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="../jdvop/script/html5.js"></script><![endif]-->
+<title>
+    #if($brand) 
+        编辑品牌
+    #else 
+        添加品牌 
+    #end
+</title>
+</head>
+<body>
+    <div class="mainNav borderGreen clearfix">
+        <a href="javascript:history.back(-1)"><p class="right btn-grey2 fr">返回</p></a>
+        <span class="text">
+            #if($brand) 
+                编辑品牌
+            #else 
+                添加品牌 
+            #end
+        </span>
+    </div>
+    <form id="dateForm" action="#if($brand) /jdvop/admin/brand/edit.php #else /jdvop/admin/brand/add.php #end " method="POST">
+        #if($brand)
+        <input type="hidden" name="id" value="$!brand.id" />
+        #end
+        <div id="iframePage">
+            <div class="automatic-box clearfix highlight_e4e4e4  pb30">
+                <div class="topTitle">
+                     <span>基本信息</span>
+                </div>
+                <table class="mt20">
+                    <colgroup>
+                        <col style="width: 100px;" />
+                        <col />
+                    </colgroup>
+                    <tr>
+                        <td class="tr"><i class="orange"> * </i>品牌名称：</td>
+                        <td>
+                            <input type="text" name="name" value="$!brand.name" class="common w180"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">英文名称：</td>
+                        <td>
+                            <input type="text" name="englishName" value="$!brand.englishName" class="common w180"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">品牌简介：</td>
+                        <td>
+                            <textarea name="description" class="common w180" maxlength="128">$!brand.description</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tr">品牌logo：</td>
+                        <td>
+                            <div>
+                                <input type="hidden" name="thumbnail" value="$!brand.getThumbnail()"/>
+                                #if ($!brand.getThumbnail().length() > 0)
+                                    <img src="/jdvop/image/readImage.php?path=$!{brand.getThumbnail()}&width=116&height=116" alt='$!brand.name' class="js_show_img" width="160" height="160"/>
+                                #else
+                                    <img src="" alt='' class="js_show_img" width="160" height="160"/>
+                                #end 
+                            </div>
+                            <div class="mt10">
+                                <span style="display:none;"><input type="file" name="thumbnail_upload" id="image_input" value="$!brand.getThumbnail()" /></span>
+                                <span id="image_input_trigger" class="btn-grey">上传Logo</span><em class="orange">请上传图片大小为160*160像素（px）大小为jpg，png，gif的格式</em>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="layout-footer pb30">
+                <div class="btn-wrap">
+                    <input type="submit" value="保存" class="btn-orange" />
+                    <a href="javascript:history.go(-1)"><input type="button" value="取消" class="btn-grey" /></a>
+                </div>
+            </div>
+    </form>    
+    </div>
+<script type="text/javascript">
+$(function(){
+    $('#image_input').fileupload({
+        url         : '/jdvop/admin/brand/image/uploead.php',
+        dataType    : 'json',
+        autoUpload  : true,
+        done        : function(e, data)
+        {
+            if (!data.result.isOk)
+            {
+                top.dialog({
+                    width: 500,
+                    title: '添加品牌',
+                    content:data.result.message,
+                    okValue: '确定',
+                    ok: function (){
+                    }
+                }).showModal();
+            }
+            $('.js_show_img').attr('src', '/jdvop/image/readImage.php?path=' + data.result.message + '&width=116&height=116');
+            $('input[name="thumbnail"]').val(data.result.message);
+            $('input[name="thumbnail_upload"]').val(data.result.message);
+            
+        }
+    });
+    $('#image_input_trigger').click(function(){
+        $('#image_input').click();
+    });
+    
+    $("#dateForm").submit(function(e){
+        e.preventDefault();
+        if($('input[name="name"]').val() == ""){
+            top.dialog({
+                width: 500,
+                title: '温馨提示',
+                content:  '请填写品牌名称',
+                okValue: '确定',
+                ok: function (){
+                }
+            }).showModal();
+            return false;
+        }
+        $.post($(this).attr('action'), $(this).serialize(), function(data){
+            if(data.isOk){
+                location = "/jdvop/admin/brands.php";
+            }else{
+                top.dialog({
+                width: 500,
+                title: '温馨提示',
+                content:  data.message,
+                okValue: '确定',
+                ok: function (){
+
+                }
+            }).showModal();
+            return false;
+            }
+        }, 'json');
+    });
+    
+});
+</script>        
+</body>
+</html>

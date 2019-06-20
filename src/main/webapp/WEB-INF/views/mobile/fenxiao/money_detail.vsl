@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/jdvop/css/admin/public.css">
+    <link rel="stylesheet" href="/jdvop/css/mobile/vant/index.css">
+    <title>佣金明细</title>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        .floor {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+        }
+
+        .floor .f_l p:nth-child(1) {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .floor p:nth-child(2) {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .floor .plus {
+            color: #77bf75;
+            font-size: 12px;
+        }
+
+        .floor .minus {
+            color: #f92736;
+            font-size: 12px;
+        }
+        .pa{
+        	height:8px;
+        	background:#f0f0f0;
+        }
+        .panel{
+        	height:100px;
+        	background:#fff;
+        	display:flex;
+        	box-sizing:border-box;
+        	padding:0 0 30px 0 ;
+        	flex-wrap: wrap;
+        }
+        .panel li{
+        	background:#fff;
+        	width:80px;
+        	line-height:24px;
+        	height:24px;
+        	text-align:center;
+        	color:#333;
+        	border-radius:3px;
+        	border:1px solid #d7d7d7;
+        	margin-left:30px;
+        	margin-top:16px;
+        }
+        .panel li.ac{
+        	background:#58a1e6;
+        	color:#fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+    	<ul class="panel">
+    		<li 
+    			v-for="(t,i) in tabList" 
+    			:class="{'ac':curIndex==i}"
+    			@click="selectTab(i)">{{t.n}}</li>
+    	</ul>
+    	<div class="pa"></div>	
+        <van-cell-group>
+            <van-cell v-for="(item,i) in list" v-if="item.type!=1">
+                <div class="floor">
+                    <div class="f_l">
+                        <p>订单号：{{item.orderKey}}</p>
+                        <p>{{item.createTime}}</p>
+                    </div>
+                    <div class="f_r">
+                        <p class="plus" v-if="item.type==0">+{{item.userMoney.toFixed(2)}}</p>
+                        <p class="minus" v-if="item.type==-1">-{{item.userMoney.toFixed(2)}}</p>
+                        <p>{{item.nowMoney}}</p>
+                    </div>
+                </div>
+            </van-cell>
+        </van-cell-group>
+    </div>
+    <script src="/jdvop/script/jquery-1.8.3.min.js"></script>
+    <script src="/jdvop/script/mobile/vue.js"></script>
+    <script src="/jdvop/script/mobile/vant.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: function () {
+                return {
+					list:null,
+					curIndex:0,
+					tabList:[
+						{
+							n:'全部',
+							type:true,
+						},
+						{
+							n:'一级分销',
+							type:false,
+						},
+						{
+							n:'二级分销',
+							type:false,
+						},
+						{
+							n:'提现',
+							type:false,
+						}
+					]
+                }
+            },
+            methods:{
+            	selectTab:function(index){
+            		this.curIndex = index;
+            		if(index == 0){
+            			this.hierachy = '';
+            			this.isDetail = '';
+            		}
+            		if(index == 1){
+            			this.hierachy = '0';
+            			this.isDetail = '';
+            		}
+            		if(index == 2){
+            			this.hierachy = '1';
+            			this.isDetail = '';
+            		}
+            		if(index == 3){
+            			this.hierachy = '';
+            			this.isDetail = '1';
+            		}
+            		this.getDetail(this.tabList[index].type);
+            	},
+            	getDetail:function(type){
+            		var _self = this;
+            		$.ajax({
+            			url:'/jdvop/mobile/fenxiao/myMoney.php',
+            			dataType:'json',
+            			type:'get',
+            			data:{
+            				userId:$!{currentUser.id},
+            				pageNum:1,
+            				hierachy:''||_self.hierachy,
+            				isDetail:''||_self.isDetail
+            			},
+            			success:function(res){
+            				if(res.code == 1){
+            					_self.list = res.data.content;
+            				}
+            			}
+            		})
+            	}
+            },
+            mounted:function(){
+            	this.getDetail();
+            }
+        })
+    </script>
+</body>
+
+</html>

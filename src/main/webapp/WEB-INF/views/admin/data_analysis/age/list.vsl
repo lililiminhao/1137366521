@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/css/admin/main.css'/>
+<script type='text/javascript' src='/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/script/admin/main.js'></script>
+<script type='text/javascript' src='/script/admin/echarts.min.js'></script>
+<script type="text/javascript" src='/script/admin/my97/WdatePicker.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/script/html5.js"></script><![endif]-->
+<title>数据分析-年龄分布</title>
+<script>
+    function  check_date()
+    {
+        var st  = $('input[name="st"]').val();
+        var et  = $('input[name="et"]').val();
+        if (st === '' || et === '') {
+            top.artAlert('时间选择错误', '开始日期或结束日期不能为空', 'error');
+            return false;
+        }
+        var sta = st.split('-');
+        var eta = et.split('-');
+
+        var std = new Date(parseInt(sta[0]), parseInt(sta[1].replace(/^0+/, '')), parseInt(sta[2].replace(/^0+/, '')));
+        var etd = new Date(parseInt(eta[0]), parseInt(eta[1].replace(/^0+/, '')), parseInt(eta[2].replace(/^0+/, '')));
+        var sts = std.getTime();
+        var ets = etd.getTime();
+        if (sts > ets)
+        {
+            top.artAlert('时间选择错误', '开始日期不能晚于结束日期', 'error');
+            return false;
+        }
+        var tv  = ets - sts;
+        if (tv > (63 * 24 * 3600 * 1000))   //时间差超过65天
+        {
+            top.artAlert('时间选择错误', '开始时间和结束时间之间不能超过2个月', 'error');
+            return false;
+        }
+        return true;
+    }
+    $(function(){
+        $('.js-submit-btn').on('click', function(e){
+            e.preventDefault();
+            if (!check_date()) {
+                return;
+            }
+            $("#dataForm").submit();
+        });
+    });
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.back(-1)"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">年龄分布</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li class="curr"><a>基本指标</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="highlight_e4e4e4 region clearfix">
+    	<div class="list">
+            <p class="numall">新增总量:<i>$userCount</i>人</p>
+            <div class="map" id="js-age-chart">
+
+            </div>
+    	</div>
+    	<div class="pie-wrap list">
+            <div class="time  clearfix">
+                <form action="/admin/statistics/ageStatistics.php" id="dataForm" method="get">
+                    <table class="fr">
+                        <tr>
+                            <td>日期：</td>
+                            <td>
+                                <input type="text" name="st" value="$!dateTool.format('yyyy-MM-dd', $st)" class="common w140" onfocus="WdatePicker({readOnly:true, skin:'blueFresh'});" placeholder="起始日期"/> - 
+                                <input type="text" name="et" value="$!dateTool.format('yyyy-MM-dd', $et)" class="common w140" onfocus="WdatePicker({readOnly:true, skin:'blueFresh'});" placeholder="截至日期"/>
+                            </td>
+                            <td>
+                                <input type="submit" class="btn-grey2 js-submit-btn ml10" value="搜索"/>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>  
+            <div id="js-histogram" class="pie-chart"></div>
+    	</div>
+    </div>
+</div>
+<script type="text/javascript">
+	//柱状图初始化
+	var piechart = echarts.init(document.getElementById('js-histogram'));
+	var agechart = echarts.init(document.getElementById('js-age-chart'));
+	//饼图
+	piechartImg = {
+	    tooltip: {
+	        trigger: 'item'
+	    },
+	    legend: {
+	        y: 'bottom',
+	        data:[$ageSbd2]
+	    },
+	    series: [
+	        {
+	            name:'年龄占比',
+	            type:'pie',
+	            radius: ['30%', '55%'],
+	            data:[$ageSbd1]
+	        }
+	    ]
+	};
+	//柱状图
+	histogram = {
+	    tooltip : {
+	        trigger: 'axis',
+	        axisPointer : {           
+	            type : 'shadow'   
+	        }
+	    },
+	    grid: {
+	        left: '3%',
+	        right: '8%',
+	        height:'80%',
+	        containLabel: true
+	    },
+	    xAxis : [
+	        {
+                    name : '年龄段',
+	            type : 'category',
+                    axisLabel:{
+	            	interval:0,  
+             		 rotate:45 
+	            },
+	            data : [$ageSbd3]
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            name : '人数',
+	            type : 'value'
+	            //max : 6000
+	        }
+	    ],
+	    series : [
+	        {
+	            name:'人数',
+	            type:'bar',
+	            data:$ageTotal,
+	           	itemStyle:{
+                            normal:{color:'#1d89cf',barGap:'60%'},
+          		}
+	        }
+	    ]
+	};	
+	agechart.setOption(piechartImg);
+	piechart.setOption(histogram);
+	window.onresize=piechart.resize; 
+</script>
+</body>
+</html>

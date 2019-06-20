@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>会员管理</title>
+</head>
+<body>
+<iframe style="display:none;" name="hiden_frm"></iframe>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <p class="right fr">
+        <a href="#" id="import_excel"><span class="btn-green2 mr10">批量导入会员</span> </a>
+        <a href="#" id="batchUpdate"><span class="btn-green2 mr10">批量编辑会员</span> </a>
+    </p>
+    <span class="text">会员管理</span>
+    <span style="display:none;"><input type="file" name="excelFile" id="excelFile" /></span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                #if(!$enabled || $enabled == 'false')
+                    <li><a href="/jdvop/admin/websiteUser/list.php?enabled=true" title="已启用会员">已启用会员</a></li>
+                    <li class="curr"><a href="#" title="已禁用会员">已禁用会员</a></li>
+                #else
+                    <li class="curr"><a href="#" title="已启用会员">已启用会员</a></li>
+                    <li><a href="/jdvop/admin/websiteUser/list.php?enabled=false" title="已禁用会员">已禁用会员</a></li>
+                #end
+            </ul>
+        </div>
+    </div>
+    <iframe name="export_ifrm" id="export_ifrm" src="javascript:void(0);" style="display:none;"></iframe>
+    <div class="automatic-box clearfix mt10">
+        <div class="fl mt4">
+            <form action="/jdvop/admin/websiteUser/list.php" method="get">
+                <input type="hidden" name="enabled" value="#if(!$enabled || $enabled == 'false') false #{else} true #{end}" />
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="kw" value="$!esc.html($request.getParameter('kw'))" class="common ml10 w160" placeholder="用户名/姓名/手机号/邮箱"/>
+                        </td>
+                        <td>
+                            <input type="submit" class="btn-grey2 ml10" value="搜索" />
+                        </td>
+                        <td><span class="btn-grey2 ml10" id="js_do_export">导出</span></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="right fr p10 js-option-parents">
+            <a href="/jdvop/admin/websiteUser/add.php"><span class="btn-green2">添加会员</span></a>
+        </div>
+    </div>
+    <div class="table-list">
+        <table class="common">
+            <colgroup>
+                <col style="width:60px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:150px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:120px" />
+                <col style="width:100px" />
+                <col/>
+            </colgroup>
+            <tr>
+                <th><label><input type="checkbox" id="select_all" /></label></th>
+                <th>用户名</th>
+                <th>昵称</th>
+                <th>手机</th>
+                <th>固话</th>
+                <th>Email</th>
+                <th>总获取积分</th>
+                <th>已消费积分</th>
+                <th>剩余积分</th>
+                <th>操作</th>
+            </tr>
+            #if($websiteUsers.hasContent())
+                #foreach($user in $websiteUsers)
+                <tr>
+                    <td class="tc"><label><input type="checkbox" class="select-item" name="ids[]" value="$!user.id" /></label></td>
+                    <td><a href="/jdvop/admin/websiteUser/view.php?id=$!user.id" class="blue">$!esc.html($user.loginName)</a></td>
+                    <td>$!esc.html($user.nickName)</td>
+                    <td>$!esc.html($user.mobile)</td>
+                    <td>$!esc.html($user.phone)</td>
+                    <td class="tr">$!esc.html($user.email)</td>
+                    <td class="tr">$!websiteIntegralService.getGenerateIntegral($user)</td>
+                    <td class="tr">$!websiteIntegralService.getConsunmeIntegral($user)</td>
+                    <td class="tc">$!user.integral</td>
+                    <td class="tc js-option-parents">
+                        <div class="drop-down js-dropDown">
+                            <span class="ico"></span>
+                            <p class="s-inp">操作</p>
+                        </div>
+                        <dl class="s-option js-sOption">
+                            <dd><a href = "" class="js-update-password" rel="$!user.id">修改密码</a></dd>
+                            #if($user.enabled)
+                                <dd><a href="" class="js-add-integral" rel="$!user.id">充值</a></dd>
+                                <dd><a href="/jdvop/admin/websiteUser/setEnabled.php?ids[]=$!user.id&enabled=false"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要禁用这位会员么?">禁用</a></dd>
+                            #else
+                                <dd><a href="/jdvop/admin/websiteUser/setEnabled.php?ids[]=$!user.id&enabled=true" method="GET" class="ajax-request" ok-message="reload">启用</a></dd>
+                                #if($websiteUserService.isDeleteable($user))
+                                    <dd><a href="/jdvop/admin/websiteUser/delete.php?ids[]=$!user.id"  method="GET" class="ajax-request" ok-message="reload" cfm-message="您真的要删除这位会员么?一旦删除将无法恢复!">删除</a></dd>
+                                #end
+                            #end
+                            <dd><a href="/jdvop/admin/websiteUser/view.php?id=$!user.id">详情</a></dd>
+                        </dl>
+                    </td>
+                </tr>
+                #end
+            #else
+                <tr>
+                    <td class="tc fs16p" colspan="11">
+                        暂无相关会员
+                    </td>
+                </tr>
+            #end
+        </table>
+    </div>
+    <div class="layout-footer clearfix">
+        <div class="btn-wrap">
+            #if(!$enabled || $enabled == 'false')
+                <span class="btn-red batch-action" batch-action="restore">启用</span>
+                <span class="btn-grey batch-action" batch-action="delete">删除</span>
+            #else
+                <span class="btn-grey batch-action" batch-action="disable">禁用</span>
+            #end
+        </div>
+        $adminPg.pager($link, $websiteUsers.getPagerSpec(), 4, '_self')
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/ckeditor/ckeditor.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script src="/jdvop/script/admin/dialog-min.js"></script>
+<script src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/common.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title></title>
+</head>
+<body>
+<!--主导航-->
+    <div class="mainNav borderGreen clearfix">
+        <a href="/jdvop/admin/websiteUser/list.php"><p class="right btn-grey2 fr">返回</p></a>
+        <span class="text">
+            添加会员
+        </span>
+    </div>
+    <form id="dateForm" action="#if($websiteUser) /jdvop/admin/websiteUser/edit.php #else /jdvop/admin/websiteUser/add.php #end" method="POST">
+    #if($websiteUser)
+        <input type="hidden" name="id" value = "$websiteUser.id">
+    #end
+    <div id="iframePage">
+        <div class="automatic-box clearfix highlight_e4e4e4">
+            <div class="topTitle">
+                 <span>基本信息</span>
+            </div>
+            <div class="item">
+                <div class="add-product">
+                    <table class="mb10 pb10 js-box">
+                        <colgroup>
+                            <col style="width:120px;" />
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <td class="tr"><i class="orange"> *</i>用户名：</td>
+                            <td class="tl">
+                                <input type="text" #if($websiteUser) readonly=""   #end name="loginName" value="$!websiteUser.loginName" class="common h22 w220" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">#if(!$websiteUser) <i class="orange"> *</i>#end 密码：</td>
+                            <td class="tl">
+                                <input type="password" name="password" class="common h22 w220"  #if($websiteUser) disabled="disabled" #end  />
+                                <label class="error"></label>
+                                #if($websiteUser)
+                                    <label><input id="change_passwd" type="checkbox" value="true"></label>
+                                    <div class="topTip-wrap">
+                                        <i class="topTip js-topTip"></i>
+                                        <em class="help-title js-topTip-title">勾选后可以修改账号登录密码</em>
+                                    </div>
+                                #end
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">昵称：</td>
+                            <td class="tl">
+                                <input type="text" name="nickName" value="$!websiteUser.nickName" class="common h22 w220" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">手机号码：</td>
+                            <td class="tl">
+                                <input type="text" name="mobile"  value="$!websiteUser.mobile" class="common h22 w220" />
+                                <label class="error"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">固定电话：</td>
+                            <td class="tl">
+                                <input type="text" name="phone"  value="$!websiteUser.phone" class="common h22 w220"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">邮箱：</td>
+                            <td class="tl">
+                                <input type="text" name="email"  value="$!websiteUser.email"  class="common h22 w220" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tr">是否启用：</td>
+                            <td class="tl">
+                                <select name="isEnabled" class="common w120 h32 mr6">
+                                    <option value = "true">是</option>
+                                    <option value = "false">否</option>
+                                </select>
+                            </td>
+                        </tr>
+                        #if(!$websiteUser)
+                            <tr>
+                                <td class="tr">增加积分：</td>
+                                <td class="tl">
+                                    <input type="text" name="integral"  class="common h22 w220 filter-input" filter-rule="isnumber" maxlength="9" error-label="积分" />
+                                    <label class="error"></label>
+                                </td>
+                            </tr>
+                        #end
+                        <tr>
+                            <td class="tr">用户分组：</td>
+                            <td class="tl">
+                                <select name="groupId" class="common h30 w220">
+                                    <option value="">请选择用户分组</option>
+                                    #foreach($group in $groups)
+                                        <option value="$group.id">$group.name</option>
+                                    #end
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>    
+        </div>
+        <div class="layout-footer pb30">
+            <div class="btn-wrap">
+                <input type="submit" value="保存" class="btn-orange" />
+                <a href="/jdvop/admin/websiteUser/list.php"><span class="btn-grey" />返回</span></a>
+            </div>
+        </div>
+    </div>
+    </form>
+<script type="text/javascript">
+$(function(){
+    
+    $('#change_passwd').click(function(){
+        if($('#change_passwd').attr("checked") === "checked"){
+            $('input[name="password"]').attr("disabled",false);
+        }else{
+            $('input[name="password"]').attr("disabled",true);
+        }
+    });
+    $('#dateForm').submit(function(e){
+        e.preventDefault();      
+        $.post($(this).attr('action'), $(this).serialize(), function(data) {
+            if (data.isOk) {
+                top.artAlert('温馨提示', '用户信息保存成功', '/jdvop/admin/websiteUser/list.php', 'ok');
+            } else {
+                top.artAlert('温馨提示', data.message, 'error');
+            }
+        }, 'json');
+    });
+});
+function inputIntNum(){
+    if(event.keyCode < 48 || event.keyCode > 57){
+        event.returnValue=false;
+    }
+}
+</script>
+</body>
+</html>

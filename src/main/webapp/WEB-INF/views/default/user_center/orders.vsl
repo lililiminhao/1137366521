@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="website" content="$!websiteTool.getWebsite().id" />
+<meta name="usertype" content="website_user" />
+<meta name="userid" content="$!userTool.getUserId()" />
+<meta name="pagetype" content="other" />
+<meta name="pageid" content="" />
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css" />
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css" />   
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+<!--[if gte IE 9]> <script type="text/javascript" src="/jdvop/script/selectivizr.js"></script><![endif]-->
+</head>
+<body>
+ #parse('header.vsl')  
+<div class="user-personal">
+#include('user_center/sider_bar.vsl')
+<div class="user-content-wrap">
+    <h3 class="user-title">我的订单</h3>
+    <div class="user-wrap">
+        <p class="pb10p pl10p pt10p">
+           便利提醒:
+            <a href="/jdvop/my/orders.php?status=waiting_confirmed" class="blue">待确认收货(#if($confirmOrderCount)$confirmOrderCount#{else}0#{end})</a>
+            <a href="/jdvop/my/orders.php?status=completed" class="blue">已完成订单(#if($okOrderCount)$okOrderCount#{else}0#{end})</a>&nbsp;&nbsp;
+        </p> 
+    </div>
+    <div class="user-wrap-tab">
+        <table class="user-tab">
+            <colgroup>
+                <col style="width: 100px;">
+                <col style="width: 300px;">
+                <col style="width: 100px;">
+                <col style="width: 120px;">
+                <col style="width: 200px;">
+                <col style="width: 150px;">
+                <col style="width: 130px;">
+            </colgroup>
+            <tr>
+                <th>订单号</th>
+                <th>订单商品</th>
+                <th>数量</th>
+                <th>积分</th>
+                <th>提交时间</th>
+                <th>订单状态</th>
+                <th>操作</th>
+            </tr>
+                #if(!$orderList.isEmpty())
+                #foreach($order in $orderList)
+                <tr>
+                    #set($entries   = $orderService.findEntries($order))
+                    #set($itemCount = 0)
+                    
+                    <td class="blue"><a href="/jdvop/my/jdvop/order/${order.getId()}.php" class="blue"> $order.getKey()</a></td>
+                    <td width="300">
+                        <p class="w280p fl">
+                            #foreach ($entry in $entries)
+                                #set($itemCount = $itemCount + $entry.getAmount())
+                                    #set($storageUnit = $storageUnitService.findOne($entry.getStorageUnitId()))
+                                    #set($product     = $productService.findOne($storageUnit.getProductId()))
+                                    <!--<a href="/jdvop/product/${product.id}.php" class="blue" title="$esc.html($product.getName())" target="_blank">-->
+                                        #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                            <img class="beaeaea fl" src="$product.getThumbnailImage()" alt="$esc.html($product.getName())" width="60" height="60" />
+                                        #else
+                                            <img class="beaeaea fl" src="$configTool.getImageHost()/thumbnail$product.getThumbnailImage()" alt="$esc.html($product.getName())" width="60" height="60" />
+                                        #end
+                                    <!--</a>-->
+                            #end
+                        </p>
+                    </td>
+                    <td>$itemCount</td>
+                    <td>$math.ceil($order.getNeedPay())</td>
+                    <td>$dateTool.format('yyyy-MM-dd HH:mm:ss', $order.getCreateTime())</td>
+                    <td class="fwb orange">
+                        #if($order.getStatus() == 'waiting_confirmed' && !$returnOrNifferMap.get($order.id))
+                            售后处理中
+                        #else
+                            $order.getStatus().getDescription()
+                        #end
+                    </td>
+                    
+                    <td>
+                        <a href="/jdvop/my/jdvop/order/${order.getId()}.php" class="blue">查看</a>
+                        ##如果该订单来源活动 屏蔽删去按钮
+                        #if($entries.get(0).sourceEntryType !='lottery')
+                            #if($order.getStatus() == 'waiting_audit' && !$order.isSplit() && !$order.niffer)
+                                <!--<a href="/jdvop/my/order/delete_${order.id}.php" class="blue js_delete_order">删除订单</a>-->
+                            #end
+                        #end
+                        #if($order.getStatus() == 'waiting_confirmed')
+                        <a href="/jdvop/my/confirmReceipt/${order.getId()}.php" class="blue js_confirm_receipt">确认收货</a>
+                            #if($order.deliveryObjectType == "provider" || $order.deliveryObjectType == "enterprise")
+                                #if(!$order.isNiffer() && $returnOrNifferMap.get($order.id))
+                                    <a href="/jdvop/my/order/niffer.php?id=$order.id" class="blue">申请换货</a>
+                                #end
+                            #end
+                        #end
+                    </td>
+                </tr>
+                #end
+                #else
+                <tr>
+                    <td colspan="7">暂无订单信息!</td>
+                </tr>
+                #end
+            </table>
+            <div class="pages">$pg.pager($link, $pager, 6, '_self')</div>
+        </div>
+    </div>
+</div>
+<!--内容框 end -->
+<!--footer-->
+#parse('footer.vsl')   
+<!--footer  end-->
+    <script type="text/javascript">
+        $(function() {
+            $(".js_apply_refund").bind("click", function(e){
+                e.preventDefault();
+                var thiz = $(this);
+                messageBox("question", "提示信息", "是否确认申请退款", true, function(){
+                    $.post(thiz.attr("href"), {}, function(data){
+                        if(data.isOk){
+                            messageBox("success", "提示信息", "申请退款成功,请留意客服人员来电", false, function(){
+                                location.reload();
+                            });
+                        }else{
+                            messageBox("error", "操作失败", data.message);
+                            return false;
+                        }
+                    }, "json");
+                });
+            });
+            
+            $('.js_confirm_receipt').bind("click", function(e){
+                e.preventDefault();
+                var thiz = $(this);
+                messageBox("question", "提示信息", "是否确认收货", true, function(){
+                    $.post(thiz.attr("href"), {}, function(data){
+                          if(data.isOk){
+                              location.reload();
+                          }else{
+                              messageBox("error", "错误信息", data.message);
+                          }
+                    }, "json");
+                });
+            });
+            
+            $('.js_delete_order').bind("click", function(e){
+                e.preventDefault();
+                var thiz = $(this);
+                messageBox("question", "温馨提示", "订单删除后不可恢复，是否确定删除？", true, function(){
+                    $.post(thiz.attr("href"), {}, function(data){
+                        if(data.isOk){
+                           location.reload();
+                        }else{
+                           messageBox("error", "错误信息", data.message);
+                        }
+                    }, "json");
+                });
+            });
+        });
+    </script>
+    <script type="text/javascript" src="/jdvop/script/tj.js"></script>  
+</body>
+</html>

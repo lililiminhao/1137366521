@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())" />
+<meta name="Description" content="" />
+<meta name="renderer" content="webkit"/>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/global.css"/>
+<link rel="stylesheet" type="text/css" href="/jdvop/css/main.css"/>   
+<title>积分模块</title>
+<!--[if IE]> <script type="text/javascript" src="/jdvop/script/html5.js"></script> <![endif]-->
+</head>
+<body>
+#parse('header.vsl')  
+<div class="forward-silder"></div>
+<div class="forward-list clearfix">
+    <div class="item-left">
+        <p class="title">热兑商品推荐</p>
+        <ul>
+            #if($products.hasContent())
+            #foreach($product in $products)
+            #set($soldPrice = $!productTool.getProductSoldPrice($product))
+            #set($hrefProduct= '/jdvop/product/'+${product.id}+'.php')
+            #if($fps)
+                #foreach($fp in $fps)
+                    #if($fp.productId == $product.id)
+                        #set($hrefProduct= '/jdvop/activity/limitExchange/view.php?fpid='+$fp.id) 
+                        #set($soldPrice = $fp.displayDiscountPrice*$websiteTool.getWebsite().getRatio())
+                        #break
+                    #end
+                #end
+            #end
+            <li>
+                <a target="_blank"  href="$hrefProduct">
+                    <p class="img">
+                    #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                        <img src="$!product.thumbnailImage" alt="$!product.name" width="120" height="120"/>
+                        #if($product.ownerType == "jingdong" )
+                            <img src="/jdvop/images/jd-ico.png" class="jd-ico"/>
+                        #end
+                    #else
+                        <img src="$configTool.getImageHost()/thumbnail$!product.thumbnailImage" alt="$!product.name"/>
+                    #end
+                    </p>
+                    <p class="name overflow-h">$!product.name</p>
+                    <p class="num">积分：<i>$!numberTool.format("#0", $soldPrice)</i></p>
+                </a>
+            </li>
+            #end
+            #end
+        </ul>
+    </div>
+    <div class="item-right">
+        <input type="hidden" name="uid" value="$user.id" />
+        <ul>
+            #if($activitys.hasContent())
+            #foreach($ac in $activitys)
+                #if(!$ac.isExpired($tz))
+                <li id="li-$velocityCount">
+                    <div class="title">$!ac.name 
+                        #set($hasLog = $forConsumeLogService.hasConsume($ac.id, $userDetail.userId))
+                        #if($ac.isActive($tz) && !$hasLog)
+                        <div class="bdsharebuttonbox">
+                            <a href="javscript:;" class="btn-weixin bds_weixin" data-cmd="weixin" title="立即转发"><i class="icon"></i>立即转发</a>
+                        </div>
+                        #end
+                    </div>
+                    <p class="sun-title">
+                         $!ac.description
+                    </p>
+                    <div class="num">
+                        获赠积分：<i>$!ac.integral</i>积分  <a href="$!ac.forwardUrl" target="_blank" class="txt-more" title="查看文章">查看文章>></a>
+                        <br/>
+                        #if(!$ac.isActive($tz))
+                        <em class="end-time">开始时间：$!dateTool.format('yyyy-MM-dd', $ac.activityTime)</em>
+                        #else
+                          <em class="end-time">结束时间：$!dateTool.format('yyyy-MM-dd', $ac.expireTime)</em>
+                        #end
+                    </div>
+                </li>
+                #end
+            #end
+            #end
+        </ul>
+    </div>
+</div>
+#parse('footer.vsl')
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/main.js"></script>
+<script type="text/javascript" src="/jdvop/script/messageBox.js"></script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script src="/jdvop/script/common.js" type="text/javascript"></script>
+<script type="text/javascript" src='/jdvop/script/admin/order/aftersale.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>换货单</title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="javascript:history.back(-1)"><p class="right btn-grey2 fr">返回</p></a>
+    <a href="javascript:;" class="js-refuse" rel="$nifferOrder.id"><p class="right btn-blue2 fr ">拒绝换货 </p></a>
+    <a href="javascript:;" class="js-submit" ><p class="right btn-red2 fr ">同意换货 </p></a>
+    <input type="hidden" name="isSystem" value="#if($order.deliveryObjectType=='system'||$order.deliveryObjectType=='jingdong')true#{else}false#{end}"/>
+    <span class="text">换货单</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <p class="text fwb">基本信息</p>
+        </div>
+    </div>
+    <div class="table-list">
+        <form id="dataForm" action="/jdvop/admin/order/niffer/audit.php" method="POST">
+        <input type="hidden" name="id" value="$nifferOrder.id" />
+        <input type="hidden" name="originalOrderId" value="$order.id" />
+        <input type="hidden" name="orderStatus" value="$order.status" />
+        <table class="common">
+            <colgroup>
+                <col style="width: 80px;" />
+                <col style="width: 220px;" />
+                <col style="width: 80px;" />
+                <col style="width: 220px;" />
+            </colgroup>
+            <tr>
+                <td class="tr">订单编号：</td>
+                <td>$!order.key</td>
+                <td class="tr">发货日期：</td>
+                <td>
+                    #if ($shipmentLog)
+                        $!dateTool.format('yyyy-MM-dd HH:mm:ss', $shipmentLog.shipmentTime)
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <td class="tr">退货人：</td>
+                <td><input type="text" name="consumerName" value="#if($nifferOrder)$!esc.html($nifferOrder.consumerName)#else$!esc.html($!order.receiverName)#end" class="common h22 w200" /></td>
+                <td class="tr">退货人手机：</td>
+                <td><input type="text" name="consumerMobile" value="#if($nifferOrder)$!esc.html($nifferOrder.consumerMobile)#else$!esc.html($!order.receiverMobile)#end" class="common h22 w200" /></td>
+            </tr>
+            <tr>
+<!--                <td class="tr">退货人电话：</td>
+                <td><input type="text" name="consumerPhone" value="#if($nifferOrder)$!esc.html($nifferOrder.consumerPhone) #else $!esc.html($!order.receiverPhone) #end" class="common h22 w200" /></td>-->
+                <td class="tr">地区：</td>
+                <td>
+                    #set($consumerProvince = $order.province)
+                    #set($consumerCity = $order.city)
+                    #set($consumerCounty = $order.county)
+                    #set($consumerTown = $order.town)
+                    #if($nifferOrder)
+                        #set($consumerProvince  = $!nifferOrder.consumerProvince)
+                        #set($consumerCity      = $!nifferOrder.consumerCity)
+                        #set($consumerCounty    = $!nifferOrder.consumerCounty)
+                        #set($consumerTown      = $!nifferOrder.consumerTown)
+                    #end
+                    <select name="region[]" class="common h24 w120">
+                        #foreach($provice in $geoRegionService.findAllProvince())
+                            <option value="$provice.id" #if($provice.id == $consumerProvince.id) selected #end>$provice.name</option>
+                        #end
+                    </select>
+                    <select name="region[]" class="common h24 w120">
+                        #foreach($city in $geoRegionService.siblings($consumerCity))
+                            <option value="$city.id" #if($city.id == $consumerCity.id) selected #end>$city.name</option>
+                        #end
+                    </select>
+                    <select name="region[]" class="common h24 w120">
+                        #foreach($county in $geoRegionService.siblings($consumerCounty))
+                            <option value="$county.id" #if($county.id == $consumerCounty.id) selected #end>$county.name</option>
+                        #end
+                    </select>
+                    #if($consumerTown.id > 0)
+                        <select name="region[]" class="common h24 w120">
+                            #foreach($town in $geoRegionService.siblings($consumerTown))
+                                <option value="$town.id" #if($town.id == $consumerTown.id) selected #end>$town.name</option>
+                            #end
+                        </select>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <td class="tr">详细地址：</td>
+                <td><input type="text" name="address" value="#if($nifferOrder && $nifferOrder.address)$esc.html($nifferOrder.address)#else$esc.html($order.receiverAddr)#end" class="common h22 w200" /></td>
+                <td class="tr">申请日期：</td>
+                <td>
+                    $!dateTool.format('yyyy-MM-dd HH:mm:ss', $nifferOrder.applyTime)
+                </td>
+            </tr>
+            #if ($shipmentLog)
+            <tr>
+                <td class="tr">换货物流公司：</td>
+                <td>
+                    <select name="shipmentCompany" class="common h24 w200">
+                    #foreach($sp in $shipCompanies)
+                        <option value="$sp.id" 
+                            #if($nifferOrder && $nifferOrder.shipmentOrder && !$nifferOrder.shipmentOrder.isEmpty())
+                                #if ($sp.id == $nifferOrder.shipmentCompany.id)
+                                    selected
+                                #end
+                            #else
+                                #if($sp.id == $shipmentLog.shipmentCompany.id)
+                                    selected
+                                #end
+                            #end>$sp.name
+                        </option>
+                    #end
+                    </select>
+                </td>
+                <td class="tr">退件单号：</td>
+                <td colspan="3"><input type="text" name="shipmentOrder" value="$!nifferOrder.shipmentOrder" onkeypress="check_input(event, is_number, 18)" class="common h22 w200"/></td>
+            </tr>
+            #end
+            <tr>
+                <td class="tr">支付方式:</td>
+                <td>
+                    #if ($payLog && $payLog.paied)
+                    $payLog.payType.description
+                    #else
+                    <span style="color:red;">该订单没有支付信息</span>
+                    #end
+                </td>
+                <td class="tr">支付金额:</td>
+                <td>
+                    #if ($payLog && $payLog.paied)
+                    $numberTool.format('#,##0.00', $order.needPay)
+                    #else
+                    <span style="color:red;">该订单没有支付信息</span>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <td class="tr">支付时间：</td>
+                <td>
+                    #if ($payLog && $payLog.paied)
+                    $!dateTool.format('yyyy-MM-dd HH:mm:ss', $payLog.paiedTime)
+                    #else
+                    <span style="color:red;">该订单没有支付信息</span>
+                    #end
+                </td>
+                
+            </tr>
+            <tr>
+                 <td class="tr">申请原因：</td>
+                <td>$!esc.html($nifferOrder.reason)</td>
+                <td class="tr">客户备注:</td>
+                <td><textarea name="remark" cols="80" rows="4" placeholder="请填写客户备注信息">$!esc.html($nifferOrder.remark)</textarea></td>
+            </tr>
+            <tr>
+                <td class="tr">客服备注:</td>
+                <td><textarea name="remarkByWorker" cols="80" rows="4" placeholder="请填写备注信息">$!esc.html($nifferOrder.remarkByWorker)</textarea></td>
+                <td class="tr">仓库备注：</td>
+                <td>$!esc.html($nifferOrder.remarkByStorehouse)</td>
+            </tr>
+        </table>
+        <div class="tab-column mt20">
+            <div class="con">
+                <ul class="clearfix">
+                    <li class="curr"><a href="javascript:;" title="订单商品">订单商品</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="empty_box ">
+            <table class="common">
+                <colgroup>
+                    <col style="width:66px;" />
+                    <col />
+                    <col style="width:120px;" />
+                    <col style="width:160px;" />
+                    <col style="width:120px;" />
+                    <col style="width:120px;" />
+                    <col style="width:160px;" />
+                    <col style="width:220px;" />
+                </colgroup>
+                <tr>
+                    <th>商品图片</th>
+                    <th>商品名称</th>
+                    <th>商品品牌</th>
+                    <th>商品单价</th>
+                    <th>订购数量</th>
+                    <th>商品总价</th>
+                    <th>操作</th>
+                </tr>
+                #foreach($entry in $entries)
+                #set($sku   = $storageUnitMap.get($entry.storageUnitId))
+                #set($product   = $productMap.get($sku.productId))
+                <tr data-sku-id="$sku.id" data-pid="$product.id">
+                    <td>
+                        <a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">
+                            #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                <img src="$product.getThumbnailImage()" width="60" height="60" />
+                            #else
+                                <img src="$configTool.getImageHost()/thumbnail$product.getThumbnailImage()" width="60" height="60" />
+                            #end
+                        </a>
+                    </td>
+                    <td><a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">$product.name</a></td>
+                    <td>$product.brand.name</td>
+                    <td class="tr">$numberTool.format('#,####,####0.00',$math.mul($entry.soldPrice, $websiteTool.getWebsite().getRatio()))</td>
+                    <td class="tr">$entry.amount</td>
+                    <td class="tr">
+                        #set($price = $math.mul($entry.soldPrice, $websiteTool.getWebsite().getRatio()))
+                        #set($total = $price * $entry.amount)
+                        $numberTool.format('#,####,####0.00', $total)
+                    </td>
+                    <td class="tc js-option-parents">
+                         #if($order.deliveryObjectType=='provider' || $order.deliveryObjectType=='enterprise')
+                        <a href="#" class="btn-select-return" data-trigger="selectedOutBox" title="加入换出商品">加入换出商品 </a>
+                        #else
+                            --
+                         #end
+                    </td>
+                </tr>
+                #end
+            </table>
+        </div>
+        
+        <div class="tab-column mt20">
+            <div class="con">
+                #if($order.deliveryObjectType=='provider' || $order.deliveryObjectType=='enterprise')
+                <a href="/jdvop/admin/order/return/chooseNifferEntry.php?id=$order.id" class="js-choose-entry"><span class="btn-green2 fr mt6 mr20 ">选择换出商品</span></a>
+                #end
+                <ul class="clearfix">
+                    <li class="curr js-tab" rel="selectedInBox">退入商品</li>
+                    <li class="js-tab" rel="selectedOutBox">换出商品</li>
+                </ul>
+            </div>
+        </div>
+        <div class="js-box empty_box ">
+            <table class="common" id="selectedInBox">
+                <colgroup>
+                    <col style="width:66px;" />
+                    <col />
+                    <col style="width:170px;" />
+                    <col style="width:170px;" />
+                    <col style="width:170px;" />
+                    <col style="width:160px;" />
+                </colgroup>
+                <tr>
+                    <th>商品图片</th>
+                    <th>商品名称</th>
+                    <th>商品品牌</th>
+                    <th>订单数量</th>
+                    <th>退货数量</th>
+                    <th>操作</th>
+                </tr>
+                #if($inEntries && $inEntries.size() > 0)
+                    #foreach($entry in $inEntries)
+                    #set($sku   = $storageUnitService.findOne($entry.storageUnitId))
+                    #set($product   = $productService.findOne($sku.productId))
+                    #set($soldPrice = $!productTool.getProductSoldPrice($product))
+                    <tr data-sku-id="$sku.id">
+                        <input type="hidden" name="storageUnitId[]" value="$sku.id"/>
+                        <input type="hidden" name="productId[]" value="$product.id"/>
+                        <input type="hidden" name="entryType[]" value="in" />
+                        <td>
+                            <a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">
+                                #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                    <img src="$product.getThumbnailImage()" width="60" height="60" />
+                                #else
+                                    <img src="$configTool.getImageHost()/thumbnail$product.getThumbnailImage()" width="60" height="60" />
+                                #end
+                            </a>
+                        </td>
+                        <td><a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">$product.name</a></td>
+                        <td>$product.brand.name</td>
+                        <td class="tr">$entry.amount</td>
+                        <td class="tc"><input type="text" name="amount[]" class="common h22 w60" value="$!entry.amount" maxlength="2"/></td>
+                        <td class="tc">
+                            --
+                        </td>
+                    </tr>
+                    #end
+                #else
+                    <tr class="js-message-box">
+                        <td colspan="7" class="tc h34 fs12p fwb red">请选择退入商品</td>
+                    </tr>
+                #end
+            </table>
+            <table class="common hide" id="selectedOutBox">
+                <colgroup>
+                    <col style="width:66px;" />
+                    <col />
+                    <col style="width:170px;" />
+                    <col style="width:170px;" />
+                    <col style="width:170px;" />
+                    <col style="width:160px;" />
+                </colgroup>
+                <tr>
+                    <th>商品图片</th>
+                    <th>商品名称</th>
+                    <th>商品品牌</th>
+                    <th>订单数量</th>
+                    <th>换货数量</th>
+                    <th>操作</th>
+                </tr>
+                #if($outEntries && $outEntries.size() > 0)
+                    #foreach($entry in $outEntries)
+                    #set($sku   = $storageUnitService.findOne($entry.storageUnitId))
+                    #set($product   = $productService.findOne($sku.productId))
+                    <tr data-sku-id="$sku.id">
+                        <input type="hidden" name="storageUnitId[]" value="$sku.id"/>
+                        <input type="hidden" name="entryType[]" value="out" />
+                        <input type="hidden" name="productId[]" value="$product.id"/>
+                        <td>
+                            <a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">
+                                #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                    <img src="$product.getThumbnailImage()" width="60" height="60" />
+                                #else
+                                    <img src="$configTool.getImageHost()/thumbnail$product.getThumbnailImage()" width="60" height="60" />
+                                #end
+                            </a>
+                        </td>
+                        <td><a href="/jdvop/admin/product.php?id=$!product.id" target="_blank">$product.name</a></td>
+                        <td>$product.brand.name</td>
+                        <td class="tr">$entry.amount</td>
+                        <td class="tc"><input type="text" name="amount[]" class="common h22 w60" value="$!entry.amount" maxlength="2"/></td>
+                        <td class="tc">
+                            #if($order.deliveryObjectType=='provider' || $order.deliveryObjectType=='enterprise')
+                            <span class="#if($shipmentLog) btn-red #{else} btn-grey #end btn-remove">删除</a>
+                            #else
+                            --
+                            #end
+                        </td>
+                    </tr>
+                    #end
+                #else
+                    <tr class="js-message-box">
+                        <td colspan="7" class="tc h34 fs12p fwb red">请选择换出商品</td>
+                    </tr>
+                #end
+            </table>
+        </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var mode    = 'selectedInBox';
+    $(function()
+    {
+        $('.btn-select-return').live('click', function(e){
+            e.preventDefault();
+            var thiz    = $(this);
+            if (thiz.attr('data-trigger') !== mode)
+            {
+                //切换一下
+                $('li[rel="' + thiz.attr('data-trigger') + '"]').click();
+            }
+            var p   = $(this).parents('tr');
+            var tds = p.children('td');
+            var skuId   = p.attr('data-sku-id');
+            var existsRow   = $('#'+ mode + ' tr[rel="' + skuId + '"]');
+            if (existsRow.size() == 0)
+            {
+                debugger;
+                //没有添加过这个商品
+                var html    = '<tr rel="' + p.attr('data-sku-id') + '">';
+                html    += '<input type="hidden" name="productId[]" value="' + p.attr('data-pid') + '" />';
+                html    += '<input type="hidden" name="storageUnitId[]" value="' + p.attr('data-sku-id') + '" />';
+                html    += '<input type="hidden" name="entryType[]" value="' + ((mode === 'selectedInBox') ? 'in' : 'out') + '" />';
+                html    += '<td>' + tds.get(0).innerHTML + '</td>';
+                html    += '<td>' + tds.get(1).innerHTML + '</td>';
+                //html    += '<td>' + tds.get(2).innerHTML + '</td>';
+                html    += '<td class="tr">' + tds.get(3).innerHTML + '</td>';
+                html    += '<td class="tr">' + tds.get(4).innerHTML + '</td>';
+                html    += '<td class="tc"><input type="text" name="amount[]" class="common h22 w60" value="1" /></td>';
+                html    += '<td class="tc"><span class="btn-red btn-remove">删除</a>';
+                $("#" + mode + " .js-message-box").hide();
+                $('#' + mode).append(html);
+            } else {
+                //已经添加过了，只是调整数量
+                var r   = existsRow.eq(0);
+                var amountCtrl  = r.find('input[name="amount[]"]');
+                var n   = parseInt(amountCtrl.val());
+                if (!isNaN(n))
+                {
+                    amountCtrl.val(n + 1);
+                } else {
+                    amountCtrl.val(1);
+                }
+            }
+        });
+
+        $('span.btn-remove').live('click', function(e){
+            e.preventDefault();
+            var t   = $(this).parents('tr');
+            if(t.siblings().size() === 1){
+                t.siblings('.js-message-box').show();
+            }
+            t.remove();
+        });
+        $('.js-submit').click(function(e){
+            e.preventDefault();
+            top.artConfirm("温馨提示", "是否确认同意此售后请求?", function (result) {
+                if (result) {
+                    $.post($("#dataForm").attr("action"), $("#dataForm").serialize(), function (data) {
+                        if (data.isOk) {
+                            var isSystem = false;
+                            #if($order.deliveryObjectType!='provider' && $order.deliveryObjectType!='enterprise')
+                                isSystem = true
+                            #end
+                            location.href = "/jdvop/admin/order/niffers.php?isSystem="+isSystem+"&ownerType=$order.deliveryObjectType&type=niffer";    
+                        } else {
+                            top.artAlert("温馨提示", data.message, 'error');
+                        }
+                    }, "json");
+                }
+            }, 'question');
+        });
+
+        $(".js-choose-entry").click(function(e){
+            e.preventDefault();
+            #if($shipmentLog)
+                window.open($(this).attr("href"), 'chooseWindow', 'height=760, width=1100, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no')  
+            #else
+            //根本都没发货
+                top.artAlert('温馨提示', "未发货的订单不需要退换任何商品", 'error')
+            #end    
+        });
+        if($('li.js-tab.curr').attr('rel')=="selectedInBox"){
+             $('a.js-choose-entry').html('');
+        }
+        $('li.js-tab').click(function(e){
+            e.preventDefault();
+            debugger;
+            var t   = $(this);
+            if (mode !== t.attr('rel'))
+            {
+                t.addClass('curr').siblings('li').removeClass('curr');
+                mode    = t.attr('rel');
+                if(mode == "selectedInBox") {
+                    $("#selectedInBox").show();
+                    $("#selectedOutBox").hide();
+                    $('a.js-choose-entry').html('');
+                } else {
+                    $("#selectedOutBox").show();
+                    $("#selectedInBox").hide();
+                    $('a.js-choose-entry').html('<span class="btn-green2 fr mt6 mr20 ">选择换出商品</span>');
+                }
+            }
+        });
+
+        $(document).on('change', 'select[name="region[]"]', function(e){
+            var selObj  = $(this);
+            selObj.nextAll().remove();//删除后面所有的框
+            var cid = parseInt($(this).val());
+            if (cid > 0)
+            {
+
+                $.get('/region/ajax.php', {parentId : cid}, function(d){
+                    var len = d.length;
+                    if (len <= 0)
+                    {
+                        return false;
+                    }
+                    var html    = '<select name="region[]" class="common h24 w120 ml4">';
+                        html   += '<option value="0">请选择</option>';
+                    var i = 0;
+                    for (; i < len; ++ i)
+                    {
+                        html    += '<option value="' + d[i].id + '">' + d[i].name + "</option>";
+                    }
+                    html   += '</select>';
+                    selObj.after(html);
+                }, 'json');
+            }
+        });
+    });
+
+    function callBackFun(data){
+        var existsRow   = $('#' + mode + ' tr[rel="' + data['su'].id + '"]');
+        if (existsRow.size() == 0) {
+            var htmlOut    = '<tr rel="' + data['su'].id + '">';
+            htmlOut    += '<input type="hidden" name="productId[]" value="' + data['product'].id  + '" />';
+            htmlOut    += '<input type="hidden" name="storageUnitId[]" value="' + data['su'].id + '" />';
+            htmlOut    += '<input type="hidden" name="entryType[]" value="' + ((mode === 'selectedInBox') ? 'in' : 'out') + '" />';
+            htmlOut    += '<td><a href="/product.php?id='+ data['product'].id +'" target="_blank"><img src="$configTool.getImageHost()/thumbnail'+ data['product'].thumbnailImage +'" width="60" height="60" /></a></td>';
+            htmlOut    += '<td><a href="/product.php?id='+ data['product'].id +'" target="_blank">'+ data['product'].name +'</a></td>';
+            htmlOut    += '<td>' + data['product'].brand.name + '</td>';
+            //htmlOut    += '<td class="tr">' + number_format(data['product'].retailPrice,2,'.','') + '</td>';
+            htmlOut    += '<td class="tc">1</td>';
+            htmlOut    += '<td class="tc"><input type="text" name="amount[]" class="common h22 w60" value="1" /></td>';
+            htmlOut    += '<td class="tc"><span class="but_red_2 btn-remove">删除</a>';
+            $("#" + mode + " .js-message-box").hide();
+            $('#' + mode).append(htmlOut);
+        } else {
+            //已经添加过了，只是调整数量
+            var r   = existsRow.eq(0);
+            var amountCtrl  = r.find('input[name="amount[]"]');
+            var n   = parseInt(amountCtrl.val());
+            if (!isNaN(n))
+            {
+                amountCtrl.val(n + 1);
+            } else {
+                amountCtrl.val(1);
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

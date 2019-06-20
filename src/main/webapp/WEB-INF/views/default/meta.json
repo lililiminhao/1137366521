@@ -1,0 +1,166 @@
+[
+    {
+        "key"   : "INDEX_BANNER_SLIDER",
+        "type"  : "slider",
+        "width" : 1920,
+        "height"    : 455,
+        "maxSize"   : 0,
+        "maxEntries"    : 5,
+        "minEntries"    : 2,
+        "description"   : "顶部轮播图片"
+    },
+    {
+        "key"   : "INDEX_RIGHT_THREE",
+        "type"  : "slider",
+        "width" : 240,
+        "height"    : 145,
+        "maxSize"   : 0,
+        "maxEntries"    : 3,
+        "minEntries"    : 3,
+        "description"   : "顶部右边3个广告"
+    },
+    {
+        "key"   : "ADV_REGION_LEFT_1",
+        "type"  : "image",
+        "width" : 400,
+        "height"    : 350,
+        "maxSize"   : 0,
+        "description"   : "广告区域左一"
+    },
+    {
+        "key"   : "ADV_REGION_LEFT_2",
+        "type"  : "image",
+        "width" : 400,
+        "height"    : 350,
+        "maxSize"   : 0,
+        "description"   : "广告区域左二"
+    },
+    {
+        "key"   : "ADV_REGION_RIGHT_UPPER",
+        "type"  : "image",
+        "width" : 400,
+        "height"    : 175,
+        "maxSize"   : 0,
+        "description"   : "广告区域右上"
+    },
+    {
+        "key"   : "ADV_REGION_RIGHT_BOTTOM",
+        "type"  : "image",
+        "width" : 400,
+        "height"    : 175,
+        "maxSize"   : 0,
+        "description"   : "广告区域右下"
+    },
+    {
+        "key"   : "FLOOR_1_FOUR_PRODUCT",
+        "description"   : "一楼4个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 4,
+        "minEntries"    : 4
+    },
+    {
+        "key"   : "FLOOR_1_FIVE_PAIHANG",
+        "description"   : "一楼排行5个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 5,
+        "minEntries"    : 5
+    },
+    {
+        "key"   : "FLOOR_2_FOUR_PRODUCT",
+        "description"   : "二楼4个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 4,
+        "minEntries"    : 4
+    },
+    {
+        "key"   : "FLOOR_2_FIVE_PAIHANG",
+        "description"   : "二楼排行5个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 5,
+        "minEntries"    : 5
+    },
+    {
+        "key"   : "FLOOR_3_FOUR_PRODUCT",
+        "description"   : "三楼4个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 4,
+        "minEntries"    : 4
+    },
+    {
+        "key"   : "FLOOR_3_FIVE_PAIHANG",
+        "description"   : "三楼排行5个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 5,
+        "minEntries"    : 5
+    },
+    {
+        "key"   : "FLOOR_4_FOUR_PRODUCT",
+        "description"   : "四楼4个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 4,
+        "minEntries"    : 4
+    },
+    {
+        "key"   : "FLOOR_4_FIVE_PAIHANG",
+        "description"   : "四楼排行5个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 5,
+        "minEntries"    : 5
+    },
+    {
+        "key"   : "FLOOR_5_FOUR_PRODUCT",
+        "description"   : "五楼4个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 4,
+        "minEntries"    : 4
+    },
+    {
+        "key"   : "FLOOR_5_FIVE_PAIHANG",
+        "description"   : "五楼排行5个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 5,
+        "minEntries"    : 5
+    },
+    {
+        "key"   : "FLOOR_6_FOUR_PRODUCT",
+        "description"   : "六楼4个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 4,
+        "minEntries"    : 4
+    },
+    {
+        "key"   : "FLOOR_6_FIVE_PAIHANG",
+        "description"   : "六楼排行5个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 5,
+        "minEntries"    : 5
+    },
+    {
+        "key"   : "FLOOR_7_FOUR_PRODUCT",
+        "description"   : "七楼4个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 4,
+        "minEntries"    : 4
+    },
+    {
+        "key"   : "FLOOR_7_FIVE_PAIHANG",
+        "description"   : "七楼排行5个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 5,
+        "minEntries"    : 5
+    },
+    {
+        "key"   : "FLOOR_8_FOUR_PRODUCT",
+        "description"   : "八楼4个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 4,
+        "minEntries"    : 4
+    },
+    {
+        "key"   : "FLOOR_8_FIVE_PAIHANG",
+        "description"   : "八楼排行5个产品",
+        "type"          : "product_box",
+        "maxEntries"    : 5,
+        "minEntries"    : 5
+    }
+]

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+        <link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+        <link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+        <script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+        <script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+        <script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+        <script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+        <script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+        <script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+        <script type="text/javascript" src="/jdvop/script/date.js"></script>
+        <script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+        <script src="/jdvop/script/common.js" type="text/javascript"></script>
+        <script type="text/javascript" src="/jdvop/script/admin/activity/timeSpike.js" ></script>
+        <title></title>
+    </head>
+    <body>
+        <!--主导航-->
+        <div class="mainNav  borderRed clearfix">
+            <span class="text">修改折扣价格</span>
+            <!-- <p class="right fr"><a href="javascript:history.back(-1);" title="返回"><span class="btn-grey2">返回</span></a></p>-->
+        </div>
+        <div id="iframePage">
+            <div class="tab-column">
+                <div class="con">
+                    <p class="text fwb"> 已选择的商品</p>
+                </div>
+            </div>
+            <div class="layout-grid highlight_e4e4e4 pb20 clearfix">
+                <form id="batch_form_submit" method="GET">
+
+                    <ul class="clearfix js-selectbox" id="candidate_box">
+                        #foreach($product in $productsChecked)
+                        #set($storage = $product.productStorage)
+                        #set($sku = $skuMap.get($product.id))
+                        <li>
+
+                            <input type="hidden" value="$!product.name" name="productName[]"/>
+
+                            <input type="hidden" value="$!numberTool.currency($product.retailPrice)" name="yuanLaiPrice"/>
+
+                            <p class="text"> <label>$!product.productCode</label></p>
+                            <p class="img">
+                                #if($product.ownerType == "jingdong")
+                                <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                                <img src="/jdvop/images/jd-ico.png" class="jd-ico"/> 
+                                #elseif($product.ownerType == "system") 
+                                <img src="$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                                #else
+                                <img src="$configTool.getImageHost()/thumbnail$!product.thumbnailImage" width="160" height="160" alt="$esc.html($product.name)"/>
+                                #end
+                            </p>
+                            <p class="text blue product-title">$!product.name</p>
+                            <input type="hidden" value="$!storage.getUseableNum()" id="kucun"/>
+                            <!--<p class="text"><i>库存：100</i> </p>-->
+
+
+                            <p class="text orange"><i class="fr">折扣：$!numberTool.format('#0.00',$product.discountRate)</i><i>$!numberTool.currency($product.retailPrice)</i> </p>
+                            <!--<p class="text orange"><i class="fr">折扣价：1600</i><i>¥1,499.00 </i> </p>-->
+
+                            <div class="edit-zhekou">
+                                <table>
+                                    <colgroup>
+                                        <col style="width:70px;"/>
+                                        <col />
+                                    </colgroup>
+                                    <tr>
+                                        <td class="tr">折扣价：</td>
+                                        <td class="tl"><input type="text" value="" name="zkPrice_z[]"  class="common h24 w100"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tr">展示原价：</td>
+                                        <td class="tl"><input type="text"  name="retailPrice[]" value="$!numberTool.format('#0.00',$product.retailPrice)" class="common h24 w100"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="tr">限量总数：</td>
+                                        <td class="tl"><input type="text" value="" name="totalCunt[]" class="common h24 w100"  placeholder="件"/></td>
+                                    </tr>
+
+                                </table>
+                                <input type="hidden" value="0" name="saleNum"/>
+                                <input type="hidden" value="$!product.id" name="checkedProductId[]"/>
+                            </div>
+                            <p class="tool">
+                                <span class="ico-del mt6 del-li"><em>删除</em></span>
+                            </p>
+                        </li>
+                        #end
+                    </ul>
+
+                </form>    
+            </div>
+            <div class="layout-footer clearfix">
+                <div class="btn-wrap">
+                    <a href="javascript:history.back(-1);" title="上一步"><span class="btn-grey">上一步</span></a>
+                    <span class="btn-grey" id="next_bu">下一步</span>
+                </div>
+            </div>
+        </div>
+         <script type="text/javascript">
+            nextFrom_add.init();
+        </script>
+    </body>
+</html>

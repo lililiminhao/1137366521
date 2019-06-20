@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+</head>
+    <body class="pm56" style="background: #fff;">
+        #if($addressList && $addressList.size() > 0)
+        <div class="address-list">
+            <ul>
+                #foreach($addr in $addressList)
+                <li #if($addressId && $addressId == $addr.getId()) class="curr" #{end}>
+                    <p class="top">
+                        <a href="/jdvop/my/mobile/address/edit.php?id=$!addr.getId()&isSubmitOrder=$!isSubmitOrder&isAwardSubmitOrder=$!isAwardSubmitOrder&islimitExchangeSubmitOrder=$!islimitExchangeSubmitOrder&islimitTimeKillOrder=$!islimitTimeKillOrder">
+                            <span class="ico-edit mui-icon"></span>
+                        </a>
+                        <span class="ico-del mui-icon" rel="/jdvop/my/address/delete.php?id=$!addr.getId()"></span>
+                        #if($addr.asDefault)
+                            <div class="btn" style="width:120px;">
+                                <label class="ico-selected mui-icon" style="top:7px;left:0"></label>
+                                <span style="position: absolute;left: 30px;top: 9px;">默认地址</span>
+                            </div>
+                        #else
+                            <div id="$!{addr.id}" class="btn js-setDefault" style="width:120px;">
+                                <label class="mui-icon" style="top:0;left:0"></label>
+                                <span style="position: absolute;left: 30px;top: 10px;">设为默认地址</span>
+                            </div>
+                        #end
+                    </p>
+                    #if($isSubmitOrder) 
+                        <a href="/jdvop/my/spcarthelper/returntoshoppingcart.php?addressId=$addr.id"> 
+                    #elseif($isAwardSubmitOrder)
+                        <a href="/jdvop/activity/lottery/order.php?addressId=$addr.id">
+                    #elseif($islimitExchangeSubmitOrder)
+                        <a href="/jdvop/activity/limitExchange/order.php?addressId=$addr.id">   
+                    #elseif($islimitTimeKillOrder)
+                        <a href="/jdvop/activity/toTimeSpikeOrder.php?addressId=$addr.id&productId=$!pid">
+                    #end
+                        <div class="name webkitbox-h">
+                            <p class="flex1 tl">$!addr.getReceiverName()</p>
+                            <p class="flex3 tl">$!addr.getMobile()</p>
+                        </div>
+                        <p class="text">$!addrMap.get($addr.getId())&nbsp;$!esc.html($addr.getAddress())</p>
+                        <!--这是选中是显示的效果图片， 不是选中则不显示-->
+                        #if($addressId && $addr.getId() == $addressId)
+                        <span class="ico-selected mui-icon"></span>
+                        #end
+                    #if($isSubmitOrder) </a>  #elseif($isAwardSubmitOrder) </a> #elseif($islimitExchangeSubmitOrder)</a> #elseif($islimitTimeKillOrder)</a>#{end}
+                </li>
+                #end
+            </ul>
+        </div>
+        <div class="editPassword">
+            <a href="/jdvop/my/mobile/address/add.php?isSubmitOrder=$!isSubmitOrder&isAwardSubmitOrder=$!isAwardSubmitOrder&islimitExchangeSubmitOrder=$!islimitExchangeSubmitOrder&islimitTimeKillOrder=$!islimitTimeKillOrder&pid=$!pid">
+                <p class="tc"> <input type="button" class="but-ok" value="新增收货地址"> </p>
+            </a>
+        </div>
+        #else
+        <div class="shopcart-none"> 
+            <i class="icon"></i>
+            <p class="title" style="padding-bottom: 20px;">您还没有属于您自己的收货地址哦！</p>
+            <div class="mod-btns webkitbox-h">
+                <p class="flex1">
+                    <a href="/jdvop/my/mobile/address/add.php?isSubmitOrder=$!isSubmitOrder" class="mod-btn" style="width: 60%; margin-left: auto; margin-right: auto;">立即添加</a>
+                </p>
+            </div>
+        </div>
+        #end
+        #if(!$isSubmitOrder) #parse('footer_nav.vsl') #end
+        <script type="text/javascript">
+            $(function() {
+                $(document).on('click', '.ico-del', function() {
+                    var url = $(this).attr('rel');
+                    mui.confirm("确定要删除该地址吗？", "温馨提示", function(v) {
+                        if (v.index == 1) {
+                            $.post(url, {}, function(result) {
+                                if (result.isOk) {
+                                    location.reload();
+                                }   
+                            }, 'json');
+                        }
+                    });
+                });
+                
+                $(".js-setDefault").on("click", function () {
+                    var defId = parseInt($(this).attr("id"));
+                    if (isNaN(defId)) {
+                        return false;
+                    }
+                    mui.confirm('确定设置此地址为默认收货地址？', '温馨提示', function (e) {
+                        if (e.index === 1) {
+                            $.post("/jdvop/my/address/asDefault.php", {"id": defId}, function (data) {
+                                if (data.isOk) {
+                                    location.reload();
+                                } else {
+                                    mui.alert(data.message, "温馨提示");
+                                }
+                            }, 'json');
+                        } 
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>

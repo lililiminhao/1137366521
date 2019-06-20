@@ -1,0 +1,195 @@
+#app {
+  color: #343434; }
+  #app .header {
+    height: 5.973rem;
+    background: url("/jdvop/images/mobile/bg@2x.png") no-repeat center;
+    background-size: cover;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 1.973rem 15px 0;
+    position: relative; }
+  #app .header-wrapper {
+    height: 75px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between; }
+    #app .header-wrapper .avatar {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      background: url("/jdvop/images/mobile/avatar.png") no-repeat center;
+      background-size: cover; }
+    #app .header-wrapper .text {
+      -webkit-box-flex: 1;
+          -ms-flex: 1;
+              flex: 1;
+      color: #fff;
+      font-size: 14px;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center;
+      padding-left: 15px; }
+    #app .header-wrapper .code {
+      width: 44px;
+      height: 75px;
+      padding-top:19px;
+      box-sizing:border-box;
+      padding-left:3px;
+      background: url("/jdvop/images/mobile/icon_biankuang@2x.png") no-repeat center;
+      background-size: 44px 44px; }
+      #app .header-wrapper .code canvas{
+      	width:38px;
+      }
+  #app .panel {
+    width: 9.2rem;
+    height: 3.533rem;
+    background: #fff;
+    border-radius: 6px;
+    position: absolute;
+    bottom: -2.133rem;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    text-align: center;
+    -webkit-box-shadow: 0 0 3px #888888;
+            box-shadow: 0 0 3px #888888; }
+    #app .panel:before {
+      content: "";
+      display: block;
+      width: 1px;
+      background: #d7d7d7;
+      height: 2.88rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+              transform: translate(-50%, -50%); }
+    #app .panel > div {
+      -webkit-box-flex: 1;
+          -ms-flex: 1;
+              flex: 1;
+      font-size: 15px;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column; }
+      #app .panel > div:nth-child(1) {
+        background: url("/jdvop/images/mobile/money-my.png") no-repeat 12px 20px;
+        background-size: 36px 36px; }
+      #app .panel > div:nth-child(2) {
+        background: url("/jdvop/images/mobile/money-frozen.png") no-repeat 12px 20px;
+        background-size: 36px 36px; }
+      #app .panel > div .btn,
+      #app .panel > div .btn2 {
+        display: block;
+        width: 56px;
+        line-height: 18px;
+        text-align: center;
+        border-radius: 9px;
+        border: 1px solid #59a1e6;
+        margin: 0 auto; }
+      #app .panel > div .btn2 {
+        border-color: #e69f59; }
+      #app .panel > div .count {
+        color: #59a1e6;
+        margin: 6px 0; }
+      #app .panel > div .count_fixed {
+        color: #e69f59;
+        margin: 6px 0; }
+  #app .f-body {
+    width: 9.2rem;
+    margin: 0 auto;
+    margin-top: 2.347rem;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    padding: 0 15px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 0 3px #888888;
+            box-shadow: 0 0 3px #888888; }
+    #app .f-body li {
+      line-height: 60px;
+      position: relative;
+      padding-left: 40px;
+      background: url("/jdvop/images/mobile/right.png") no-repeat right;
+      background-size: 9px 18px; }
+      #app .f-body li:last-child:after {
+        display: none; }
+      #app .f-body li:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 1px;
+        width: 100%;
+        background: #d7d7d7;
+        -webkit-transform: scale(1, 0.5);
+                transform: scale(1, 0.5); }
+      #app .f-body li a {
+        display: block; }
+      #app .f-body li img {
+        width: 32px;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        -webkit-transform: translateY(-50%);
+                transform: translateY(-50%); }
+  #app .code-wrapper {
+    width: 7.14rem;
+    height: 7.68rem;
+    background: url("/jdvop/images/mobile/img-erweima@3x.png") no-repeat center;
+    background-size: cover; }
+    #app .code-wrapper2 {
+    width: 7.14rem;
+    height: 7.68rem;
+    background: url("/jdvop/images/mobile/img-erweima22@3x.png") no-repeat center;
+    background-size: cover; }
+    #findR{
+    	position:absolute;
+    	bottom:0;
+    	left:0;
+    	width:50%;
+    	height:50%;
+    }
+    #app .code-wrapper .coder {
+      padding-top: 1.067rem;
+      width: 3.2rem;
+      margin: 0 auto;
+      text-align: center; }
+    #app .code-wrapper .c-w {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto;
+      
+      margin-bottom: 6px; }
+      #app .code-wrapper .c-w canvas{
+      	width: 100px;
+      }
+    #app .code-wrapper .close {
+      width: 33px;
+      height: 33px;
+      position: absolute;
+      bottom: -36px;
+      left: 50%;
+      -webkit-transform: translateX(-50%);
+              transform: translateX(-50%);
+      background: url("/jdvop/images/mobile/icon_chacha@2x.png") no-repeat center;
+      background-size: 32px 32px; }

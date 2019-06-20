@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta content="telephone=no" name="format-detection" />
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script src="/jdvop/script/mobile/zepto.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script src="/jdvop/script/mobile/swiper.min.js"></script>
+<script src="/jdvop/script/mobile/imgDelayedLoad.js"></script>
+
+<title>$!esc.html($!special.activityName)</title>
+<style>
+	 #quan_list{
+        	padding:12px 0;
+        }
+        .quan_wrapper {
+		  display: -webkit-box;
+		  display: -ms-flexbox;
+		  display: flex;
+		  overflow-x: scroll;
+		  width: 100%;
+		  padding: 0 15px; }
+		#quan_list .have{
+			color:#999;
+		}
+		#quan_list {
+		  width: 100%;
+		  overflow: hidden; }
+		
+		.quan_item {
+		  width: 120px;
+		  height: 74px;
+		  margin-right: 3px;
+		  background: url(/jdvop/images/admin/icon_baidi@2x.png) no-repeat;
+		  background-size: cover;
+		  display: -webkit-box;
+		  display: -ms-flexbox;
+		  display: flex;
+		  -webkit-box-pack: justify;
+		      -ms-flex-pack: justify;
+		          justify-content: space-between;
+		  text-align: center;
+		  -webkit-box-sizing: border-box;
+		          box-sizing: border-box;
+		  padding: 5px; }
+		  .quan_item .q_l {
+		    width: 94px;
+		    display: -webkit-box;
+		    display: -ms-flexbox;
+		    display: flex;
+		    -webkit-box-orient: vertical;
+		    -webkit-box-direction: normal;
+		        -ms-flex-direction: column;
+		            flex-direction: column;
+		    -webkit-box-pack: center;
+		        -ms-flex-pack: center;
+		            justify-content: center; }
+		    .quan_item .q_l span {
+		      font-size: 24px; }
+		  .quan_item .q_r {
+		    -webkit-box-flex: 1;
+		        -ms-flex: 1;
+		            flex: 1;
+		    color: #da525e;
+		    display: -webkit-box;
+		    display: -ms-flexbox;
+		    display: flex;
+		    -webkit-box-orient: vertical;
+		    -webkit-box-direction: normal;
+		        -ms-flex-direction: column;
+		            flex-direction: column;
+		    -webkit-box-pack: center;
+		        -ms-flex-pack: center;
+		            justify-content: center;
+		    padding-right: 5px;
+		    letter-spacing: 0;
+		    -webkit-transform:scale(.6);
+		    transform:scale(.6); }
+</style>
+<style>
+    .activity-bg{z-index:100000;position:fixed;width:100%;height:100%;left:0;right:0;bottom:0;background:#4c4c4c;overflow:hidden;}
+    .activity-bg .activity-cont{text-align:center;z-index:101;position:absolute;left:50%;top:50%;width:80%;margin-left:-40%;margin-top:-46%;border-radius:10px;background:#fff;overflow:hidden;}
+    .activity-bg .activity-cont .img{margin:15% auto 0 auto;width:50%;height:50%;}
+    .activity-bg .activity-cont .img img{width:100%;height:100%;}
+    .activity-bg .back{position:absolute;left:6%;top:6%;width:4%;}
+    .activity-bg .back img{width:100%;height:100%;}
+    .activity-bg .line-text{font-size:16px;color:#999;margin:2% 0 1% 0;}
+    .activity-bg .tip-text{color:#e5ae5c;font-size:14px;margin-bottom:10%;}
+</style>
+
+<script type="text/javascript">
+	
+    $(function() {
+        $('.js-img').each(function() {
+            /*产品图片的高度*/
+            var tHeight = $(this).width();
+            $(this).height(tHeight);
+        });
+        $('.custom-notice .js-del').click(function() {
+            $(this).parents(".custom-notice").remove();
+        });
+        
+        //轮播图:
+        var mainbanner=$(".js-main-banner");
+        for(var i=0;i<mainbanner.length;i++){
+          var selectElment = $(".js-main-banner").eq(i);
+              selectElment.addClass("js-paginationSwiper"+i);
+              mainSwiper();
+        }
+        function mainSwiper(){
+            var swiper = new Swiper($(".js-paginationSwiper"+i+".js-main-banner"), {
+                pagination: ".js-paginationSwiper"+i+" .swiper-pagination",
+                nextButton: '.swiper-button-next',
+                prevButton: '.swiper-button-prev',
+                paginationClickable: true,
+                centeredSlides: true,
+                autoplay: 2500,
+                autoplayDisableOnInteraction: false
+           });
+        }
+        $('#searchBtn').click(function(){
+            $('#form1').submit();
+        });
+        //文字公告
+        var oCon = document.getElementById("textMove");
+        if(oCon !== null) {
+            var seep = -2;
+            var _move = null;
+            function autoRoll() {
+                if (oCon.offsetLeft < -oCon.offsetWidth / 2) {
+                    oCon.style.left = 0;
+                };
+                if (oCon.offsetLeft > 0) {
+                    oCon.style.left = -oCon.offsetWidth / 2 + 'px';
+                };
+                oCon.style.left = oCon.offsetLeft + seep + 'px';
+            };
+                    clearInterval(_move);
+            _move = setInterval(autoRoll, 80);
+                    if (oCon.innerHTML.length <= 22) {
+                        clearInterval(_move);
+            } else {
+                oCon.innerHTML += oCon.innerHTML;
+            };
+        };
+        fgm.on(window, "load", function (){
+            if($('#bannnerImg').length>0){new LazyLoad("bannnerImg");} //轮播
+            if($('#aM1').length>0){new LazyLoad("aM1");} //a-module-1
+            if($('#aM2').length>0){new LazyLoad("aM2");} //a-module-2
+            if($('#aM3').length>0){new LazyLoad("aM3");} //a-module-3
+            if($('#aM4').length>0){ new LazyLoad("aM4");}//a-module-4
+            if($('#aM5').length>0){ new LazyLoad("aM5");} //a-module-5
+        });
+        
+    });
+</script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+</head>
+<body style="background: #f0f0f0; padding-bottom: 60px" userid="$!{currentUser.userId}">
+	<input type="hidden" name="offLineTime" id="offLineTime" value="$!date.format('yyyy-MM-dd HH:mm:ss',$!special.offLineTime)">
+    <input type="hidden" name="specialStatus" value="$special.status.getDescription()" />
+    <input type="hidden" name="onLineTime" id="onLineTime" value="$!date.format('yyyy-MM-dd HH:mm:ss',$!special.onLineTime)">
+    <input type="hidden" name="date" id="date" value="$date" />
+    #set($ratio = $websiteTool.getWebsite().getRatio())
+    #if($blocks && $blocks.size() > 0)
+        #foreach($block in $blocks) 
+            #if($block.bloKey == 'NOTICE_BLOCK')
+                $frontRenderTool.getNotice($block)
+            #end
+            #if($block.bloKey == 'PRODUCT_BLOCK_1' || $block.bloKey == 'PRODUCT_BLOCK_2' || 
+                $block.bloKey == 'PRODUCT_BLOCK_3' || $block.bloKey == 'PRODUCT_BLOCK_4')
+                #set($products = $productTool.findAsMap($frontRenderTool.getCustomBlocks($block)))
+                $!frontRenderTool.getProduct($block, $products, $ratio)
+            #end
+            #if($block.bloKey == 'SLIDER_BLOCK')
+                $!frontRenderTool.getSlider($block)
+            #end
+            #if($block.bloKey == 'IMAGE_BLOCK')
+                $!frontRenderTool.getImage($block)
+            #end
+            #if($block.bloKey == 'NAVIGATION_BLOCK')
+                $!frontRenderTool.getNavigation($block)
+            #end
+            #if($block.bloKey == 'PRODUCT_SEARCH_BLOCK')
+                $!frontRenderTool.getSearchBox($block)
+            #end
+        #end
+    #end
+    <div class="activity-bg js-activityBg">
+		<div class="activity-cont">
+			<a href="/jdvop/index.php">
+				<i class="back">
+					<img src="images/mobile/activity-back.png">
+				</i>
+			</a>
+			<div class="img">
+				<img src="images/mobile/activity-bg.png">
+			</div>
+			#set($specialStatus = $special.status.getDescription())
+			
+			#if(!$special.offLineTime || !$specialStatus || $specialStatus == "未上线")
+				<div class="line-text">活动暂未上线，感谢你的关注！</div>
+			#else
+				<div class="line-text">活动已下线，感谢你的关注！</div>
+			#end
+			
+			<div class="tip-text">更多活动即将来袭，敬请期待</div>
+		</div>
+	</div>
+    <div class="footer-nav js-footerNav">
+	    <div class="list flex1">
+	         <a href="/jdvop/index.php">
+            	<img src="/jdvop/images/mobile/nav/icon-index.png" class="js-icon-com"/>
+             	<img src="/jdvop/images/mobile/nav/icon-index-curr.png" class="js-icon-com-curr"/>
+         		商城
+	         </a>
+	    </div>
+	    <div class="list flex1 js-cate-curr">
+			<a href="/jdvop/mobile/product/category.php">
+	        <img src="/jdvop/images/mobile/nav/icon-classify.png"  class="js-icon-com"/>
+	        <img src="/jdvop/images/mobile/nav/icon-classify-curr.png" class="js-icon-com-curr"/>分类
+			</a>
+	    </div>
+	    <div class="list flex1 js-shoppingCard-curr">
+	        <a href="/jdvop/shoppingCart/myCart.php">
+	        <img src="/jdvop/images/mobile/nav/icon-card.png"  class="js-icon-com"/>
+	        <img src="/jdvop/images/mobile/nav/icon-card-curr.png" class="js-icon-com-curr"/>购物车</a>
+	    </div>
+	    <div class="list flex1 js-userCenter-curr">
+	        <a href="/jdvop/my/mobile/userCenter.php">
+	        <img src="/jdvop/images/mobile/nav/icon-my.png" class="js-icon-com"/>
+	        <img src="/jdvop/images/mobile/nav/icon-my-curr.png" class="js-icon-com-curr"/>我的</a>
+	    </div>
+	</div>
+	<script type="text/javascript">
+		
+	
+		 //判断过期时间在当前时间之后  则显示已过期
+	    //下线时间
+	    var offLineTime =Date.parse($("#offLineTime").val().replace(/-/g, "/"));
+	    //上线时间
+	    var onLineTime = Date.parse($("#onLineTime").val().replace(/-/g, "/"));
+	    //当前时间
+	    var sysD = Date.parse($("#date").val().replace(/-/g, "/"));
+	    //专题活动状态
+	    var special = $('input[name="specialStatus"]').val();
+	    //判断上线时间和下线时间为空
+	    if(!onLineTime || !offLineTime){
+	    	$(".js-activityBg").show();//未上线
+	    }else{
+			//判断该活动有没有上线   如果没有上线 则显示的是未上线
+	        if(offLineTime < sysD ){//下线时间小于当前时间 则弹出下线提示
+	           $(".js-activityBg").show();
+	        }else{//上线
+	           $(".js-activityBg").hide();
+	        }
+	        if(onLineTime > sysD){ //如果上线时间 早于当前时间 
+	        	$(".js-activityBg").show();//未上线
+	        }
+	    }
+	</script>  
+	
+	<script >
+		$('.quan_item').each(function(){
+			var tergrt = $(this).find('.q_l span');
+			var htmlv = tergrt.text();
+			tergrt.html(parseFloat(htmlv));
+			var _self = $(this);
+			$(this).on('click',function(){
+				var userId = $('body').eq(0).attr('userid');
+	    		if(!userId){
+	    			location.href = '/jdvop/my/mobile/userCenter.php';
+	    			return;
+	    		}
+	    		var isHave = _self.find('.q_r').hasClass('have');
+	    		if(isHave){//如果已领取
+	    			return;
+	    		}
+	    		var couponId = $(this).attr('couponid');
+	    		$.ajax({
+	    			url:'/jdvop/mobile/receiveCoupon.php',
+	    			type:'get',
+	    			data:{
+	    				userId:userId,
+	    				couponId:couponId
+	    			},
+	    			success:function(res){
+	    				res = JSON.parse(res);
+	    				mui.alert(res.msg,'温馨提示');
+	    				if(res.code == 1){
+	    					location.reload();
+	    				}
+	    			}
+	    		})
+			})
+		});
+	</script>
+</body>
+</html>

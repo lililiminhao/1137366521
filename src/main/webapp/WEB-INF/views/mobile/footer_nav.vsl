@@ -1,0 +1,46 @@
+<div class="footer-nav js-footerNav">
+    <div class="list flex1">
+         <a href="/jdvop/index.php">
+             <img src="/jdvop/images/mobile/nav/icon-index.png" class="icon-index"/>
+				商城
+         </a>
+    </div>
+    <div class="list flex1 js-cate-curr">
+        <a href="/jdvop/mobile/product/category.php">
+            <img src="/jdvop/images/mobile/nav/icon-classify.png"  class="js-icon-com"/>
+            <img src="/jdvop/images/mobile/nav/icon-classify-curr.png" class="js-icon-com-curr"/>分类
+		</a>
+    </div>
+    <div class="list flex1 js-shoppingCard-curr">
+        <a href="/jdvop/shoppingCart/myCart.php">
+            <img src="/jdvop/images/mobile/nav/icon-card.png"  class="js-icon-com"/>
+            <img src="/jdvop/images/mobile/nav/icon-card-curr.png" class="js-icon-com-curr"/>购物车
+		</a>
+    </div>
+    <div class="list flex1 js-userCenter-curr">
+        <a href="/jdvop/my/mobile/userCenter.php">
+            <img src="/jdvop/images/mobile/nav/icon-my.png" class="js-icon-com"/>
+            <img src="/jdvop/images/mobile/nav/icon-my-curr.png" class="js-icon-com-curr"/>我的
+		</a>
+    </div>
+</div>
+<script  type="text/javascript">
+(function(){ //导航状态
+    var loca = window.location.href.replace("http://", "");
+    var currentURL = loca.substring(loca.indexOf("/"), loca.length);
+    if(currentURL.indexOf("/jdvop/my/mobile/userCenter.php") !== -1) {
+        $('.js-userCenter-curr').addClass('curr');
+    } else if(currentURL.indexOf("/jdvop/shoppingCart/myCart.php") !== -1) {
+        $('.js-shoppingCard-curr').addClass('curr');
+    } else if(currentURL.indexOf("/jdvop/mobile/product/category.php") !== -1) {
+        $('.js-cate-curr').addClass('curr');
+    }
+    $('.js-footerNav .list a').each(function(){
+        var k = this.getAttribute('href');
+        if (k.indexOf(currentURL) !== -1){
+            this.parentNode.className+=" curr";
+            return false;
+        }
+    });
+})();
+</script>

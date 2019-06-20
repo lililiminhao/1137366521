@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">    
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta name="keywords" content=""/>
+<meta name="Description" content="" />
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link rel="stylesheet" type="text/css" href="/theme/jdvop/css/index.css"/>
+<!--<link rel="stylesheet" type="text/css" href="/theme/jdvop/css/carousel.css"/>-->
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<script src="/jdvop/script/jquery-1.8.3.min.js"></script>
+<link rel="stylesheet" href="/jdvop/css/admin/ui-dialog.css"/>
+<script src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script src="/jdvop/script/admin/main.js"></script>
+<script src="/theme/jdvop/script/jquery.flexslider-min.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type="text/javascript" src="/theme/jdvop/script/templet-tool.js"></script>
+<title></title>
+<script type="text/javascript">
+    $(function() {
+        //轮播banner
+        $('.j-top-slider').flexslider({
+            animation: "fade",
+            slideshowSpeed: 5000,
+            directionNav: false,
+            pauseOnAction: false
+        });
+        $(document).on("click", "a.js-submit", function(e) {
+            e.preventDefault();
+            var _from = $("#dataForm");
+            $.post(_from.attr("action"), _from.serialize(), function(data) {
+                if (data.isOk) {
+                    location = "/jdvop/admin/website/skeleton.php";
+                } else {
+                    top.artAlert("温馨提示", data.message, 'error');
+                }
+            }, "json");
+        });
+
+    });
+</script>
+</head>
+<body>
+    <!--主导航-->
+    <div class="mainNav borderGreen clearfix">
+        <a href="javascript:history.back(-1)"><p class="right btn-grey2 fr">返回</p></a>
+        <a href="#" class="js-submit"><p class="right btn-green2 fr">保存</p></a>
+        <span class="text">模板数据配置</span>
+    </div>
+    <div id="iframePage">
+        <div class="iframe_content">
+            <div class="automatic-box clearfix highlight_e4e4e4">
+                <div class="topTitle">
+                    <span>数据配置</span>
+                </div>
+                <form id="dataForm" action="/jdvop/admin/website/skeleton/blockAdv.php"  method="POST">
+                    <input type="hidden" name="type" value="$block.type"/>
+                    <input type="hidden" name="key" value="$block.key"/>
+                    <input type="hidden" name="index" value="#if($index)$index#{else}0#{end}"/>
+                    <div id="js-form-data">
+                        <!--image-->
+                        #if($imageMap && !$imageMap.isEmpty())
+                            #foreach($entry in $imageMap.entrySet())
+                                #foreach($img in $entry.value)
+                                    <input type="hidden" name="image[]" value="$entry.key#$!img.url" delete="$entry.key"/>
+                                    <input type="hidden" name="imageLink[]" value="$entry.key#$!img.linkTo" delete="$entry.key"/>
+                                #end
+                            #end
+                        #end
+                        <!--slider-->
+                        #if($sliderMap && !$sliderMap.isEmpty())
+                            #foreach($entry in $sliderMap.entrySet())
+                                #foreach($slider in $entry.value)
+                                    #foreach($img in $slider.entries)
+                                    <input type="hidden" name="image[]" value="$entry.key#$!img.image" delete="$entry.key"/>
+                                    <input type="hidden" name="imageLink[]" value="$entry.key#$!img.linkTo" delete="$entry.key"/>
+                                    #end
+                                #end
+                            #end
+                        #end
+                    </div>
+                    <div id="js-text-data">
+                        #if($textMap && !$textMap.isEmpty())
+                            #foreach($entry in $textMap.entrySet())
+                                #foreach($text in $entry.value)
+                                <input type="hidden" name="text[]" value="$entry.key#$!text.text" delete="$entry.key"/>
+                                <input type="hidden" name="textLink[]" value="$entry.key#$!text.linkTo" delete="$entry.key"/>
+                                #end
+                            #end
+                        #end
+                    </div>
+                    <div id="js-product-data">
+                        #if($productMap && !$productMap.isEmpty())
+                            #foreach($entry in $productMap.entrySet())
+                                #foreach($product in $entry.value)
+                                    #foreach($id in $product.value)
+                                    <input type='hidden' name='entry[]' value='$entry.key#$id' delete='$entry.key'/>
+                                    #end
+                                #end
+                            #end
+                        #end
+                    </div>
+                    <div id="js-booklet-data">
+                        #if($bookletMap && !$bookletMap.isEmpty())
+                            #foreach($entry in $bookletMap.entrySet())
+                                #foreach($booklet in $entry.value)
+                                    #foreach($id in $booklet.value)
+                                    <input type='hidden' name='entry[]' value='$entry.key#$id' delete='$entry.key'/>
+                                    #end
+                                #end
+                            #end
+                        #end    
+                    </div>
+                    <div class="empty_box">
+                        #if($flag && $flag == 'true')
+                            #if($type == 'header')
+                                $!v2RenderTool.getVelocity($skeleton, $type, $key, 0, $md)
+                            #else
+                                $!v2RenderTool.getVelocity($skeleton, $type, $key, $index, $md)
+                            #end
+                        #else
+                            $block.previewTemplate
+                        #end
+                    </div>
+                    <div id="append-data" style="position: absolute;  background: #f7f7f7; border:1px solid #ddd;  z-index: 99999;"></div>
+                    <input style="display: none;" type='file' name='filedData' id='image_input' multiple/>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

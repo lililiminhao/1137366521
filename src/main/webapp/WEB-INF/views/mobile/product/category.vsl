@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="x5-fullscreen" content="true"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script  type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script  type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>		
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+</head>
+<body>
+<!--    <header class="bar-nav">
+        <a href="javascript:history.go(-1)" class="btn btn-back fl"></a>
+        <h1 class="title">商品分类 </h1>
+    </header>-->
+    <div class="search-wrap" style="position: absolute;">
+        <form id="form1" action="/jdvop/mobile/products.php" method="GET">
+            <div class="search-frm" style=" right: 50px;">
+                <input type="search" class="search" name="k" id="search" autocomplete="off" placeholder="搜索全部商品"/>
+                <a class="clear hide js-clearSearch" href="javascript:;" >x</a>
+            </div>
+            <div class="btn-wrap">
+                <input type="submit" value="搜索" class="hide"/>
+                <a href="javascript:;" id="searchBtn" class=" hd_search_btn_blue">搜索</a>
+            </div>
+        </form>
+    </div>
+    <div class="classroom" style="top:45px;">
+        <div class="side-bar-wrap">
+            <div class="side-bar js-sideBar">
+                #set($websiteProductTag = $website.getExt().get('ENABLE_WEBSITE_PRODUCTTAG'))
+                #if($websiteProductTag && $websiteProductTag == 'true')
+                <input type="hidden" name="url" value="/jdvop/mobile/category/definedCates.php"/>
+                <ul class="swiper-wrapper">
+                    #set($rootCates = $websiteProductTagTool.getRootTag())
+                    #foreach($root in $rootCates)
+                    #if($foreach.count == 1 && $root.id > 0)
+                        #set($childCates = $websiteProductTagTool.getChilds($root.id))
+                    #end
+                    <li class="swiper-slide #if($foreach.count == 1) curr #{end}" rel="$!root.id">
+                        <a href="#">$!root.name</a>
+                    </li>
+                    #end
+                </ul>
+                #else
+                <input type="hidden" name="url" value="/jdvop/mobile/category/sysCates.php"/>
+                <ul class="swiper-wrapper">
+                    #foreach($root in $rootCates)
+                    #if($foreach.count == 1 && $root.id > 0)
+                        #set($childCates = $productCateTool.getAllChilds($root.id))
+                    #end
+                    <li class="swiper-slide #if($foreach.count == 1) curr #{end}" rel="$!root.id">
+                        <a href="#">$!root.name</a>
+                    </li>
+                    #end
+                </ul>
+                #end
+            </div>
+        </div>
+        <div class="side-main">
+            <ul class="category-list ui-justify">
+                #foreach($cate in  $childCates)
+                    #if($websiteProductTag == true)
+                        <li><a href="/jdvop/mobile/products.php?wpt=$!cate.id">$!cate.name</a></li>
+                    #else
+                        <li><a href="/jdvop/mobile/products.php?c=$!cate.id">$!cate.name</a></li>
+                    #end
+                #end
+            </ul>
+        </div>
+    </div>
+    #parse('footer_nav.vsl')
+    <script src="/jdvop/script/mobile/swiper.min.js"></script>
+    <script type="text/javascript">
+        var mySwiper1 = new Swiper('.js-sideBar', {
+            freeMode: true,
+            slidesPerView: 'auto',
+            direction: 'vertical'
+        });
+        
+        $('#searchBtn').click(function(){
+            $('#form1').submit();
+        });
+        
+        $(document).on('touchstart',".js-sideBar li",function(){
+            var thiz=$(this);
+            var index_=thiz.index();
+            thiz.addClass("curr").siblings().removeClass("curr");
+            mySwiper1.slideTo(index_-3, 1000, false);
+            var cateId = thiz.attr('rel');
+            var url    = $('input[name=url]').val();
+            var parameter = "c";
+            if(url === '/jdvop/mobile/category/definedCates.php') {
+                parameter = "wpt";
+            }  
+            $.get(url, {cateId: cateId}, function(result) {
+                var data = eval('(' + result + ')');
+                if (typeof data === 'object') {
+                    var html = '';
+                    if(typeof(data.length) !== 'undefined' && data.length > 0) {
+                        for (i = 0; i < data.length; ++i)
+                        {
+                            html += '<li>';
+                            html += '<a href="/jdvop/mobile/products.php?'+ parameter + '=' + data[i]['id'] + '">';
+                            html += data[i]['name'];
+                            html += '</a>';
+                            html += '</li>';
+                        }
+                        $('ul.category-list').html(html);
+                    } else {
+                        $('ul.category-list').html(html);
+                    }
+                }
+            }, 'application/json');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type="text/javascript" src='/jdvop/script/admin/my97/WdatePicker.js'></script>
+<script type='text/javascript' src='/jdvop/script/main.js'></script>
+<link rel="stylesheet" href="/jdvop/css/admin/ui-dialog.css"/>
+<script src="/jdvop/script/admin/dialog-min.js"></script>
+<script src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>众城付支付单对账单导出</title>
+<script>
+    function checkTime(){
+        var time = document.getElementById("time").value;
+        if(time == ""  ){
+          top.artAlert('温馨提示', '支付日期不能为空！', 'error');
+          return false;
+        }
+       document.getElementById("formid").submit();
+     }  
+
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav  borderGreen clearfix">
+    <span class="text">众城付对账单导出</span>
+</div>
+<div id="iframePage">
+    <div class="tab-column">
+        <div class="con">
+            <ul class="clearfix">
+                <li><a href="/jdvop/admin/statistics/smkPaymentExport.php" title="众城付支付对账">杭州市民卡支付对账单导出</a></li>
+                <li class="curr">众城付支付对账单导出</li>
+            </ul>
+        </div>
+    </div>
+   
+    <div class="automatic-box clearfix highlight_e4e4e4 pt30 pb30" style="border-top: none; ">
+        <p class="pl30 fs16p pt16">
+           获取众城付的订单支付对账信息，该信息由众城付系统提供。
+        </p>
+        <p class="pl30 fs16p pt16">
+            因微信第三方需要对账，不能导出今天的支付信息。如需导出今天的支付信息，需要明天上午10点钟才能导出。
+        </p>
+        <form id="formid" action="/jdvop/admin/statistics/tsmPaymentExport.php" method="POST">
+            <p class ="pl30 fs16p pt30">
+                支付日期： <input type="text" id="time" name="st" class="common w140" onfocus="WdatePicker({readOnly:true, skin:'blueFresh',dateFmt:'yyyy-MM-dd',maxDate:'$!{downloadTime}'});"  placeholder="支付日期"/>
+                <input style="border:0;" type="button" onclick = "checkTime();" class="btn-blue2" value="众城付支付对账单下载" /> 
+            </p>
+        </form>
+    </div>
+</div>
+</body>
+</html>

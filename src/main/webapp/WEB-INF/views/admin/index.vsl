@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">    
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta name="keywords" content="$!esc.html($websiteTool.getWebsite().getName())-管理平台"/>
+<meta name="Description" content="$!esc.html($websiteTool.getWebsite().getName())-管理平台" />
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/script/admin/jscrollpane/jquery.jscrollpane.css' />
+<link   rel="stylesheet" type='text/css' href="/jdvop/css/admin/ui-dialog.css"/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/jscrollpane/jquery.mousewheel.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/jscrollpane/jquery.jscrollpane.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-min.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/dialog-plus-min.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src="/jdvop/script/admin/alert.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/my97/WdatePicker.js"></script>
+<!--[if lt IE 9]><script type="text/javascript" src="script/html5.js"></script><![endif]-->
+<title>$!esc.html($websiteTool.getWebsite().getName())-管理平台</title>
+<script type="text/javascript">
+window.onresize=main_obj.page_init;
+$(function() {
+    var MENU = [
+        #if($shiro.isIncludePermitted('system:edit'))
+        {
+            name    : '系统管理',
+            cls     : '',
+            clsI    : 'ico xitong',
+            sub     : [
+,{
+    name    : '角色名称',
+    href    : '/jdvop/admin/role/list.php'
+},
+
+/* {
+    name    : '新增角色名称',
+    href    : '/jdvop/admin/website/role/toAdd.php'
+}, */
+                {
+                    name    : '网站信息',
+                    href    : '/jdvop/admin/website.php'
+                }
+                #if($admin.loginName == "administrator" || $admin.loginName == "admin")
+                ,{
+                    name    : '地址管理',
+                    href    : '/jdvop/admin/geoRegion.php'
+                }
+                
+                #end
+            ]
+        },
+        #end
+        #if($shiro.isIncludePermitted('account:view','provide:view','provide:shipment','fenxiao_user:view','fenxiao_rank:view'))
+        {
+            name    : '账号管理',
+            cls     : '',
+            clsI    : 'ico zhanghao',
+            sub     : [
+            #if($shiro.isPermitted('account:view'))
+                {
+                    name    : '管理员列表',
+                    href    : '/jdvop/admin/website/administrators.php?isProvider=false'
+                },
+                #end
+                #if($shiro.isPermitted('provide:view'))
+                    {
+                        name    : '供应商管理',
+                        href    : '/jdvop/admin/website/provider.php'
+                    },
+                #end
+                #if($shiro.isPermitted('provide:shipment'))
+                    {
+                        name    : '快递价格模板配置',
+                        href    : '/jdvop/admin/shipmentFeeSettingList.php'
+                    },
+                #end
+                 #if($shiro.isPermitted('fenxiao_user:view'))
+                {
+                    	name:'分销商管理',
+                        href:'/jdvop/admin/website/list_fenxiao.php'
+                    },
+                      #end
+                    #if(!$shiro.isPermitted('fenxiao_user:view') && $shiro.isPermitted('fenxiao_rank:view'))
+                 {
+                    	name:'分销等级',
+                        href:'/jdvop/admin/website/list_fenxiao_rank.php'
+                  },
+                #end
+            ]
+        },
+        #end
+##         #if($shiro.isIncludePermitted('provide:view','shipment_fee:edit'))
+##        {
+##            name    : '供应商管理',
+##            cls     : '',
+##            clsI    : 'ico zhanghao',
+##            sub     :[
+##                #if($shiro.isPermitted('provide:view'))
+##                {
+##                    name    : '供应商列表',
+##                    href    : '/jdvop/admin/website/provider.php'
+##                },
+##                #end
+##                #if($shiro.isPermitted('provide:shipment'))
+##                {
+##                    name    : '快递价格模板配置',
+##                    href    : '/jdvop/admin/shipmentFeeSettingList.php'
+##                }
+##                #end
+##            ]
+##        },
+##        #end
+        #if($shiro.isIncludePermitted('enterprise_list:view','enterprise_employee:view', 'enterprise_exclusive:view'))
+        {
+            name    : '企业管理',
+            cls     : '',
+            clsI    : 'ico zhanghao',
+            sub     :[
+                #if($shiro.isPermitted('enterprise_list:view'))
+                {
+                    name    : '企业列表',
+                    href    : '/jdvop/admin/enterprise.php'
+                },
+                #end
+                #if($shiro.isPermitted('enterprise_employee:view'))
+                {
+                    name    : '员工列表',
+                    href    : '/jdvop/admin/enterpriseEmployee.php'
+                },
+                #end
+                #if($shiro.isPermitted('enterprise_exclusive:view'))
+                {
+                    name    : '专享池列表',
+                    href    : '/jdvop/admin/enterpriseExclusiveProductPool.php'
+                },
+                #end
+            ]
+        },
+        #end
+        
+        #if($shiro.isIncludePermitted('commen_activity:view','enterprise_activity:view','mobile_template:edit', 'fenxiao_model:edit', 'enterprise_model:edit', 'custom_navigation:edit'))
+        {
+            name    : '页面管理',
+            cls     : '',
+            clsI    : 'ico temp',
+            sub     : [
+                 #if($shiro.isPermitted('commen_activity:view'))
+                {
+                    name   : '普通专题活动',
+                    href   : '/jdvop/admin/specialList.php?type=commonSpecial'
+                },
+                #end
+                 #if(!$shiro.isPermitted('commen_activity:view') && $shiro.isPermitted('enterprise_activity:view'))
+                {
+                    name   : '企业专题活动',
+                    href   : '/jdvop/admin/specialList.php?type=enterpriseSpecial'
+                },
+                 #end
+                #if($shiro.isPermitted('index_model:edit'))
+                {
+                    name   : '首页模板配置',
+                    href   : '/jdvop/admin/custom.php'
+                },
+                #end
+                #if($shiro.isPermitted('fenxiao_model:edit'))
+                {
+                    name   : '分销模板配置',
+                    href   : '/jdvop/admin/fenxiaotemplate.php'
+                },
+                #end
+                #if($shiro.isPermitted('enterprise_model:edit'))
+                {
+                    name   : '企业专区配置',
+                    href   : '/jdvop/admin/customEnterprise.php'
+                }
+                #end
+            ]
+        },
+        #end
+         #if($shiro.isIncludePermitted('zdy_brand:view','zdy_brand:create'))
+        {
+            name    : '自定义分类管理',
+            cls     : '',
+            clsI    : 'ico customFenlei',
+            sub     : [
+                #if($shiro.isPermitted('zdy_brand:view'))
+                {
+                    name   : '自定义分类列表',
+                    href   : '/jdvop/admin/userDefinedCates.php'
+                },
+                #end
+                #if($shiro.isPermitted('zdy_brand:create'))
+                {
+                    name   : '自定义分类添加',
+                    href   : '/jdvop/admin/userDefinedCate/add.php'
+                }
+                #end
+            ]
+        },
+        #end
+        #if($shiro.isIncludePermitted('fenxiao_product:view','product:create','product:view', 'stock:view','custom_cate:edit','brand:view'))
+        {
+            name    : '产品管理',
+            cls     : '',
+            clsI    : 'ico porduct',
+            sub     : [
+                #if($shiro.isPermitted('product:view'))
+                {
+                    name   : '产品列表',
+                    href   : '/jdvop/admin/products.php'
+                },
+                #end
+                #if($shiro.isPermitted('product:create'))
+                {
+                    name   : '发布新产品',
+                    href   : '/jdvop/admin/product/add.php'
+                },
+                #end
+                #if($shiro.isPermitted('stock:view'))
+                {
+                    name   : '库存维护',
+                    href   : '/jdvop/admin/product/storages.php'
+                },
+                #end
+                 #if($shiro.isPermitted('fenxiao_product:view'))
+                {
+                    name:'分销产品',
+                    href:'/jdvop/admin/product/fenxiao_list.php'
+                },
+                #end
+                #if($shiro.isPermitted('brand:view'))
+                    {
+                        name   : '品牌管理',
+                        href   : '/jdvop/admin/brands.php'
+                    },
+                #end
+                {
+                    name   : '系统分类',
+                    href   : '/jdvop/admin/productCates.php'
+                },
+                
+            ]
+        },
+        #end
+        #if($shiro.isIncludePermitted('order:view', 'system_order:view','order_after_sale:view','system_order_after_sale:view','order:shipment','statistics:view','apply_order_exception:view','apply_order_transaction:view'))
+        {
+            name    : '订单管理',
+            cls     : '',
+            clsI    : 'ico order',
+            sub     : [
+                #if($shiro.isPermitted('order:view'))
+                {
+                    name   : '订单列表',
+                    href   : '/jdvop/admin/orders.php'
+                },
+                #end
+                #if($shiro.isPermitted('system_order:view'))
+                {
+                    name   : '系统订单',
+                    href   : '/jdvop/admin/order/systemOrders.php'
+                },
+                #end
+                #if($shiro.isPermitted('order_after_sale:view'))
+                {
+                    name   : '售后订单',
+                    href   : '/jdvop/admin/order/niffers.php?isSystem=false'
+                },
+                #end
+                 #if(!$shiro.isPermitted('order_after_sale:view') && $shiro.isPermitted('system_order_after_sale:view'))
+                {
+                    name   : '系统售后订单',
+                    href   : '/jdvop/admin/order/niffers.php?isSystem=true&ownerType=$!type'
+                },
+                #end
+                #if($shiro.isPermitted('apply_order_exception:view'))
+                {
+                    name    : '支付异常订单',
+                    href    : '/jdvop/admin/order/fail/list.php'
+                },
+                #end
+				#if($shiro.isPermitted('apply_order_transaction:view'))
+                {
+                    name    : '交易处理中订单',
+                    href    : '/jdvop/admin/order/transactionDispose/list.php'
+                },
+                #end
+                #if($shiro.isPermitted('order:shipment'))
+                {
+                    name    : '批量发货',
+                    href    : '/jdvop/admin/order/toBatchShipment.php'
+                },
+                {
+                    name    : '订单结算',
+                    href    : '/jdvop/admin/order/toOrderSettleLog.php'
+                },
+                #end
+                #if($shiro.isPermitted('statistics:view'))
+                {
+                    name   : '分销商提现',
+                    href:'/jdvop/admin/website/admin_tixian_money.php'
+                },
+                #end
+            ]
+        },
+        #end
+        #if($shiro.isIncludePermitted('duizhang:refund_view','yongjin:smk_view','statistics:view','duizhang:pay_view','yongjin:fenxiao_view'))
+        {
+            name    : '数据统计',
+            cls     : '',
+            clsI    : 'ico tongji',
+            sub     : [
+                #if($shiro.isPermitted('duizhang:pay_view'))
+                {
+                    name   : '对账日志',
+                    href    : '/jdvop/admin/statistics/payment.php?timeType=payTime'
+                },
+                #end
+                #if(!$shiro.isPermitted('duizhang:pay_view') && $shiro.isPermitted('duizhang:refund_view'))
+                {
+                    name   : '退款对账',
+                    href    : '/jdvop/admin/statistics/return.php'
+                },
+                #end
+                #if($shiro.isPermitted('duizhang:pay_export'))
+                {
+                    name   : '对账单导出',
+                    href    : '/jdvop/admin/statistics/smkPaymentExport.php'
+                },
+                #end
+                #if($shiro.isPermitted('order:export'))
+                {
+                    name   : '订单导出',
+                    href    : '/jdvop/admin/statistics/report.php'
+                },
+                #end
+                #if($shiro.isPermitted('yongjin:fenxiao_view'))
+                {
+                    name   : '佣金日志',
+                    href:'/jdvop/admin/website/admin_fenxiao_money.php'
+                },
+                #end
+                  #if(!$shiro.isIncludePermitted('yongjin:fenxiao_view') && $shiro.isPermitted('yongjin:smk_view'))
+                {
+                    name   : '市民卡佣金',
+                    href:'/jdvop/admin/website/admin_smk_money.php'
+                },
+                #end
+            ]
+        }
+        #end
+    ];
+    var html    = '<ul>';
+##    #if($shiro.isPermitted('market:view'))
+    #if($shiro.isIncludePermitted('coupon:view','voucher:view','market:view'))
+    MENU.push({
+        name:'营销管理',
+        cls     : '',
+        clsI    : 'ico tongji',
+        sub:[
+             #if($shiro.isPermitted('coupon:view'))
+                {
+                    name:'优惠券列表',
+                    href:'/jdvop/admin/statistics/couponList.php'
+                },
+             #end
+             #if($shiro.isPermitted('voucher:view'))
+	        {
+	            name:' 提货券列表',
+	            href:'/jdvop/admin/enterpriseEmployeeVoucher.php'
+	        }
+             #end
+        ]
+    })
+    #end
+    for(i = 0; i < MENU.length; ++ i)
+    {
+        var m   = MENU[i];
+        if (typeof m === 'object')
+        {
+            if (m.sub !== undefined && typeof m.sub == 'object' && m.sub.length > 0)
+            {
+                if(i == 0) {
+                    html    += '<li class="level-1 curr">';
+                } else {
+                    html    += '<li class="level-1">';
+                }
+                html    += '<p class="til js-title '+ m.cls +'">';
+                html    += '<i class=" '+ m.clsI +'"></i>';
+                html    += m.name + '<span class="arrow"></span></p>';
+                if(i == 0) {
+                    html    += '<ol>';
+                } else {
+                    html    += '<ol style="display: none;">';
+                }
+                for (ii = 0; ii < m.sub.length; ++ ii)
+                {
+                    var ob  = m.sub[ii];
+                    if (ob === undefined)
+                    {
+                        continue;
+                    }
+                    if (ob.href !== undefined)
+                    {
+                        html    += '<li class="level-2"><p class="ti2 js-title">';
+                        html    += '<a href="'+ m.sub[ii].href +'" target="iframe"><i class="ico-1"></i>' + m.sub[ii].name + '</a></p></li>';
+                    } else {
+                        html    += '<li class="level-2"><p class="ti2 js-title"><i class="ico-1"></i>' + ob.name + '</p>';
+                        html    += '<ol style="display:none;">';
+                        for (iii = 0; iii < ob.sub.length; ++ iii)
+                        {
+                            if (ob.sub[iii] === undefined)
+                            {
+                                continue;
+                            }
+                            html    += '<li class="level-3"><a href="'+ ob.sub[iii].href +'" target="iframe">'+ ob.sub[iii].name +'</a></li>';
+                        }
+                        html    += '</ol>';
+                    }
+                }
+                html    += '</ol></li>';
+            }
+        }
+    }
+    html    += '</ul>';
+    $('#menuCotent').html(html);
+    $('.level-2').each(function(){
+		var _self = $(this);
+		$(this).on('mouseover',function(e){
+			var children = _self.find('ol');
+			if(children.length){
+				_self.find('ol a').css('color','#666');
+			}
+		});
+		
+	})
+    main_obj.page_init();
+    $(document).on('click', '.js-up-pwd', function(e){
+        e.preventDefault();
+        top.dialog({
+            width: 400,
+            title: '修改密码',
+            content:'<div class="con">'
+                    +   '<table>'
+                    +   '<colgroup>'
+                    +   '<col style="width: 100px;">'
+                    +   '<col />'
+                    +   '</colgroup>'
+                    +   '<tr> <td class="tr">原始密码：</td><td><input type="password" name="oldPassword" class="common w180"/></td></tr>'
+                    +   '<tr> <td class="tr">新密码：</td><td><input type="password" name="newPwd" class="common w180"/></td></tr>'
+                    +   '<tr> <td class="tr">确认新密码：</td><td><input type="password" name="confimPwd" class="common w180"/></td></tr>'
+                    +   '</table>'
+                    +'</div>',
+            okValue: '确定',
+            ok: function (){
+                var oldPassword = top.$('input[name="oldPassword"]').val();
+                if(oldPassword == '' || oldPassword.length < 6 || oldPassword.length > 16) {
+                    top.artAlert('温馨提示', '请输入正确的原始密码', 'error');
+                    return false;
+                }
+                var newPwd = top.$('input[name="newPwd"]').val();
+                if(newPwd == '' || newPwd.length < 6 || newPwd.length > 16) {
+                    top.artAlert('温馨提示', '请输入正确的新密码', 'error');
+                    return false;
+                }
+                var confimPwd = top.$('input[name="confimPwd"]').val();
+                $.post('/jdvop/admin/account/editPwd.php', {'oldPwd' : oldPassword, 'newPwd' : newPwd, 'confimPwd' : confimPwd}, function(data){
+                    if (data.isOk) {
+                        top.artAlert('温馨提示','密码修改成功', 'ok');
+                        return;
+                    } else {
+                        top.artAlert('温馨提示', data.message, 'error');
+                        return;
+                    }
+                }, 'json');
+            },
+            cancelValue: '取消',
+            cancel: function (){
+            }
+        }).showModal();
+    });
+ });
+</script>
+</head>
+<body>
+<div class="a-layout-left js-aLayoutLeft">
+    <div class="logo">
+        <p class="img">
+            <img src="$configTool.getImageHost()$!websiteTool.getWebsite().getExt().get('ADMIN_LOGO')" width="160" height="60" alt="$!esc.html($websiteTool.getWebsite().getName())-管理平台"/>
+        </p>
+    </div>
+    <div class="menuCotent" id="menuCotent"> </div>
+</div>
+<div class="a-layout-right" id="layoutRight">
+    <div class="tab-menu">
+        <div class="system-operation">
+            <div class="selectbox js-selectbox1" onselectstart="return false">
+                <p class="s-inp">系统设置</p>
+                <dl class="s-option2 js-sOption">
+                    <dd><a href="" class="js-up-pwd" title="修改密码"><i class="ico key2"></i>修改密码</a></dd>
+                    <dd><a href="/jdvop/admin/logout.php" title="退出系统"><i class="ico key3"></i>退出系统</a></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="a-iframe">
+        #if($admin.isProvider())
+            <iframe name="iframe" src="/jdvop/admin/products.php"  frameborder="no" scrolling="auto" width="100%" height="auto" allowtransparency="true"></iframe>
+        #else
+            <iframe name="iframe" src="/jdvop/admin/website.php"  frameborder="no" scrolling="auto" width="100%" height="auto" allowtransparency="true"></iframe>
+        #end
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta content="telephone=no" name="format-detection" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css" />
+    <link rel="stylesheet" href="/jdvop/css/mobile/submit.css" />
+    <link rel="stylesheet" href="/jdvop/css/mobile/main.css?v=2015" />
+    <script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+    <script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+    <script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>
+    <script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+    <title>$!esc.html($websiteTool.getWebsite().getName())</title>
+</head>
+<script>
+    #if ($isEnterpriseZoneProduct && $thisProductTotalVoucher > 0)
+        var isPopAlert = true;
+    #else
+    var isPopAlert = false;
+    #end
+</script>
+
+<body class="pm56">
+    #if($address)
+    <article class="clearfix address" id="to_select_address">
+        <div class="name clearfix">
+            <p class="flex1" style="line-height: 26px;"><img src="/jdvop/images/mobile/ico_name.png" class="ico_name fl" />$!address.receiverName</p>
+            <p class="flex1" style="line-height: 26px;"><img src="/jdvop/images/mobile/ico_phone.png" class="ico_phone fl" />$!address.mobile</p>
+        </div>
+        <p>$!address.province.name $!address.city.name $!address.county.name #if($address.town && $address.town.id >
+            0)$!address.town.name#{end} $!address.address</p>
+        <span class="ico-arrow-left"></span>
+    </article>
+    <input type="hidden" name="addressId" value="$!address.id" />
+    #else
+    <article class="clearfix address" id="to_select_address">
+        <p class="prompt tc" style="padding-top: 30px; font-size: 18px; font-family: arial; color: #333;">添加收货人信息</p>
+        <span class="ico-arrow-left"></span>
+    </article>
+    #end
+    #if($address)
+    <div class='id-card clearfix #if($!resultMap.get("ENABLEOVERSEAS") == "false") hide #end '>
+        #if(!$address.identityCard)
+        <p class="tip fl">
+            <input type="text" name="identityCard" placeholder="因涉及入境，请填写收货人身份证" />
+        </p>
+        <span class="btn fl js-save-identityCard">保存</span>
+        #else
+        <p class="tip fl js-identityCard-info">
+            #set($identityCard = $address.identityCard)
+            #set($identityCard = $identityCard.substring(0,3) + "*************" + $identityCard.substring(14,18))
+            身份证号&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$identityCard
+        </p>
+        <span class="btn fl js-update-identityCard" identityCard="$address.identityCard">修改</span>
+        #end
+    </div>
+    #end
+    <div class="shopcart-list noChecked ">
+        #foreach($info in $infos)
+        <h2 class="top">订单信息</h2>
+        #if($fp)
+        <form id="submit_order_form" action="/jdvop/activity/limitExchange/submit.php" method="post">
+            <input type="hidden">
+            <input type="hidden" name="fpid" value="$fp.id" />
+
+            #else
+            <form id="submit_order_form" action="/jdvop/shoppingCart/submitOrder.php" method="post">
+                <input type="hidden" name="totalPrice" value="#if($fp)$!numberTool.format('#0.00', $allPrice)#else$!numberTool.format('#0.00',
+            $totalPrice)#end">
+                #end
+                ##gcc
+
+                <input type="hidden" name="couponIdInit[]" value="$!info.get('userCoupon').couponId" />
+                <input type="hidden" name="couponId[]" value="$!info.get('userCoupon').id" />
+                #if($info.get("cartEntryList") && $!info.get("cartEntryList").size() > 0)
+                <input type="hidden" name="isSubmitOrder" value="true">
+                <input type="hidden" name="myAddressId" value="0" />
+
+                <ul>
+                    #foreach($entry in $info.get("cartEntryList"))
+                    #set($product = $productTool.asProductByExclusiveProductPool($entry.sourceEntryId,
+                    $!userTool.getUserId()))
+                    #set($skuId = $productTool.getStorageUnits($product.id).get(0).id)
+                    <li class="clearfix">
+
+                        <input type="hidden" name="entry[]" value="$!skuId" />
+                        <!-- input type="hidden" name="fid" value="$entry.fenxiaoUserId"/ -->
+                        <input type="hidden" name="type[]" value="sku" />
+                        <input type="hidden" name="sentry[]" value="$!product.id" />
+                        <input type="hidden" name="stype[]" value="product" />
+                        <input type="hidden" name="amount[]" value="$entry.amount" />
+                        <input type="hidden" name="productOwnerType[]" value="$!product.ownerType" />
+                        <input type="hidden" name="fenxiaoUserId[]" value="$entry.fenxiaoUserId" />
+
+                        <a href="/jdvop/product/${product.id}.php">
+                            <p class="img">
+                                #if($product.ownerType == "jingdong" || $product.ownerType == "system")
+                                <img src="$!product.thumbnailImage" width="80" height="80" />
+                                #else
+                                <img src="$configTool.getImageHost()/middle$!product.thumbnailImage" width="80" height="80" />
+                                #end
+                            </p>
+                            <div class="text">
+                                <span class="name">$!product.name</span>
+                                <em class="price"><i class="red">&yen;$!numberTool.format('#0.00',
+                                        $product.retailPrice)</i> </em> <br>
+                                <em class="price">数量：<i>$!entry.amount</i> </em>
+                            </div>
+                        </a>
+                    </li>
+                    #end
+                </ul>
+                #end
+                #if($address)
+                <div class="shopcart-list noChecked mt10">
+                    <span style='position:relative; padding-left:2%;height:40px;font:normal 14px/45px "microsoft yahei";  color: #585c64;font-weight: bold;background:#fff;'>配送方式</span>
+                    <span style='text-align: center; float: right;position:relative;font:normal 14px/50px "microsoft yahei"; color: #585c64;background:#fff;'>
+                        #if($info.get("shipmentFee") && $info.get("shipmentFee")> 0)
+                        快递&nbsp;&yen;&nbsp;$!numberTool.format('#0.00', $info.get("shipmentFee"))
+                        #else
+                        快递&nbsp;免邮
+                        #end
+                    </span>
+                </div>
+                #end
+                <div class="shopcart-list noChecked mt10">
+                    <!-- 提货券  -->
+                    #if($info.get("isEnterpriseZoneProduct") && $info.get("thisProductTotalVoucher")>0)
+                    <div class="quan_area">
+                        <h2>提货券：</h2>
+                        <div class="quan_item" style="justify-content:flex-end">
+                            <span>$info.get("thisProductTotalVoucher")张可用</span>
+                        </div>
+                    </div>
+                    #else
+                    #if($info.get("userCoupon"))
+                    #set($userCoupon = $info.get("userCoupon"))
+                    <input type="hidden" name="couponMoney[]" value="$!userCoupon.realMoney" />
+                    <div class="quan_area cll">
+                        <h2>优惠券：</h2>
+                        <div class="quan_item" couponid="$!userCoupon.id" initId="$!userCoupon.couponId">
+                            #if($userCoupon.type == 1)
+                            <span class="tips">满减优惠$!{userCoupon.amount}元</span>
+                            <span>-￥$!{userCoupon.amount}</span>
+                            #elseif($userCoupon.type == 2)
+                            <span class="tips">直减优惠$!{userCoupon.amount}元</span>
+                            <span>-￥$!{userCoupon.amount}</span>
+                            #elseif($userCoupon.type == 3)
+                            <span class="tips">折扣优惠$!{userCoupon.amount}折</span>
+                            <span>$!{userCoupon.amount}折</span>
+                            #else
+                            <span class="tips" initId="0">不使用优惠券</span>
+                            <span>-￥0.00</span>
+                            #end
+                        </div>
+                    </div>
+                    #end
+                    #end
+                    <h2 class="top">买家留言</h2>
+                    <div class="txt-msg">
+                        <textarea name="userRemark" class="common js-change-length" placeholder="选填，可填写您和卖家达成一致的要求(最多200字)"></textarea>
+                        <p class="tr textarea-pop js-show-length">还可以输入<i class="js-num red">200</i>个字</p>
+                    </div>
+                    <h2 class="top">小计：
+                        $info.get("resultMap").get("TOTALPRICE")</h2>
+                    <!-- <input type="hidden" name="totalPrice" value="#if($fp)$!numberTool.format('#0.00', $allPrice)#else$!numberTool.format('#0.00', $resultMap.get("
+                        TOTALPRICE"))#end"></input> -->
+                </div>
+                <!-- 优惠券列表侧边 -->
+                <div id="quan_list" class="quan_list" ownerid="$!info.get('ownerId')">
+                    <div class="quan_back">
+                        <i></i>
+                    </div>
+                    <div class="no-use" select="1" val="1" couponid="0">
+                        <span>不使用优惠券</span>
+                        <label class="selected"></label>
+                    </div>
+                    <div class="content">
+                        <ul class="quan-list">
+                            #set($userCoupons = $info.get("userCoupons"))
+                            #foreach($coupon in $userCoupons)
+                            #if($coupon.type==1 )
+                            <li class="quan-item" select="0" couponid=$coupon.couponId>
+                                <div class="price">
+                                    <div class="type">满减券</div>
+                                    <div class="kan">￥<span>$coupon.amount</span></div>
+                                    <div class="count">满$coupon.usable可用</div>
+                                </div>
+                                <div class="desc">
+                                    <p class="quan-name">$coupon.targetName</p>
+                                    <p class="quan-time">$coupon.startTime~$coupon.endTime</p>
+                                </div>
+                                <label></label>
+                            </li>
+                            #elseif($coupon.type==2 )
+                            <li class="quan-item " select="0" couponid=$coupon.couponId>
+                                <div class="price">
+                                    <div class="type">直减券</div>
+                                    <div class="kan">￥<span>$coupon.amount</span></div>
+                                    <div class="count">直减$coupon.amount</div>
+                                </div>
+                                <div class="desc">
+                                    <p class="quan-name">$coupon.targetName</p>
+                                    <p class="quan-time">$coupon.startTime~$coupon.endTime</p>
+                                </div>
+                                <label></label>
+                            </li>
+                            #elseif($coupon.type==3)
+                            <li class="quan-item " select="0" couponid=$coupon.couponId>
+                                <div class="price">
+                                    <div class="type">折扣券</div>
+                                    <div class="kan">￥<span>$coupon.amount</span></div>
+                                    <div class="count">$coupon.amount折</div>
+                                </div>
+                                <div class="desc">
+                                    <p class="quan-name">$coupon.targetName</p>
+                                    <p class="quan-time">$coupon.startTime~$coupon.endTime</p>
+                                </div>
+                                <label></label>
+                            </li>
+
+                            #end
+                            #end
+
+
+
+
+                            #*<li class="quan-item" select="0" val="3">
+                                <div class="price">
+                                    <div class="type">满减券</div>
+                                    <div class="kan">￥<span>399</span></div>
+                                    <div class="count">满3000可用</div>
+                                </div>
+                                <div class="desc">
+                                    <p class="quan-name">电器类目专享</p>
+                                    <p class="quan-time">2018.08.09~2018.08.31</p>
+                                </div>
+                                <label>
+                                </label>
+                            </li>*#
+                        </ul>
+                        <p class="nomore">没有更多有效券了</p>
+
+                    </div>
+
+                </div>
+
+                #end
+            </form>
+            ##gcc
+
+    </div>
+
+    <section class="fixed-column webkitbox-h">
+        <p class="flex2 but-collection tl">
+            <span class="all-jf" style="margin-left: 10%;">
+                共<i class="js-total-amount">$!totalAmount </i>件
+                &nbsp; &nbsp;
+                实付款：<i class="js-total-price">
+                    &yen; #if($fp)$!numberTool.format('#0.00', $allPrice)#else$!numberTool.format('#0.00',
+                    $totalPrice)#end
+                </i>
+            </span>
+        </p>
+        <p class="flex1 #if($address) but-orange #{else} but-grey #{end}">
+            <a href="javascript:;" class="submit-order ico-shopping">提交订单</a>
+        </p>
+    </section>
+
+
+    <script type="text/javascript">
+        // var jump = false;//选择优惠券之后  设置为true
+        // //初始化标记最优秀的那个优惠券
+        $('.no-use,.quan-list li').each(function () {
+            var lastId = $(this).parents('.quan_list').prev('.shopcart-list').find('.quan_area .quan_item .tips').attr('initId');
+            var initId = $(this).parents('.quan_list').prev('.shopcart-list').find('.quan_area .quan_item').attr('initid');
+            var tegId = $(this).parents('.quan_list').prev('.shopcart-list').find('.quan_area .quan_item').attr('couponid');
+            var couponid = $(this).attr('couponid');
+            if (couponid == (tegId || initId || lastId)) {
+                $(this).attr('nochange', 1);
+                $(this).addClass('selected');
+            } else {
+                $(this).attr('nochange', 0);
+            }
+        });
+
+        $(function () {
+            $(".js-change-length").keyup(function () {
+                var len = $(this).val().length;
+                if (len > 199) {
+                    $(this).val($(this).val().substring(0, 200));
+                }
+                var num = 200 - len;
+                if (num < 0) {
+                    num = 0;
+                }
+                $(".js-num").text(num);
+            });
+
+            $('#to_select_address').on('click', function () {
+                $.post('/jdvop/my/spcarthelper/tochangeaddress.php', $('#submit_order_form').serialize(), function (d) {
+                    location = d;
+                }, 'text/html');
+            });
+            $('.id-card').on("click", ".js-save-identityCard", function () {
+                var addressId = $('input[name="addressId"]').val();
+                var identityCard = $('input[name="identityCard"]').val();
+                $.post('/jdvop/my/mobile/address/saveIdentityCard.php', { addressId: addressId, identityCard: identityCard }, function (result) {
+                    var data = eval('(' + result + ')');
+                    if (data.isOk) {
+                        location.reload();
+                    } else {
+                        mui.alert(data.message, '温馨提示');
+                        return false;
+                    }
+                }, 'application/json');
+            });
+
+            $('.id-card').on("click", '.js-update-identityCard', function () {
+                $('.js-identityCard-info').empty();
+                $('.js-identityCard-info').append('<input type="text" name="identityCard" value="' + $(this).attr("identityCard") + '" placeholder="因涉及入境，请填写收货人身份证" />');
+                $(this).removeClass("js-update-identityCard").addClass("js-save-identityCard").html("保存");
+            });
+            //不选择优惠券  直接返回
+            $('.quan_back i').on('click', function () {
+                $(this).parent().parent(".quan_list").removeClass('active');
+            });
+            //动态计算content的高度
+            var VHeight = window.innerHeight - 106;
+            $('.content').css({ 'height': VHeight + 'px', 'overflow-x': 'scroll' });
+
+            //选择优惠券,显示优惠券列表
+            $('.cll').click(function () {
+                $(this).parent().next(".quan_list").addClass('active');
+            });
+
+
+            // $.each($('.no-use,.quan-list .quan-item'), function (index, el) {
+            //     console.log($(this));
+            //     var _self = $(this);
+            //     $(this).on('click', function () {
+            //         console.log(index)
+            //         // 判断是否选中的为当前自己的优惠券，如果为当前优惠券，则默认返回，否则进行跳转
+            //         var change = _self.attr('nochange');
+            //         if (jump) {
+            //             return;
+            //         }
+            //         if (change == 1) {
+            //             $(".quan_list").removeClass('active');
+            //             return;
+            //         }
+            //         var couponID = _self.attr('couponid'); // 获取当前点中的couponid,如果是不选择优惠券，则couponid=0
+            //         var orginParams = decodeURI(location.href.split('?')[1]); // 当前选中的url信息
+            //         var fIndex = orginParams.indexOf('&couponId='); // 查找是否已经携带couponId
+            //         if (fIndex !== -1) {
+            //             orginParams = orginParams.substr(0, fIndex);
+            //         }
+            //         orginParams = orginParams + '&couponId=' + couponID; // 选中优惠券进行后缀赋值
+            //         _self.addClass('selected'); // 当前选中的添加选中样式
+            //         $.each($('.no-use,.quan-item'), function (pindex, ell) { // 其他的类型删除选中样式，并且select属性为0
+            //             if (pindex !== index) {
+            //                 $(this).attr('select', 0);
+            //                 $(this).removeClass('selected');
+            //             }
+            //         });
+            //         jump = true;
+            //         location = '/jdvop/shoppingCart/chooseEntry.php?' + encodeURI(orginParams);
+            //     })
+            // });
+
+
+            $('.no-use,.quan-list .quan-item').on('click', function (index, el) {
+                var jump = false;//选择优惠券之后  设置为true
+                // //初始化标记最优秀的那个优惠券
+                var _self = $(this);
+                var change = _self.attr('nochange');
+                if (jump) {
+                    return;
+                }
+                if (change == 1) {
+                    $(".quan_list").removeClass('active');
+                    return;
+                }
+                var ownerId = _self.parents('.quan_list').attr('ownerid');
+
+                var couponID = _self.attr('couponid');
+                var orginParams = decodeURI(location.href.split('?')[1]);
+                var fIndex = orginParams.indexOf('&couponId[]=');
+
+                // 第一次验证是否有相同的优惠券,url不携带couponId[]的时候
+                var firstVerify = false;
+                //  优惠券更新
+                _self.parents('.quan_list').siblings('.quan_list').find('.quan-list .quan-item').each(function (qindex, element) {
+
+                    console.log(_self.parents('.quan_list').siblings('.quan_list').find('.quan-list .selected').attr('couponid'))
+                    if (couponID != 0 && _self.attr('couponid') == _self.parents('.quan_list').siblings('.quan_list').find('.quan-list .selected').attr('couponid')) {
+                        mui.alert('优惠券已被使用，若要使用，请去把该优惠券置空', '温馨提示');
+                        firstVerify = true;
+                        return false;
+                    }
+                });
+                if (firstVerify) {
+                    return;
+                }
+                // 第一次验证是否有使用相同优惠券结束
+
+                //  已选择优惠券进行修改优惠券
+                if (fIndex !== -1) {
+                    var couponParams = orginParams.substr(fIndex, orginParams.length); // couponid数组的字符串,如&couponId[]=8-186&couponId[]=12-185
+                    orginParams = orginParams.substr(0, fIndex); // 没有couponid数组的字符串，后面自行进行拼接
+                    var couponParamsArr = couponParams.split('&couponId[]=').slice(1);
+                    // [8-186,12-185]，进去的是8的不选择优惠券
+
+                    // 多个商家能用同一个优惠券的情况，做出判断
+                    for (var i = 0; i < couponParamsArr.length; i++) {
+                        if (couponParamsArr[i].split('-')[1] == couponID && couponID != "0") {
+                            mui.alert('优惠券已被使用，若要使用，请去把该优惠券置空', '温馨提示');
+                            return;
+                        }
+                    }
+
+                    // 循环添加变更优惠券信息
+                    for (var i = 0; i < couponParamsArr.length; i++) {
+                        if (couponParamsArr[i].split('-')[0] == ownerId) {
+                            // 如果等于优惠券归属的商家id，则判定已经有这个数据了
+                            orginParams = orginParams + '&couponId[]=' + ownerId + '-' + couponID;
+                            // 前面已经替换数组，需要把后面的数组继续添加进去
+                            for (var j = i + 1; j < couponParamsArr.length; j++) {
+                                orginParams = orginParams + '&couponId[]=' + couponParamsArr[j]
+                            };
+                            break;
+                        } else {
+                            // 如果不等于优惠券归属的商家id，则按照顺序填充
+                            orginParams = orginParams + '&couponId[]=' + couponParamsArr[i];
+                            // 如果最后一个也找不到商家id，则添加一个新的数组参数。
+                            if (couponParamsArr.length == i + 1) {
+                                orginParams = orginParams + '&couponId[]=' + ownerId + '-' + couponID;
+                            }
+                        };
+                    }
+                } else {
+                    // 初始化第一次进来没有添加couponid[]
+                    orginParams = orginParams + '&couponId[]=' + ownerId + '-' + couponID;
+                }
+                _self.addClass('selected');
+                $(_self.parents('.quan_list').find('.no-use,.quan-list .quan-item')).each(function (pindex, ell) {
+                    if (pindex !== index) {
+                        $(this).attr('select', 0);
+                        $(this).removeClass('selected');
+                    }
+                });
+                jump = true;
+                location = '/jdvop/shoppingCart/chooseEntry.php?' + encodeURI(orginParams);
+            });
+
+
+            //提交订单
+            var isRepetition = false;
+            $('.submit-order').bind("click", function () {
+                var addrId = $('input[name=addressId]').val();
+                if (addrId === '' && addrId <= 0) {
+                    mui.alert('请选择您的收货地址！', '温馨提示');
+                    return false;
+                }
+                if (isPopAlert) {
+                    mui.confirm('你确定使用提货券完成本次交易吗？', '温馨提示', function (e) {
+                        if (e.index == 1) {
+                            $("input[name=myAddressId]").attr('value', addrId);
+                            if (!isRepetition) {
+                                isRepetition = true;
+                                $('.submit-order').text('提交中...');
+                                $('.submit-order').attr('disabled', 'disabled');
+                                $('.submit-order').css('background', '#ccc');
+                                $.post($("#submit_order_form").attr("action"), $("#submit_order_form").serialize(), function (result) {
+                                    var data = eval('(' + result + ')');
+                                    if (data.isOk) {
+                                   		// 修改于20190228，chenhongluan，选过选择支付方式页面，直接跳转到市民卡支付
+				                        $.get("/jdvop/my/order/shiminkaPay/topay.php?id=" + data.message, function (res) {
+				                        var res = eval('(' + res + ')'); // 格式化返回的json数据
+				                        if (res.isOk) {
+				                    		location = res.message; // 跳转到支付页面
+						                }  else {
+						                    mui.alert(res.message, '温馨提示');
+						                }
+				                	},'application/json');
+                                       // location.href = "/jdvop/my/order/shiminkaPay/topay.php?id=" + data.message;
+                                    } else {
+                                        mui.alert(data.message, '温馨提示');
+                                        $('.submit-order').css('background', '#f55d12')
+                                        $('.submit-order').removeAttr('disabled');
+                                        $('.submit-order').text('提交订单');
+                                        isRepetition = false;
+                                    }
+                                }, 'application/json');
+                            }
+                        }
+                    });
+                    return false;
+                }
+
+                $("input[name=myAddressId]").attr('value', addrId);
+                if (!isRepetition) {
+                    isRepetition = true;
+                    $('.submit-order').text('提交中...');
+                    $('.submit-order').attr('disabled', 'disabled');
+                    $('.submit-order').css('background', '#ccc');
+                    $.post($("#submit_order_form").attr("action"), $("#submit_order_form").serialize(), function (result) {
+                        var data = eval('(' + result + ')');
+                        if (data.isOk) {
+                        // 修改于20190228，chenhongluan，选过选择支付方式页面，直接跳转到市民卡支付
+                        $.get("/jdvop/my/order/shiminkaPay/topay.php?id=" + data.message, function (res) {
+                        var res = eval('(' + res + ')');// 格式化返回的json数据
+                        if (res.isOk) {
+                    		location = res.message; // 跳转到支付页面
+		                }  else {
+		                    mui.alert(res.message, '温馨提示');
+		                }
+                	},'application/json');
+                           // location.href = "/jdvop/my/order/shiminkaPay/topay.php?id=" + data.message;
+                        } else {
+                            mui.alert(data.message, '温馨提示');
+                            $('.submit-order').css('background', '#f55d12')
+                            $('.submit-order').removeAttr('disabled');
+                            $('.submit-order').text('提交订单');
+                            isRepetition = false;
+                        }
+                    }, 'application/json');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

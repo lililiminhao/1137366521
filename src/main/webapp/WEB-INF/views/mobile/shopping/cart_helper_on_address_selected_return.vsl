@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta content="telephone=no" name="format-detection"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+        <link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+        <script  type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+        <script  type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+        <script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+        <title>提交订单</title>
+    </head>
+    <body>
+        <form action="/jdvop/shoppingCart/chooseEntry.php" method="get" id="form1">
+            #if ($address)
+            <input type="hidden" name="addressId" value="$address" />
+            #end
+            #if ($spcartHolder)
+                #if ($spcartHolder.entry)
+                    #foreach($eid in $spcartHolder.entry)
+                        <input type="hidden" name="isSelected[]" value="true" />
+                        <input type="hidden" name="entry[]" value="$eid" />
+                    #end
+                #end
+
+                #if ($spcartHolder.type)
+                    #foreach($tp in $spcartHolder.type)
+                        <input type="hidden" name="type[]" value="$tp" />
+                    #end
+                #end
+
+                #if ($spcartHolder.sentry)
+                    #foreach($se in $spcartHolder.sentry)
+                        <input type="hidden" name="sentry[]" value="$se" />
+                    #end
+                #end
+
+                #if ($spcartHolder.stype)
+                    #foreach($st in $spcartHolder.stype)
+                        <input type="hidden" name="stype[]" value="$st" />
+                    #end
+                #end
+
+                #if ($spcartHolder.amount)
+                    #foreach($amt in $spcartHolder.amount)
+                        <input type="hidden" name="amount[]" value="$amt" />
+                    #end
+                #end
+
+                #if($spcartHolder.productOwnerType)
+                    #foreach($ownerType in $spcartHolder.productOwnerType)
+                    <input type="hidden" name="productOwnerType[]" value="$ownerType" />
+                    #end
+                #end
+
+                #if($spcartHolder.fenxiaoUserIds)
+                    #foreach($fxUserId in $spcartHolder.fenxiaoUserIds)
+                        <input type="hidden" name="fenxiaoUserId[]" value="$fxUserId" />
+                    #end
+                #end
+            #end
+        </form>
+        <script type="text/javascript">
+            var fm = document.getElementById('form1');
+            fm.submit();
+        </script>
+    </body>
+</html>

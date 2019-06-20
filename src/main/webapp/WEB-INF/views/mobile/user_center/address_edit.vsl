@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+</head>
+<body class="pm56">
+    <form id="address_form" action="#if($address)/jdvop/my/mobile/address/edit.php#{else}/jdvop/my/mobile/address/add.php#{end}" method="POST">
+        #if($address)
+            <input type="hidden" name="addressId" class="input-text1" value="$!address.id"/>
+        #end
+        <input type="hidden" name="isSubmitOrder" value="$isSubmitOrder" />
+        <input type="hidden" name="isAwardSubmitOrder" value="$isAwardSubmitOrder" />
+        <input type="hidden" name="islimitExchangeSubmitOrder" value="$islimitExchangeSubmitOrder" />
+        <input type="hidden" name="islimitTimeKillOrder" value="$islimitTimeKillOrder" />
+        <div class="editPassword">
+            <dl>
+                <dd class="webkitbox-h">
+                    <p class="tr"><i class="red">*</i>收货人：</p>
+                    <p class="flex1"><input type="text" name="name" value="$!address.receiverName" placeholder="收货人姓名" class="com"></p>
+                </dd>
+                <dd class="webkitbox-h">
+                    <p class=" tr"><i class="red">*</i>手机号码：</p>
+                    <p class="flex1"><input type="tel" name="mobile" value="$!address.mobile" maxlength="11" placeholder="手机号码" class="com not"></p>
+                </dd>
+                <dd class="webkitbox-h">
+                    <p class=" tr"><i class="red">*</i>所在省份：</p>
+                    <p class="flex1">
+                        <select id="province" name="regions[]" class="js-choose-prov com" style="min-width:60%;">
+                            <option value="0">请选择</option>
+                            #foreach($prov in $provinceList)
+                                #if($address.province.id)
+                                    <option value="$prov.getId()" #if($prov.id == $address.province.id) selected #{end}>$prov.getName()</option>
+                                #else
+                                    <option value="$prov.getId()" #if($prov.id == 15) selected #{end}>$prov.getName()</option>
+                                #end
+                            #end
+                        </select>
+                    </p>
+                </dd>
+                <dd class="webkitbox-h">
+                    <p class=" tr"><i class="red">*</i>所在城市：</p>
+                    <p class="flex1">
+                        <select id="city" name="regions[]" class="js-choose-city com" style="min-width: 60%;">
+                            <option value="0">请选择</option>
+                            #foreach($city in $cityList)
+                                <option value="${city.id}" #if($city.id == $address.city.id) selected #{end} >${city.name}</option>
+                            #end
+                        </select>
+                    </p>
+                </dd>
+                <dd class="webkitbox-h js-dd-county">
+                    <p class="tr"><i class="red">*</i>所在地区：</p>
+                    <p class="flex1">
+                        <select id="county" name="regions[]" class="js-choose-county com" style="min-width: 60%;">
+                            <option value="0">请选择</option>
+                            #foreach($county in $countyList)
+                                <option value="${county.id}" #if($county.id == $address.county.id) selected #{end} >${county.name}</option>
+                            #end
+                        </select>
+                    </p>
+                </dd>
+                #if($address.town && $address.town.id > 0)
+                    <dd class="webkitbox-h dd-town">
+                        <p class="tr"><i class="red">*</i>所在街道：</p>
+                        <p class="flex1">
+                            <select id="town" name="regions[]" class="js-choose com" style="min-width: 60%;">
+                                <option value="0">请选择</option>
+                                #foreach($town in $townList)
+                                <option value="${town.id}" #if($town.id == $address.town.id) selected #{end} >${town.name}</option>
+                                #end
+                            </select>
+                        </p>
+                    </dd>
+                #end
+                <dd class="webkitbox-h">
+                    <p class=" tr"><i class="red">*</i>详细地址：</p>
+                    <p class="flex1"><input type="text" name="address" value="$!address.address" class="com not" placeholder="详细地址"></p>
+                </dd>
+            </dl>
+        </div>
+        <div class="editPassword">
+            <p class="tc"> <input type="submit" class="but-ok" value="确定保存"> </p>
+        </div>
+    </form>
+    <script type="text/javascript">
+        $(function() {
+        	#if(!$address.province.id)
+	            loadingCity();
+	            loadingCounty();
+	            loadingTown();
+            #end
+            //选择省
+            $('select.js-choose-prov').live('change', function(e) {
+                loadingCity();
+            });
+            //选择市
+            $('select.js-choose-city').live('change', function(e) {
+                loadingCounty();
+            });
+            //选择区
+            $('select.js-choose-county').live('change', function(e) {
+                loadingTown();
+            });
+            
+            function loadingCity() {
+                var cid = parseInt($('select.js-choose-prov').val());
+                if (cid > 0) {
+                    $("#city").empty().append('<option value="0">请选择</option>');
+                    $("#county").empty().append('<option value="0">请选择</option>');
+                    $("#town").empty().append('<option value="0">请选择</option>');
+                    $.get('/jdvop/region/ajax.php', {parentId: cid}, function(result) {
+                        var data = eval('(' + result + ')');
+                        var len = data.length;
+                        if (len <= 0) {
+                            return;
+                        } else {
+                            var i = 0;
+                            for (; i < len; ++i) {
+                                var option = '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                                $("#city").append(option);
+                            }
+                        }
+                    }, 'application/json');
+                } else {
+                    $("#city").empty().append('<option value="0">请选择</option>');
+                    $("#county").empty().append('<option value="0">请选择</option>');
+                    $("#town").empty().append('<option value="0">请选择</option>');
+                }
+            }
+            
+            function loadingCounty() {
+                var cid = parseInt($('select.js-choose-city').val());
+                if (cid > 0) {
+                    $("#county").empty().append('<option value="0">请选择</option>');
+                    $("#town").empty().append('<option value="0">请选择</option>');
+                    $.get('/jdvop/region/ajax.php', {parentId: cid}, function(result) {
+                        var data = eval('(' + result + ')');
+                        var len = data.length;
+                        if (len <= 0) {
+                            return;
+                        } else {
+                            var i = 0;
+                            for (; i < len; ++i) {
+                                var option = '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                                $("#county").append(option);
+                            }
+                        }
+                    }, 'application/json');
+                } else {
+                    $("#county").empty().append('<option value="0">请选择</option>');
+                    $("#town").empty().append('<option value="0">请选择</option>');
+                }
+            }
+            
+            function loadingTown() {
+                var cid = parseInt($('select.js-choose-county').val());
+                if (cid > 0) {
+                    $("#town").empty().append('<option value="0">请选择</option>');
+                    $.get('/jdvop/region/ajax.php', {parentId: cid}, function(result) {
+                        var data = eval('(' + result + ')');
+                        var len = data.length;
+                        $('.dd-town').remove();
+                        if (len > 0) {
+                            var html = '';
+                            html += '<dd class="webkitbox-h dd-town">';
+                            html += '<p class="tr"><i class="red">*</i>所在街道：</p>';
+                            html += '<p class="flex1">';
+                            html += '<select id="town" name="regions[]" class="com" style="min-width: 60%;">';
+                            html += '<option value="0">请选择</option>';
+                            var i = 0;
+                            for (; i < len; ++i) {
+                                html += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                            }
+                            html += '</select></p></dd>';
+                            $('.js-dd-county').after(html);
+                        } 
+                    }, 'application/json');
+                } else {
+                    $("#town").empty().append('<option value="0">请选择</option>');
+                }
+            }
+            
+            //保存收货人地址
+            $("#address_form").submit(function(e) {
+                e.preventDefault();
+                $.post($("#address_form").attr('action'), $("#address_form").serialize(), function(result) {
+                    var data = eval('(' + result + ')');
+                    if (data.isOk) {
+                        var isSubmitOrder = $('input[name=isSubmitOrder]').val();
+                        var isAwardSubmitOrder = $('input[name=isAwardSubmitOrder]').val();
+                        var islimitExchangeSubmitOrder = $('input[name=islimitExchangeSubmitOrder]').val();
+                        var islimitTimeKillOrder = $('input[name=islimitTimeKillOrder]').val();
+                        if(isSubmitOrder === "true") {
+                            location = "/jdvop/my/spcarthelper/returntoshoppingcart.php?addressId=" + data.message.id;
+                        }else if(isAwardSubmitOrder === "true"){
+                            location = "/jdvop/activity/lottery/order.php?addressId="+data.message.id;
+                        }else if(islimitExchangeSubmitOrder === "true"){
+                            location = "/jdvop/activity/limitExchange/order.php?addressId="+data.message.id;
+                        }else if(islimitTimeKillOrder === "true"){
+                            location = "/jdvop/activity/toTimeSpikeOrder.php?addressId="+data.message.id+"&productId=$!pid";
+
+                        }else{
+                            location = "/jdvop/my/mobile/address.php?isSubmitOrder=false";
+                        }
+                    } else {
+                        mui.alert(data.message, '温馨提示');
+                    }
+                }, 'application/json');
+            });
+        });
+    </script>
+</body>
+</html>

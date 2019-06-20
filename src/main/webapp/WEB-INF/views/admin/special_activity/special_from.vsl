@@ -1,0 +1,184 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>$!esc.html($websiteTool.getWebsite().getName())-管理平台</title>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<link  rel='stylesheet' type='text/css' href='/jdvop/css/admin/wx-index.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/jdvop/script/fileupload/jquery.iframe-transport.js"></script>
+<script type='text/javascript' src="/jdvop/script/admin/main.js"></script>
+<script type='text/javascript' src='/jdvop/script/admin/dragsort-0.5.1.min.js'></script>
+<script type="text/javascript" src='/jdvop/script/admin/my97/WdatePicker.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/script/html5.js"></script><![endif]-->
+<title></title>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderGreen clearfix">
+    <a href="/jdvop/admin/specialList.php?type=commonSpecial"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">#if($special)编辑#if($special.type =="commonSpecial")普通 #else企业专享#end专题活动 #else 添加专题活动 #end</span>
+</div>
+<div id="iframePage">
+	<div class="automatic-box clearfix highlight_e4e4e4">
+    	<div class="topTitle">
+             <span>基本信息</span>
+        </div>
+        <form id="js-data-form" action="#if($special) /jdvop/admin/special/specialEdit.php #else /jdvop/admin/special/specialSave.php #end" method="POST">
+        	 #if($special)
+                <input type="hidden" name="specialId" value="$special.id"/>
+                <input type="hidden" name="type" value="$special.type">
+            #else
+            	<input type="hidden" name="productPoolId" value="0" />    
+            #end
+            <div class="automatic-box clearfix" style="border-top: none;">
+                <div class="add-product role-persition-table">
+                     <div class="js-box">
+                         <table class="js-boxCont" id="js-common">
+                               <colgroup>
+    		                        <col style="width:120px;"/>
+    		                        <col/>
+    		                    </colgroup>
+								#if(!$special)
+                                    <tr>
+                                        <td class="tr" style="padding-left:45px;">专题类型：</td>
+										<td class="js-title">
+											<label class="cup"><input type="radio" name="type" value='commonSpecial' checked="checked" style="float:inherit!important;" />普通专题</label>
+											<label class="cup"><input type="radio" name="type" value='enterpriseSpecial' style="float:inherit!important;margin-left:30px;"/>企业专享专题</label>
+										</td>
+                                    </tr>
+								#end
+                               <tr>
+                               		<td class="tr"><i class="red">*</i>专题名称：</td>
+    								<td>
+                               			<input type="text" name="activityName" class="common h30" value="$!special.activityName" maxlength="25" />
+                               	    </td> 
+                           	   </tr>
+                           	   <tr id="js-product" #if($special && $special.type == "enterpriseSpecial") #else style="display: none;" #end>
+                           	       <td class="tr"><i class="red">*</i>使用商品池：</td>
+								   <td>
+                           	       		<select class="common w200 h30" name="productPoolId" id="js-select" #if($pool == false) disabled = "true" #end>
+                           	       			<option value="0">请选择</option> 
+                           	       			#foreach($pool in $productPool)
+                           	       				<option value="$!pool.id" #if($pool.id == $!special.productPoolId) selected #end>$!pool.name</option>
+                           	       			#end
+                           	       		</select>
+                           	       </td>
+                           	   </tr>
+                               <tr>
+									<td class="tr">上线时间：</td>
+    								<td>
+    		                             <span class="time-input">
+    		                                #set($sysDate=$!dateTool.format('yyyy-MM-dd HH:mm:ss',$!dateTool.getSystemDate()))
+    		                                <input type="text" name="onLineTime" value="$!dateTool.format('yyyy-MM-dd HH:mm:ss', $!special.onLineTime)" 
+    		                                       class="common w200 h30" onfocus="WdatePicker({readOnly:true, minDate:'$sysDate', skin:'blueFresh', dateFmt:'yyyy-MM-dd HH:mm:59'});" 
+    		                                       placeholder="上线时间"/>
+    		                                <span class="text h30" style="top:-7px;">日期</span>
+    		                            </span> 
+    		                       </td>
+    		                    </tr>
+    		                    <tr>
+    		                        <td class="tr">下线时间：</td>
+    								<td>
+    		                            <span class="time-input">
+    			                            <input type="text" name="offLineTime" value="$!dateTool.format('yyyy-MM-dd HH:mm:ss', $!special.offLineTime)" 
+    			                                   class="common w200 h30" onfocus="WdatePicker({readOnly:true, minDate:'$sysDate', skin:'blueFresh', dateFmt:'yyyy-MM-dd HH:mm:59'});"
+    			                                   placeholder="下线时间"/>
+    			                            <span class="text h30" style="top:-7px;">日期</span>
+    			                        </span>
+    		                        </td>
+    		                    </tr>
+    		                    <tr>
+    		                        <td class="tr"><span style="display:inline-block;vertical-align: top;">备注：</span></td>
+    								<td>
+    		                            <textarea name="remark" class="common w360 h30" maxlength="100" placeholder="最多可输入100个字符">$!special.remark</textarea>
+    		                        </td>
+    		                    </tr> 
+                         </table>
+                     </div>
+                </div>
+            </div>
+            <div class="layout-footer pb30">
+                <div class="btn-wrap">
+                    <button type="submit" class="btn-orange">确定</button>
+                    <span class="btn-grey" onclick="javascript:history.back(-1);">取消</span>
+                </div>
+            </div>
+        </form>
+	</div>
+</div>
+<script type="text/javascript">
+
+$(function(){
+
+	$(".js-title input").click(function(){
+    	var typeChecked = $("input[name='type']:checked").val();
+    	
+    	if(typeChecked=="enterpriseSpecial"){
+    		$("#js-product").show();
+    	}
+    	if(typeChecked=="commonSpecial"){
+    		$("#js-product").hide();
+    	}
+	});
+	$(document).on("submit", "#js-data-form", function(e){
+	 	e.preventDefault();
+	 	var thiz = $(this);
+	 	
+       	var speciaName = $("input[name ='activityName']").val();
+        if(speciaName == ""){
+        	top.artAlert('温馨提示','专题名称不能为空！', 'error');
+            return false;
+        }
+       	
+		//post参数
+		var specialId = $("input[name='specialId']").val();
+		if(typeof(specialId) !== "undefined"){
+			var type = $("input[name='type']").val();
+		}else{
+			var type = $("input[name='type']:checked").val();
+		}
+       	
+       	
+       	var productPoolId = $("select[name='productPoolId']").val();
+       	var onLineTime = $("input[name='onLineTime']").val();
+       	var offLineTime = $("input[name='offLineTime']").val();
+       	var remark= $("textarea[name='remark']").val();
+       	
+   		var allData = []; 
+   		
+		if(typeof(specialId) !== "undefined"){ //路径为编辑的时候才传ID 过去
+       		allData.push('specialId='+specialId);
+       	}
+		allData.push('type='+type);
+       	allData.push('activityName='+speciaName);
+       	
+       	if(type == "commonSpecial"){
+			allData.push('productPoolId='+0);//普通专题则商品池为0
+       	}else{
+       		allData.push('productPoolId='+productPoolId);
+       	}
+       
+       	allData.push('onLineTime='+onLineTime);
+       	allData.push('offLineTime='+offLineTime);
+       	allData.push('remark='+remark);
+		
+        $.post(thiz.attr("action"), allData.join('&'), function(data){
+            if(data.isOk){
+                top.artAlert('温馨提示', '数据保存成功！', '/jdvop/admin/specialList.php?type='+type, 'ok');
+            }else{
+                top.artAlert('出错啦', data.message, 'error');
+            }
+        }, 'json');
+    });
+	
+});
+	
+</script>
+
+</body>
+	
+</html>

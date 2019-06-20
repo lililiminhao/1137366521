@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/Mglobal.css"/>
+<link rel="stylesheet" href="/jdvop/css/mobile/main.css"/>
+<script type="text/javascript" src="/jdvop/script/mobile/zepto.min.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mian.js"></script>	
+<script type="text/javascript" src="/jdvop/script/tongji-baidu.js"></script>
+<script type="text/javascript" src="/jdvop/script/mobile/mui.min.js"></script>
+<title>$!esc.html($websiteTool.getWebsite().getName())</title>
+<style>
+    .btn-pay-wrap button:nth-child(1){margin-right:35px;}
+    .btn-pay-wrap button{width:30%;}
+    .blue {background:#0082f0!important;}
+</style>
+</head>
+    <body class="pm56">
+        <div class="submit-ok">
+            <p class="img"> </p>
+            <div class="top">
+                <span class="icon ok"></span><br/>
+                #if($useVoucher)
+                	订单已使用提货券成功支付！
+                #else
+                 	订单已提交成功！
+                #end
+                
+                #if($myOrder.status == 'waiting_pay')
+                    <div class="time">请您在<i class="orange haveHour">24</i>时<i class="orange haveMinute">00</i>分<i class="orange haveSecond">00</i>秒完成支付</div>
+                #end
+            </div>
+            <p class="text">
+                您的订单号为： <i>$!myOrder.key </i><br/> 
+                您本次购买需支付金额：<i>&yen;$!numberTool.format("#0.00",$myOrder.needPay)</i> <br/>
+                配送至:<em>$!myOrder.province.name $!myOrder.city.name $!myOrder.county.name #if($myOrder.town && $myOrder.town.id > 0)$!myOrder.town.name#{end} $!myOrder.receiverAddr </em><br/>
+                详细信息请看 <a href="/jdvop/my/mobile/order/${myOrder.id}.php"><i>订单详情</i> </a> 
+            </p>
+        </div>
+        #if(!$useVoucher)
+        <div class="btn-pay-wrap">
+            <button class="js-shiminka-pay" type="button" data-href="/jdvop/my/order/shiminkaPay/topay.php?id=$!{myOrder.id}">市民卡支付</button>
+##            #if($myOrder.needPay < 5001)
+##                <button class="hide js-tsm-wechat-pay" type="button" data-href="/jdvop/my/order/tsmPay/topay.php?orderKey=$!{myOrder.key}&payType=wechat">微信支付</button>
+##            #end
+        </div>
+        #end
+        
+        #parse('footer_nav.vsl')
+    </body>
+    <script>
+    $(function(){
+        #if($myOrder.status == 'waiting_pay')
+        //支付倒计时
+        clock();
+        countDown();
+        #end
+     
+        var ua = window.navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i) == 'micromessenger'){
+            $('.js-tsm-wechat-pay').removeClass('hide');
+        }
+        
+        //市民卡支付
+        $(".js-shiminka-pay").click(function(e){
+            e.preventDefault();
+            $.post($(this).attr("data-href"), function(d){
+                var data = eval('(' + d + ')');
+                if (data.isOk) {
+                    location = data.message;
+                }  else {
+                    mui.alert(data.message, '温馨提示');
+                }
+            }, 'application/json');
+        });
+        
+        //tsmPay
+        $(".js-tsm-wechat-pay").click(function(e){
+            e.preventDefault();
+            if(isWeiXin()){
+                $.post($(this).attr("data-href"), function(d){
+                    var data = eval('(' + d + ')');
+                    if (data.isOk) {
+                        location = data.message;
+                    }  else {
+                        mui.alert(data.message, '温馨提示');
+                    }
+                }, 'application/json');
+            } else {
+                mui.alert("请用微信浏览器打开!", '温馨提示');
+            }
+        });
+        
+    });
+    //订单过期时间=订单创建时间+24h
+    var expiredTime = $expiredTime;
+    //获取服务器当前时间
+    var currentTime = $dateTool.getSystemTime();
+    //刷新间隔
+    var intervalTime = 1000;
+    //24h
+    var oneDay = 60*1000*60*24;
+    //intervalId
+    var intervalId = null;
+
+    function countDown(){
+        intervalId = setInterval("clock()",intervalTime);
+    }
+    function clock(){
+      if(intervalId!==null){
+          currentTime+=intervalTime;
+      }
+      var haveTime = expiredTime-currentTime;
+      if(haveTime<=0){
+          window.clearInterval(intervalId);
+          return ;
+      }
+      if(haveTime>oneDay){
+          currentTime+=(haveTime-oneDay);
+          haveTime=oneDay;
+      }
+      var haveHour = Math.floor(haveTime/(60*1000*60));//小时
+      var laveTime1 = haveTime%(60*1000*60); //计算小时后剩余的毫秒数
+      var haveMinute =Math.floor(laveTime1/(60*1000));//分钟
+      var laveTime2 = laveTime1%(60*1000);//计算分钟后剩余毫秒数
+      var haveSecond = Math.floor(laveTime2/1000);//秒
+      $(".haveHour").html(haveHour);
+      $(".haveMinute").html(haveMinute);
+      $(".haveSecond").html(haveSecond);
+    }
+    
+    function isWeiXin(){
+        var ua = window.navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i) == 'micromessenger'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+</script>
+</html>

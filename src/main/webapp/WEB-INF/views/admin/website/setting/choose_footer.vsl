@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/global.css'/>
+<link   rel='stylesheet' type='text/css' href='/jdvop/css/admin/main.css'/>
+<script type='text/javascript' src='/jdvop/script/jquery-1.8.3.min.js'></script> 
+<script type='text/javascript' src='/jdvop/script/admin/main.js'></script>
+<script type='text/javascript' src='/jdvop/script/dragsort-0.5.1.min.js'></script>
+<!--[if lt IE 9]><script type="text/javascript" src="/jdvop/script/html5.js"></script><![endif]-->
+<title>模板配置</title>
+<script type="text/javascript">
+$(function(){
+    // 中间模块拖动排序
+    $('#dragsort').dragsort({
+        dragSelector: "li",
+        dragEnd: function() { },
+        dragBetween: 'false',
+        dragSelectorExclude:'li.btn-add',
+        placeHolderTemplate: '<li class="a-dashed"></li>',
+        scrollSpeed: 5
+    });
+    $(document).on('click','.js-tab li',function(){
+        var oIndex = $(this).index();
+        $("input[name='key']").val($(this).attr("rel"));
+        $(this).addClass("curr").siblings().removeClass("curr");
+        $(".js-tabContent .item").eq(oIndex).show().siblings().hide();
+    });
+    
+});
+</script>
+</head>
+<body>
+<!--主导航-->
+<div class="mainNav borderBlue clearfix">
+    <a href="javascript:history.back(-1)" title="返回"><p class="right btn-grey2 fr">返回</p></a>
+    <span class="text">选择底部模板</span>
+</div>
+<div id="iframePage">
+    <form id="data-form" method="post">
+        <input type="hidden" name="key" value="$!blocks[0].key">
+        <div class="automatic-box  clearfix">
+            <div class="tab-column">
+                <div class="con">
+                    <p class="text fl">选择底部模块:</p>
+                    <ul class="clearfix js-tab">
+                        #foreach($block in $blocks)
+                        <li class="#if($velocityCount == 1) curr #end" rel="$!block.key"><a href="javascript:;" title="$!block.description">$!block.description</a></li>
+                        #end
+                    </ul>
+                </div>
+            </div>
+            <div class="automatic-box highlight_e4e4e4 tab-img js-tabContent" style="border-top:none;">
+                #foreach($block in $blocks)
+                <div class="item #if($velocityCount == 1) curr #else hide #end"><img src="$!block.preview"/></div>
+                #end
+            </div>
+        </div>
+        <div class="layout-footer clearfix">
+            <div class="btn-wrap">
+                <button type="submit" class="btn-orange">确定</button>
+                <span class="btn-grey" onclick="javascript:window.history.go(-1);">取消</span>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>
