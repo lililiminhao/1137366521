@@ -8,7 +8,7 @@
     
    <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-       <spring.version>4.3.10.RELEASE</spring.version>
+       <spring.version>6.0.0</spring.version>
        <druid.version>1.0.18</druid.version>
        <mybaitsplus.version>3.0.4</mybaitsplus.version>
    </properties>
